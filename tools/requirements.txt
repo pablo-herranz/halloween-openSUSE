@@ -1,3 +1,4 @@
 Pillow>=11
 reuse[charset-normalizer]>=5
 scour>=0.38
+resvg-py>=0.5
