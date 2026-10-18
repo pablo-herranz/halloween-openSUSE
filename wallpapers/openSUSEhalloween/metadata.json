@@ -1,0 +1,16 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "martin@pluskal.org",
+                "Name": "Martin Pluskal"
+            }
+        ],
+        "Description": "A Geeko-inspired chameleon and its pumpkin lantern in a misty autumn forest: dusk by day, moonlit by night",
+        "Id": "openSUSEhalloween",
+        "License": "CC-BY-SA-4.0",
+        "Name": "openSUSE Halloween",
+        "Version": "2026.10.0",
+        "Website": "https://github.com/plusky/halloween-openSUSE"
+    }
+}

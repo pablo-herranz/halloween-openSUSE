@@ -1,0 +1,23 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "martin@pluskal.org",
+                "Name": "Martin Pluskal"
+            },
+            {
+                "Email": "plasma-devel@kde.org",
+                "Name": "KDE Visual Design Group"
+            }
+        ],
+        "Category": "",
+        "Description": "Breeze with autumn colours, a leaf trim and a pumpkin clock",
+        "EnabledByDefault": true,
+        "Id": "openSUSE-halloween",
+        "License": "LGPL",
+        "Name": "openSUSE Halloween",
+        "Version": "2026.10.0",
+        "Website": "https://github.com/plusky/halloween-openSUSE"
+    },
+    "X-Plasma-API": "5.0"
+}

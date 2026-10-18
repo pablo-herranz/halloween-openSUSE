@@ -1,0 +1,47 @@
+# The single source of truth for every colour in halloween-openSUSE.
+# tools/build.py fills the colour scheme, the Plasma style colours, the
+# splash, SDDM and Plymouth from these values; nothing else hardcodes them.
+
+[colors]
+# Backgrounds: a warm, plum-tinted night
+night = "#1C1622"          # window
+view = "#141018"           # lists, text fields
+view_alt = "#1A1520"       # alternate rows
+header = "#231B2A"         # headers, title bars, tooltips
+button = "#2A2130"
+complementary = "#120E16"  # OSDs and other complementary areas
+pumpkin_dark = "#6B3410"   # alternate background for accented areas
+
+# Text
+cream = "#F2E9E1"
+inactive = "#ADA2AE"
+white = "#FFFFFF"
+
+# Autumn accents
+pumpkin = "#E8751A"        # accent, focus, hover
+ember = "#B84A17"          # selection background
+candle = "#F0B429"         # neutral / warning
+apricot = "#F5A05A"        # links
+plum = "#A77BCA"           # visited links
+olive = "#A9BA4B"          # positive
+cranberry = "#E5484D"      # negative
+moss = "#4A5D23"           # decoration only, never text
+
+# Text on the ember selection background
+sel_inactive = "#F6D3C2"
+sel_link = "#FFE2A8"
+sel_visited = "#EBD9FF"
+sel_positive = "#E4F2A6"
+sel_neutral = "#FFE7A3"
+sel_negative = "#FFD3D5"
+
+# openSUSE Green: only ever used on the chameleon, never in the UI
+chameleon = "#73BA25"
+
+[roles]
+# Boot splash (Plymouth) and login screen gradients: top to bottom
+sky_top = "#0E0A12"
+sky_bottom = "#2E1D2B"
+progress_track = "button"
+progress_fill = "pumpkin"
+sddm_fallback = "night"

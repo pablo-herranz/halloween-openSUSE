@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Leaf sprig hanging from the top-right corner of popups (placeholder, hand-drawn) -->
+  <path d="M63 1 C 56 6, 48 14, 40 28" fill="none" stroke="#4A5D23" stroke-width="2.2" stroke-linecap="round"/>
+  <g transform="translate(46 -24) rotate(195 10 32)">
+    <path d="M10 0 C 14 4, 18 6, 16 10 C 20 12, 20 16, 16 18 C 19 21, 17 25, 12 26 L 10 32 L 8 26 C 3 25, 1 21, 4 18 C 0 16, 0 12, 4 10 C 2 6, 6 4, 10 0 Z" fill="#B84A17"/>
+    <path d="M10 30 L 10 5" fill="none" stroke="#6B3410" stroke-width="1"/>
+  </g>
+  <g transform="translate(32 -18) rotate(225 16 32)">
+    <path d="M16 0 L 18.5 7 L 23 5 L 22 11 L 30 9 L 27 15.5 L 32 18 L 24.5 21.5 L 26 26.5 L 19 24 L 17 30 L 17 32 L 15 32 L 15 30 L 13 24 L 6 26.5 L 7.5 21.5 L 0 18 L 5 15.5 L 2 9 L 10 11 L 9 5 L 13.5 7 Z" fill="#E8751A"/>
+    <path d="M16 30 L 16 6 M 16 20 L 6 15 M 16 20 L 26 15" fill="none" stroke="#B84A17" stroke-width="1"/>
+  </g>
+  <circle cx="40" cy="29" r="2.6" fill="#E5484D"/>
+  <circle cx="36.6" cy="32.2" r="2.2" fill="#E5484D"/>
+  <circle cx="42.4" cy="32.6" r="2" fill="#E5484D"/>
+</svg>

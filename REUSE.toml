@@ -1,0 +1,32 @@
+version = 1
+SPDX-PackageName = "halloween-openSUSE"
+SPDX-PackageSupplier = "Martin Pluskal <martin@pluskal.org>"
+SPDX-PackageDownloadLocation = "https://github.com/plusky/halloween-openSUSE"
+
+# Artwork: wallpapers, icons, characters, previews and screenshots
+[[annotations]]
+path = ["art/**", "wallpapers/**", "icons/**"]
+SPDX-FileCopyrightText = "2026 Martin Pluskal <martin@pluskal.org>"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# The Plasma style is built from Breeze (LGPL); its ornaments share that licence
+[[annotations]]
+path = "plasma/desktoptheme/**"
+SPDX-FileCopyrightText = "2026 Martin Pluskal <martin@pluskal.org>"
+SPDX-License-Identifier = "LGPL-2.0-or-later"
+
+# Look-and-feel package metadata and the Plymouth theme (from Plymouth's spinner)
+[[annotations]]
+path = ["plasma/look-and-feel/**/metadata.json", "plasma/look-and-feel/**/contents/defaults", "plymouth/**"]
+SPDX-FileCopyrightText = "2026 Martin Pluskal <martin@pluskal.org>"
+SPDX-License-Identifier = "GPL-2.0-or-later"
+
+# Docs, small config files and the art notes (palette, prompts)
+[[annotations]]
+path = [
+    "README.md", "CHANGELOG.md", ".gitignore", ".gitattributes", "REUSE.toml",
+    "tools/requirements.txt", "tools/upstream.toml", "sddm/**",
+    "art/*.toml", "art/*.md", "art/prompts/**",
+]
+SPDX-FileCopyrightText = "2026 Martin Pluskal <martin@pluskal.org>"
+SPDX-License-Identifier = "CC0-1.0"

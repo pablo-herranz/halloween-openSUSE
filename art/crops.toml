@@ -1,0 +1,11 @@
+# Focus points (0..1 of width and height) used when a wallpaper master is
+# cropped to another aspect ratio, e.g. 16:9 masters to 16:10 screens.
+# Keep the chameleon inside the crop by moving focus_x towards it.
+
+[dusk]
+focus_x = 0.5
+focus_y = 0.5
+
+[night]
+focus_x = 0.5
+focus_y = 0.5

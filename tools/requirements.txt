@@ -1,0 +1,3 @@
+Pillow>=11
+reuse[charset-normalizer]>=5
+scour>=0.38
