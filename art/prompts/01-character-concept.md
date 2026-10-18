@@ -39,7 +39,7 @@ Prompt (same for both):
 
 ## Result
 
-Kept in `art/drafts/01-concept/` (not in git) until one is chosen:
+Drafts kept in `art/drafts/01-concept/` (not in git):
 
 | | File | Notes |
 |---|---|---|
@@ -47,3 +47,9 @@ Kept in `art/drafts/01-concept/` (not in git) until one is chosen:
 | B | `flux-b.png` | Cute, but frog-like faces |
 | C | `nb2-c.png` | Most chameleon-like, adds a small lantern; has caption text (crop before reuse) |
 | D | `nb2-d.png` | Clearly a chameleon (casque, turret eyes, spiral tail), consistent across views, no text |
+
+## Chosen: D
+
+Approved on 2026-10-18. Saved as `art/source/concept-sheet.png`
+(1376x768). It is the reference image for every later character
+generation.
