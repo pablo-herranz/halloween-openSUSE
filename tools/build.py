@@ -29,6 +29,7 @@ MAX_4K_BYTES = 3_000_000
 LNF_ID = "org.openSUSE.halloween.desktop"
 SDDM_DIR = "/usr/share/sddm/themes/breeze-openSUSE-halloween"
 PLYMOUTH_DIR = "/usr/share/plymouth/themes/openSUSE-halloween"
+CROPS = tomllib.loads((ROOT / "art/crops.toml").read_text())
 
 placeholders_used = []
 
@@ -59,6 +60,20 @@ def crop_ratio(img, ratio, fx=0.5, fy=0.5):
     nh = round(w / ratio)
     y = min(max(round(fy * h - nh / 2), 0), h - nh)
     return img.crop((0, y, w, y + nh))
+
+
+def crop_to(wallpapers, variant, ratio):
+    """Crop a wallpaper master to `ratio` around its focus point in art/crops.toml."""
+    focus = CROPS.get(variant, {})
+    return crop_ratio(wallpapers[variant], ratio, focus.get("focus_x", 0.5), focus.get("focus_y", 0.5))
+
+
+def splash_backdrop(night):
+    """The part of the night master that leaves the chameleon out (art/crops.toml [splash])."""
+    x0, y0, x1, y1 = CROPS["splash"]["box"]
+    region = night.crop((round(x0 * night.width), round(y0 * night.height),
+                         round(x1 * night.width), round(y1 * night.height)))
+    return crop_ratio(region, 16 / 9)
 
 
 def save_jpeg(img, path, limit=None):
@@ -103,20 +118,16 @@ def panel_mock(img, p):
 # --- components ----------------------------------------------------------------
 
 def build_wallpaper(p):
-    crops = tomllib.loads((ROOT / "art/crops.toml").read_text())
     src = ROOT / "wallpapers/openSUSEhalloween"
     out = USER / "wallpapers/openSUSEhalloween"
     write(out / "metadata.json", (src / "metadata.json").read_text())
     images = {}
     for variant, sub in (("dusk", "images"), ("night", "images_dark")):
-        img = master(f"wallpaper-{variant}", lambda v=variant: ph.wallpaper(p, v)).convert("RGB")
-        focus = crops.get(variant, {})
+        images[variant] = master(f"wallpaper-{variant}", lambda v=variant: ph.wallpaper(p, v)).convert("RGB")
         for w, h in SIZES:
-            c = crop_ratio(img, w / h, focus.get("focus_x", 0.5), focus.get("focus_y", 0.5))
-            save_jpeg(c.resize((w, h), Image.LANCZOS), out / f"contents/{sub}/{w}x{h}.jpg",
-                      MAX_4K_BYTES if w >= 3840 else None)
-        images[variant] = img
-    save_png(crop_ratio(images["dusk"], 16 / 9).resize((400, 225), Image.LANCZOS), out / "contents/screenshot.png")
+            save_jpeg(crop_to(images, variant, w / h).resize((w, h), Image.LANCZOS),
+                      out / f"contents/{sub}/{w}x{h}.jpg", MAX_4K_BYTES if w >= 3840 else None)
+    save_png(crop_to(images, "dusk", 16 / 9).resize((400, 225), Image.LANCZOS), out / "contents/screenshot.png")
     return images
 
 
@@ -140,7 +151,7 @@ def build_look_and_feel(p, wallpapers, hero, lit, unlit):
     out = USER / "plasma/look-and-feel" / LNF_ID
     shutil.copytree(src, out)
     splash = out / "contents/splash"
-    night = crop_ratio(wallpapers["night"], 16 / 9).resize((1920, 1080), Image.LANCZOS)
+    night = splash_backdrop(wallpapers["night"]).resize((1920, 1080), Image.LANCZOS)
     bg = ImageEnhance.Brightness(night.filter(ImageFilter.GaussianBlur(8))).enhance(0.55)
     save_jpeg(bg, splash / "images/background.jpg")
     save_png(fit(hero, 512), splash / "images/hero.png")
@@ -153,9 +164,9 @@ def build_look_and_feel(p, wallpapers, hero, lit, unlit):
     previews = out / "contents/previews"
     shots = ROOT / "art/previews"
     made = {
-        "preview.png": lambda: panel_mock(crop_ratio(wallpapers["dusk"], 16 / 9), p).resize((600, 337), Image.LANCZOS),
-        "fullscreenpreview.jpg": lambda: panel_mock(crop_ratio(wallpapers["dusk"], 16 / 9), p).resize((1920, 1080), Image.LANCZOS),
-        "lockscreen.png": lambda: ImageEnhance.Brightness(crop_ratio(wallpapers["night"], 16 / 9)).enhance(0.8).resize((600, 337), Image.LANCZOS),
+        "preview.png": lambda: panel_mock(crop_to(wallpapers, "dusk", 16 / 9), p).resize((600, 337), Image.LANCZOS),
+        "fullscreenpreview.jpg": lambda: panel_mock(crop_to(wallpapers, "dusk", 16 / 9), p).resize((1920, 1080), Image.LANCZOS),
+        "lockscreen.png": lambda: ImageEnhance.Brightness(crop_to(wallpapers, "night", 16 / 9)).enhance(0.8).resize((600, 337), Image.LANCZOS),
         "splash.png": lambda: splash_mock(p, bg, fit(hero, 512), fit(lit, 192)).resize((300, 169), Image.LANCZOS),
     }
     for name, make in made.items():
@@ -183,7 +194,7 @@ def build_sddm(p, wallpapers):
     write(out / "metadata.desktop", (src / "metadata.desktop").read_text())
     write(out / "theme.conf.overrides",
           fill_tokens((src / "theme.conf.overrides.in").read_text(), {**p, "THEMEDIR": SDDM_DIR}))
-    bg = crop_ratio(wallpapers["night"], 16 / 10).resize((2560, 1600), Image.LANCZOS)
+    bg = crop_to(wallpapers, "night", 16 / 10).resize((2560, 1600), Image.LANCZOS)
     bg = vignette(ImageEnhance.Brightness(bg).enhance(0.9))
     save_jpeg(bg, out / "background.jpg")
     shots = ROOT / "art/previews/sddm.png"

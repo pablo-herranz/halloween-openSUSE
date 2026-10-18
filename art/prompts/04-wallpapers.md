@@ -59,6 +59,44 @@ Same prompt for both models, concept sheet as the reference:
 | E | Same composition as D, stars, glowing lanterns |
 | F | Same, but candle flames stick out of the pumpkin tops |
 
-Proposed pair: **D** (dusk) and **E** (night), waiting for approval.
-`art/crops.toml` moves the 16:10 crop to focus_x 0.55 so the chameleon keeps
-a margin.
+**D** (dusk) and **E** (night) approved on 2026-10-18.
+
+## 4K finals
+
+| Model | Settings | References |
+|---|---|---|
+| `gemini-3.1-flash-image` | 4K (5504x3072), 16:9, count 2 | dusk D, concept sheet |
+| `gemini-3.1-flash-image` | 4K (5504x3072), 16:9, count 2 | dusk final, night E, concept sheet |
+
+Dusk prompt:
+
+> Re-create image 1 as a high-resolution final for a 4K desktop wallpaper.
+> Keep it exactly the same picture: the same composition and framing, every
+> birch tree, branch, hill, leaf, the moon and the three jack-o'-lanterns in
+> the same place and size, the same colours and dusk light. The chameleon is
+> the character from image 2 and stays in the same pose and position as in
+> image 1, with the same green body, plum witch hat with burnt-orange band
+> and striped knitted scarf. Only add fine detail: crisp clean outlines, soft
+> gouache paper texture, smooth even sky gradients without banding or noise.
+> No text, no lettering, no watermark, no signature.
+
+Night prompt: the night draft prompt above, with image 1 the dusk final,
+"matching the night lighting and colours of image 2" (night E), the
+chameleon from image 3, and "crisp clean outlines, smooth even sky gradients
+without banding or noise".
+
+Both pairs stayed close to the drafts (mean colour difference 4.5–5.4 of 255
+at draft size). Chosen: dusk **#2** (smoother sky than #1) as
+`art/source/wallpaper-dusk.png`, night **#1** (closest to E, warmer lantern
+light on the face) as `art/source/wallpaper-night.png`. The night final lines
+up with the dusk final better than draft E did, so Plasma's day/night switch
+keeps everything in place.
+
+## Crops
+
+`art/crops.toml`:
+
+- focus_x 0.55 for both: the 16:10 crop (90% of the width) takes from the
+  left only, so the chameleon (73–93% of the width) keeps its tail.
+- `[splash] box`: the splash backdrop is the calm left part of the night
+  master, so the splash's own chameleon isn't doubled.

@@ -9,3 +9,8 @@ focus_y = 0.5
 [night]
 focus_x = 0.55
 focus_y = 0.5
+
+# The splash backdrop: the calm left part of the night master (x0, y0, x1, y1),
+# so the splash's own chameleon isn't doubled by the one in the wallpaper.
+[splash]
+box = [0.0, 0.2, 0.58, 0.785]
