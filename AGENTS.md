@@ -108,14 +108,16 @@ request what you fixed and what you declined, with the reason.
   wallpaper-based images with `crop_to()` (`tools/imaging.py`), and keep
   `check_resolutions` and `check_plymouth_layout` passing rather than relaxing
   them.
+- Verify a change in the test VM (`tools/dev/vm/`) on all three desktops,
+  KDE Plasma included, never by applying the theme to a real machine's
+  desktop (CONTRIBUTING.md, "Trying it in the test VM").
 - Retake the README gallery with `make gallery` after a change that shows (it
-  runs the test VM in `tools/dev/vm/`, so it is one of the `TARGET=` targets:
-  ask first).
+  runs the test VM, so it is one of the `TARGET=` targets: ask first).
 
 ## Ask first
 
-- The `make` targets that take `TARGET=user@host`: they change a real
-  machine's settings over SSH.
+- The `make` targets that take `TARGET=user@host`: `gallery` drives the test
+  VM on that host; the others change a real machine's settings over SSH.
 - `sudo`, installing packages, or changing the user's desktop settings.
 - Paid image generation beyond what the task asked for.
 - Opening a pull request that isn't a draft, unless the user asked for the

@@ -72,32 +72,21 @@ commit meaningful and self-contained.
 
 Keep pull requests focused: one icon set, one fix, one feature.
 
-### Trying it on a machine
+### Trying it in the test VM
 
-`make install` only copies files, as a package does (see the README). For a
-quick round trip while developing, the helpers in `tools/dev/` also apply the
-theme to a Plasma session, save the previous settings and restore them on
-uninstall. They change settings, so use them only on a test machine. The
-`make` targets that take `TARGET=user@host` build here, copy `build/` and the
-helpers to the test machine over SSH and run them there:
-
-```bash
-make install-user TARGET=user@testbox   # and install-root, plymouth
-make verify TARGET=user@testbox
-make screens TARGET=user@testbox && make fetch-screenshots TARGET=user@testbox
-make previews   # turn the screenshots into package previews and README images
-```
-
-For GNOME and Xfce, `tools/dev/vm/vm.sh` runs a throwaway Tumbleweed VM with
-both desktops on any Linux machine with KVM, headless, and takes screenshots
-through QEMU. Install a release tarball into it like a package would:
+`make install` only copies files, as a package does (see the README). Try and
+verify every change in the test VM, on all three desktops, Plasma included:
+`tools/dev/vm/vm.sh` runs a Tumbleweed VM with KDE Plasma, GNOME and Xfce on
+any Linux machine with KVM, headless, and takes screenshots through QEMU.
+Install a release tarball into it like a package would:
 
 ```bash
-tools/dev/vm/vm.sh create                 # once: image, disk, both desktops
+tools/dev/vm/vm.sh create                 # once: image, disk, the three desktops
 make check && tools/dist.sh
 tools/dev/vm/vm.sh install dist/halloween-openSUSE-*.tar.gz
-tools/dev/vm/vm.sh desktop xfce           # or gnome; reboots and logs in
-tools/dev/vm/vm.sh shot xfce              # ~/vm-halloween/shots/xfce.png
+tools/dev/vm/vm.sh desktop plasma         # or gnome, xfce; reboots and logs in
+tools/dev/vm/vm.sh run 'plasma-apply-colorscheme openSUSEHalloween'   # pick it as a user would
+tools/dev/vm/vm.sh shot plasma            # ~/vm-halloween/shots/plasma.png
 ```
 
 The README's screenshots all come from that VM. After a change that shows,
@@ -105,6 +94,12 @@ retake them all in one go: `make gallery TARGET=user@host` builds a release
 tarball, installs it in the VM on that host, takes every screenshot on Plasma,
 GNOME and Xfce at 1920x1080, copies them to `art/screenshots/` and remakes
 the README images in `docs/screenshots/`. Commit both with the change.
+
+The helpers in `tools/dev/` can also apply the theme to a real Plasma session
+over SSH (`make install-user`, `install-root`, `plymouth`, `verify`, `screens`
+with `TARGET=user@host`), saving the previous settings and restoring them on
+uninstall. They change that machine's settings, so use them only on a
+dedicated test machine, and not for verifying a change: the VM does that.
 
 ## Commit messages
 
