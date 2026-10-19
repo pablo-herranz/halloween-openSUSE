@@ -1,11 +1,12 @@
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: CC0-1.0
 
-# Pull requests the repository owner opens from a branch of this repository
-# are set to merge (with a merge commit) once main's required checks pass.
-# Everyone else's, Dependabot's included, wait for a maintainer. Drafts are
-# left alone until they are marked ready. To keep one from merging:
-# gh pr merge --disable-auto <number>
+# Pull requests the repository owner or Dependabot opens from a branch of
+# this repository are set to merge (with a merge commit) once main's required
+# checks pass. Dependabot only proposes releases at least 7 days old (see
+# dependabot.yml). Everyone else's pull requests wait for a maintainer.
+# Drafts are left alone until they are marked ready. To keep one from
+# merging: gh pr merge --disable-auto <number>
 #
 # GitHub merges these as github-actions, so the merge doesn't start a Check
 # run on main. The pull request's run already checked the same tree: main's
@@ -22,7 +23,8 @@ jobs:
   enable:
     name: Enable auto-merge
     if: >-
-      github.event.pull_request.user.login == github.repository_owner
+      (github.event.pull_request.user.login == github.repository_owner
+       || github.event.pull_request.user.login == 'dependabot[bot]')
       && github.event.pull_request.head.repo.full_name == github.repository
       && !github.event.pull_request.draft
     runs-on: ubuntu-24.04
