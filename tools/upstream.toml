@@ -50,3 +50,14 @@ base = "https://gitlab.freedesktop.org/plymouth/plymouth/-/raw/26.134.222/themes
 "entry.png" = "8325ccd1676dd318498d739a20af2f234ce35690cb89796af39afaeba179bc62"
 "keyboard.png" = "cf6674ab2f7fa5bc401dddd14f8818c4ceb86cdb5ba3ae5553e8878a5320aa0f"
 "lock.png" = "4854942e80051cec8cf6265ce011cad210954a8ee08609fce31dd59f973c7d9c"
+
+# Upstream source that comments and checks follow without downloading it: what
+# they say GTK or GNOME Settings does was read here, at these tags.
+[references]
+# check.py gtk_fast_symbolic(): what GTK's own one-colour icon parser accepts
+gtk-symbolic-parser = "https://gitlab.gnome.org/GNOME/gtk/-/blob/4.22.5/gtk/gdktextureutils.c"
+# vectors.py symbolic_files(): at an exact size, a Fixed directory wins over a
+# Scalable one (compare_dir_size_matches)
+gtk-icon-lookup = "https://gitlab.gnome.org/GNOME/gtk/-/blob/4.22.5/gtk/gtkicontheme.c"
+# vectors.py GNOME_SETTINGS: the icons of GNOME Settings' sidebar and pages
+gnome-settings-panels = "https://gitlab.gnome.org/GNOME/gnome-control-center/-/tree/50.4/panels"

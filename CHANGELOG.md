@@ -6,6 +6,20 @@ calendar-based: `YEAR.MONTH.PATCH`, the month without a leading zero.
 
 ## [Unreleased]
 
+### Changed
+
+- One-colour icons come hinted for 16 px, in `16x16/`: their level edges are
+  snapped to whole pixels without changing any key or stroke by more than
+  0.4 px, so fewer pixels blur (51% of the inked pixels were partly covered,
+  now 44%). Every other size keeps the exact outline from `scalable/`.
+
+### Fixed
+
+- GTK 4 drew our one-colour icons with its full SVG renderer: they had no
+  size and kept their placement in a transform, so its own, faster parser
+  turned them down. They now have a size and plain coordinates, and a check
+  keeps it that way.
+
 ## [2026.10.1] - 2026-10-19
 
 ### Added

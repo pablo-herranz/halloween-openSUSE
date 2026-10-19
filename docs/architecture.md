@@ -157,7 +157,10 @@ cleaned-up masters, their colours held to the palette by `normalise()`. Add
 the SVG master to `art/source/vectors/` and map it to icon names in
 `tools/vectors.py` (`FOLDER_EMBLEMS`, `APPS`, `DEVICES`, `SETTINGS`,
 `MIME_EMBLEMS`, `SYMBOLIC`, `GNOME_SETTINGS`, `ALIASES`). Symbolic icons are
-written in KDE's format so they follow the colour scheme. Settings icons also
+written in KDE's format so they follow the colour scheme, with a size and plain
+coordinates for GTK's own parser, twice: hinted for 16 px in `16x16/`, where
+their level edges sit on whole pixels, and exact in `scalable/` for every other
+size. Settings icons also
 come at 16 and 22 px (`16x16/apps`, `22x22/apps`), where the pumpkin fills the
 icon and the glyph nearly fills the pumpkin. Plasma would show our icon for
 any Breeze name that only extends one of ours (`tools/kde_lookup.py` mirrors

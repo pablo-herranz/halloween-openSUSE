@@ -8,10 +8,11 @@ DesktopDefault=48
 ToolbarDefault=22
 PanelDefault=48
 DialogDefault=32
-# The fixed sizes come first so their simplified icons win at 16 and 22 px
+# The fixed sizes come first so their simplified icons win at 16 and 22 px,
+# and the one-colour icons hinted for 16 px (tools/vectors.py) at 16 px
 # kde: links to Breeze Dark's own icons for names Plasma would otherwise take
 # from ours (tools/kde_lookup.py); left out of the GNOME and Xfce variant
-Directories=16x16/places,16x16/apps,22x22/apps,scalable/places,scalable/apps,scalable/categories,scalable/actions,scalable/mimetypes,scalable/devices,kde
+Directories=16x16/places,16x16/apps,16x16/categories,16x16/actions,22x22/apps,scalable/places,scalable/apps,scalable/categories,scalable/actions,scalable/mimetypes,scalable/devices,kde
 
 [16x16/places]
 Size=16
@@ -21,6 +22,16 @@ Type=Fixed
 [16x16/apps]
 Size=16
 Context=Applications
+Type=Fixed
+
+[16x16/categories]
+Size=16
+Context=Categories
+Type=Fixed
+
+[16x16/actions]
+Size=16
+Context=Actions
 Type=Fixed
 
 [22x22/apps]
