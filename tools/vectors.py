@@ -17,7 +17,7 @@ Missing masters return None, so build.py falls back to placeholders.
 """
 import re
 
-from common import ROOT, rgb
+from common import ROOT, contrast, rgb
 
 MASTERS = ROOT / "art/source/vectors"
 ICON_SIZE = 64
@@ -51,6 +51,9 @@ ALIASES = {
     "folder-images": "folder-pictures",
     "folder-picture": "folder-pictures",
     "folder-desktop": "user-desktop",
+    "user-bookmarks": "folder-favorites",
+    "folder-drag-accept": "folder-open",
+    "folder-visiting": "folder-open",
 }
 EMBLEM_SCALE = 1.12      # emblem size relative to the master's leaf
 
@@ -85,38 +88,120 @@ APPS = {
     "app-bug": ("tools-report-bug", "drkonqi"),
     "app-emoji": ("preferences-desktop-emoticons", "org.gnome.Characters", "accessories-character-map"),
     "app-bridge": ("org.kde.xwaylandvideobridge",),
+    # GNOME's, Xfce's and openSUSE's own apps, and their KDE counterparts
+    "app-calculator": ("accessories-calculator", "org.gnome.Calculator", "gnome-calculator", "kcalc",
+                       "org.kde.kcalc", "galculator"),
+    "app-camera": ("org.gnome.Snapshot", "org.gnome.Cheese", "cheese", "kamoso", "org.kde.kamoso"),
+    "app-clocks": ("org.gnome.clocks", "gnome-clocks", "preferences-system-time", "kclock", "org.kde.kclock"),
+    "app-contacts": ("org.gnome.Contacts", "kaddressbook", "org.kde.kaddressbook"),
+    "app-diskusage": ("org.gnome.baobab", "baobab", "filelight", "org.kde.filelight"),
+    "app-docviewer": ("org.gnome.Evince", "org.gnome.Papers", "evince", "atril", "okular", "org.kde.okular"),
+    "app-logs": ("org.gnome.Logs", "gnome-logs", "utilities-log-viewer", "org.kde.kjournaldbrowser"),
+    "app-maps": ("org.gnome.Maps", "gnome-maps", "marble", "org.kde.marble"),
+    "app-connections": ("org.gnome.Connections", "krdc", "org.kde.krdc", "preferences-desktop-remote-desktop"),
+    "app-videos": ("org.gnome.Totem", "totem", "org.gnome.Showtime", "org.xfce.parole", "parole", "dragonplayer",
+                   "org.kde.dragonplayer", "multimedia-video-player"),
+    "app-music": ("pragha", "org.gnome.Music", "gnome-music", "elisa", "org.kde.elisa", "multimedia-audio-player"),
+    "app-audio": ("org.gnome.Decibels",),
+    "app-tour": ("org.gnome.Tour", "gnome-tour"),
+    "app-tweaks": ("org.gnome.tweaks", "gnome-tweaks"),
+    "app-extensions": ("org.gnome.Extensions", "org.gnome.Shell.Extensions"),
+    "app-mail": ("evolution", "org.gnome.Evolution", "org.xfce.mailreader", "internet-mail", "mail-client", "kmail",
+                 "org.kde.kmail2"),
+    "app-updates": ("system-software-update", "gpk-update-viewer", "gpk-prefs", "update-manager"),
+    "app-notes": ("org.xfce.notes", "xfce4-notes", "org.gnome.Notes", "knotes", "org.kde.knotes"),
+    "app-dictionary": ("org.xfce.Dictionary", "accessories-dictionary", "org.gnome.Dictionary"),
+    "app-search": ("org.xfce.appfinder",),
+    "app-sensors": ("xfce-sensors", "psensor"),
+    "app-clipboard": ("xfce4-clipman-plugin", "klipper", "org.kde.klipper"),
+    "app-color": ("gnome-color-manager", "preferences-color"),
+    "app-yast": ("yast-control-center", "yast"),
+    "app-volume": ("org.pulseaudio.pavucontrol", "pavucontrol", "multimedia-volume-control",
+                   "preferences-desktop-sound"),
+    "app-bluetooth": ("blueman", "blueman-device", "preferences-system-bluetooth", "bluetooth"),
+    "device-harddisk": ("org.gnome.DiskUtility", "gnome-disks"),
 }
 # Devices: master -> the names drives and media are shown with
 DEVICES = {
     "device-harddisk": ("drive-harddisk", "drive-harddisk-root", "drive-partition", "drive-multidisk",
                         "drive-multipartition"),
     "device-usb": ("drive-removable-media", "drive-removable-media-usb", "drive-removable-media-usb-pendrive",
-                   "media-flash", "media-flash-memory-stick", "media-flash-sd-mmc", "media-flash-smart-media"),
+                   "media-removable", "media-flash", "media-flash-memory-stick", "media-flash-sd-mmc",
+                   "media-flash-smart-media", "org.xfce.volman"),
     "device-optical": ("media-optical", "media-optical-audio", "media-optical-blu-ray", "media-optical-data",
                        "media-optical-dvd", "media-optical-recordable", "media-optical-video", "drive-optical",
                        "media-write-cd", "media-write-dvd"),
-    "device-server": ("network-server", "network-workgroup"),
+    "device-server": ("network-server", "network-workgroup", "org.xfce.gigolo"),
+    "device-printer": ("printer", "printer-network", "printer-remote", "system-config-printer",
+                       "preferences-devices-printer"),
+    "device-phone": ("phone", "smartphone"),
+    "device-mouse": ("input-mouse",),
+    "device-keyboard": ("input-keyboard",),
+    "device-headphones": ("audio-headphones", "audio-headset"),
+    "device-monitor": ("video-display", "display"),
+    "device-battery": ("battery",),
+    "device-computer": ("computer", "computer-laptop"),
+    "app-spectacle": ("camera-photo",),
+    "app-camera": ("camera-web",),
 }
+
+# Settings dialogs (Xfce's, and the same KCMs and panels elsewhere): the
+# glyph carved into the pumpkin master, large enough to tell apart at 16 px
+SETTINGS = {
+    "glyph-brush": ("org.xfce.settings.appearance", "preferences-desktop-theme", "preferences-desktop-theme-global"),
+    "emblem-monitor": ("org.xfce.settings.display", "preferences-desktop-display"),
+    "glyph-keyboard": ("org.xfce.settings.keyboard", "preferences-desktop-keyboard"),
+    "glyph-mouse": ("org.xfce.settings.mouse", "preferences-desktop-mouse", "preferences-desktop-touchpad"),
+    "emblem-picture": ("org.xfce.xfdesktop", "preferences-desktop-wallpaper"),
+    "glyph-panel": ("org.xfce.panel", "org.xfce.PanelProfiles"),
+    "glyph-grid": ("org.xfce.workspaces", "preferences-desktop-virtual"),
+    "glyph-window": ("org.xfce.xfwm4", "preferences-system-windows"),
+    "glyph-wand": ("org.xfce.xfwm4-tweaks",),
+    "glyph-bell": ("org.xfce.notification", "preferences-desktop-notification",
+                   "preferences-desktop-notification-bell"),
+    "glyph-battery": ("org.xfce.powermanager", "xfce4-power-manager-settings", "preferences-system-power-management",
+                      "preferences-system-power"),
+    "glyph-hourglass": ("org.xfce.session", "preferences-system-session"),
+    "glyph-access": ("org.xfce.settings.accessibility", "preferences-desktop-accessibility"),
+    "glyph-signpost": ("org.xfce.settings.default-applications", "preferences-desktop-default-applications"),
+    "glyph-quill": ("org.xfce.settings.editor", "ca.desrt.dconf-editor"),
+    "glyph-crystal": ("org.xfce.about",),
+    "glyph-screensaver": ("org.xfce.ScreenSaver", "preferences-desktop-screensaver"),
+    "glyph-logout": ("lightdm-gtk-greeter-settings", "preferences-system-login"),
+    "glyph-web": ("preferences-system-network", "nm-connection-editor"),
+    "glyph-lock": ("org.freedesktop.MalcontentControl",),
+    "glyph-ghosts": ("mugshot", "preferences-desktop-user", "system-users"),
+}
+SETTINGS_EMBLEM_SIZE = 0.68   # glyph size relative to the pumpkin's body
 
 # File types: the page master with an emblem -> the MIME type icon names.
 # File managers ask for the specific name first (image-png before
 # image-x-generic), so the common specific names are listed too.
 MIME_EMBLEMS = {
-    "glyph-quill": ("text-x-generic", "text-plain", "text-markdown"),
-    "emblem-scroll": ("application-pdf", "application-vnd.oasis.opendocument.text", "x-office-document"),
-    "emblem-picture": ("image-x-generic", "image-png", "image-jpeg", "image-gif", "image-webp", "image-svg+xml"),
+    "glyph-quill": ("text-x-generic", "text-plain", "text-markdown", "text-csv"),
+    "emblem-scroll": ("application-pdf", "x-office-document", "x-office-spreadsheet", "x-office-presentation",
+                      "application-vnd.oasis.opendocument.text", "application-vnd.oasis.opendocument.spreadsheet",
+                      "application-vnd.oasis.opendocument.presentation", "application-msword",
+                      "application-vnd.openxmlformats-officedocument.wordprocessingml.document",
+                      "application-vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                      "application-vnd.openxmlformats-officedocument.presentationml.presentation",
+                      "application-vnd.ms-excel", "application-vnd.ms-powerpoint", "application-epub+zip"),
+    "emblem-picture": ("image-x-generic", "image-png", "image-jpeg", "image-gif", "image-webp", "image-svg+xml",
+                       "image-heif", "image-avif", "image-tiff"),
     "emblem-note": ("audio-x-generic", "audio-mpeg", "audio-flac", "audio-ogg", "audio-x-vorbis+ogg",
-                    "audio-x-wav"),
-    "emblem-reel": ("video-x-generic", "video-mp4", "video-webm", "video-x-matroska"),
+                    "audio-x-wav", "audio-mp4", "audio-x-opus+ogg"),
+    "emblem-reel": ("video-x-generic", "video-mp4", "video-webm", "video-x-matroska", "video-quicktime",
+                    "video-x-msvideo"),
+    "emblem-stencil": ("text-x-generic-template",),
     "glyph-chest": ("package-x-generic", "application-x-archive", "application-zip", "application-x-tar",
                     "application-x-compressed-tar", "application-x-xz-compressed-tar",
                     "application-x-7z-compressed", "application-x-rpm"),
     "glyph-web": ("text-html",),
     "glyph-wand": ("text-x-script", "text-x-python", "application-x-shellscript", "application-json",
                    "application-xml"),
-    "glyph-gear": ("application-x-executable", "application-x-sharedlib"),
+    "glyph-gear": ("application-x-executable", "application-x-sharedlib", "application-x-desktop"),
 }
-MIME_EMBLEM_SIZE = 0.5   # emblem size relative to the page's width
+MIME_EMBLEM_SIZE = 0.66   # emblem size relative to the page's width
 
 # Dolphin is the master folder with a bat, like Breeze's folder with a dolphin
 DOLPHIN = ("org.kde.dolphin", "system-file-manager", "org.gnome.Nautilus", "org.xfce.thunar", "org.xfce.filemanager")
@@ -125,7 +210,7 @@ DOLPHIN = ("org.kde.dolphin", "system-file-manager", "org.gnome.Nautilus", "org.
 # (directory, names). They take the colour scheme's text colour.
 SYMBOLIC = {
     "glyph-bookmark": ("actions", ("bookmarks", "favorites")),
-    "glyph-grid": ("actions", ("applications-all-symbolic",)),
+    "glyph-apps": ("actions", ("applications-all-symbolic",)),
     "glyph-wand": ("categories", ("applications-development-symbolic",)),
     "glyph-brush": ("categories", ("applications-graphics-symbolic",)),
     "glyph-crystal": ("categories", ("help-about-symbolic",)),
@@ -136,11 +221,12 @@ SYMBOLIC = {
     "glyph-broom": ("categories", ("applications-utilities-symbolic",)),
     "glyph-signpost": ("actions", ("compass",)),
     "glyph-sleep": ("actions", ("system-suspend", "system-suspend-symbolic")),
-    "glyph-coffin": ("actions", ("system-suspend-hibernate", "system-suspend-hibernate-symbolic")),
+    "glyph-hibernate": ("actions", ("system-suspend-hibernate", "system-suspend-hibernate-symbolic", "system-hibernate",
+                                    "system-hibernate-symbolic")),
     "glyph-reboot": ("actions", ("system-reboot", "system-reboot-symbolic")),
-    "glyph-candle": ("actions", ("system-shutdown", "system-shutdown-symbolic")),
+    "glyph-power": ("actions", ("system-shutdown", "system-shutdown-symbolic")),
     "glyph-lock": ("actions", ("system-lock-screen", "system-lock-screen-symbolic")),
-    "glyph-door": ("actions", ("system-log-out", "system-log-out-symbolic")),
+    "glyph-logout": ("actions", ("system-log-out", "system-log-out-symbolic", "xfsm-logout")),
     "glyph-ghosts": ("actions", ("system-switch-user", "system-switch-user-symbolic")),
 }
 SYMBOLIC_SIZE = 16
@@ -224,14 +310,14 @@ def tidy(text, precision=5, groups=True):
     return scour.scourString(text, opts) + "\n"
 
 
-def fit(shapes_markup, box, target):
+def fit(shapes_markup, box, target, attrs=""):
     """Group markup so `box` (x0, y0, x1, y1) is centred in `target` (x0, y0, size)."""
     bx0, by0, bx1, by1 = box
     tx, ty, size = target
     s = size / max(bx1 - bx0, by1 - by0)
     ox = tx + (size - (bx1 - bx0) * s) / 2 - bx0 * s
     oy = ty + (size - (by1 - by0) * s) / 2 - by0 * s
-    return f'<g transform="translate({ox:.3f} {oy:.3f}) scale({s:.6f})">{shapes_markup}</g>'
+    return f'<g{attrs} transform="translate({ox:.3f} {oy:.3f}) scale({s:.6f})">{shapes_markup}</g>'
 
 
 def icon(shapes_markup, box, margin=0.0, size=ICON_SIZE):
@@ -322,6 +408,30 @@ def to_chameleon_green(colour, chameleon):
     return colour
 
 
+def normalise(colour, palette):
+    """Hold a master's colour to the palette: purples move to the icon plum's
+    hue and saturation (the masters drift towards magenta), near-whites
+    become cream, and near-blacks lift until they stand off the night
+    background (WCAG 1.4.11 asks 3:1 of icons; this keeps at least 1.5:1)."""
+    import colorsys
+    r, g, b = (c / 255 for c in colour)
+    h, light, s = colorsys.rgb_to_hls(r, g, b)
+    if 260 / 360 <= h <= 340 / 360 and s > 0.2:
+        ph, _, ps = colorsys.rgb_to_hls(*(c / 255 for c in rgb(palette["plum_icon"])))
+        h, s = ph, min(s, ps)
+    elif light > 0.93 and s < 0.6:
+        return rgb(palette["cream"])
+    night = rgb(palette["night"])
+    while light < 1 and contrast(tuple(round(c * 255) for c in colorsys.hls_to_rgb(h, light, s)), night) < 1.5:
+        light += 0.01
+    return tuple(round(c * 255) for c in colorsys.hls_to_rgb(h, light, s))
+
+
+def paint(shapes, palette):
+    """Markup of a colour master's shapes, its colours held to the palette."""
+    return "".join(s.markup(normalise(s.colour, palette)) for s in shapes)
+
+
 def area(box):
     return (box[2] - box[0]) * (box[3] - box[1])
 
@@ -347,7 +457,7 @@ def other_icons(palette):
     icons = {}
     trash, potion = load("trash"), load("potion")
     if trash:
-        pot = "".join(s.markup() for s in trash)
+        pot = paint(trash, palette)
         box = union(s.bbox() for s in trash)
         if potion:
             full, top = potion_markup(trash, potion)
@@ -378,7 +488,7 @@ def app_icons(palette):
     for master, names in APPS.items():
         shapes = load(master)
         if shapes:
-            text = icon("".join(s.markup() for s in shapes), union(s.bbox() for s in shapes), 0.06)
+            text = icon(paint(shapes, palette), union(s.bbox() for s in shapes), 0.06)
             made.update({f"scalable/apps/{n}.svg": text for n in names})
     folder, bat = load("folder"), load("emblem-bat")
     if folder and bat:
@@ -405,7 +515,11 @@ def symbolic_icon(shapes, palette):
     style = ('<style type="text/css" id="current-color-scheme">'
              f'.ColorScheme-Text {{ color:{palette["cream"]}; }}</style>')
     size = SYMBOLIC_SIZE
-    return tidy(svg(style + fit("".join(paths), box, (0.5, 0.5, size - 1)), (0, 0, size, size)), groups=False)
+    # scour moves a fill all paths share up to their group, and Qt resolves
+    # currentColor there, so the group needs the class as well
+    # whole pixels: a 14 px box from (1, 1) keeps straight edges on the grid at 16 px
+    body = fit("".join(paths), box, (1, 1, size - 2), ' class="ColorScheme-Text"')
+    return tidy(svg(style + body, (0, 0, size, size)), groups=False)
 
 
 def symbolic_icons(palette):
@@ -423,7 +537,7 @@ def device_icons(palette):
     for master, names in DEVICES.items():
         shapes = load(master)
         if shapes:
-            text = icon("".join(s.markup() for s in shapes), union(s.bbox() for s in shapes), 0.06)
+            text = icon(paint(shapes, palette), union(s.bbox() for s in shapes), 0.06)
             made.update({f"scalable/devices/{n}.svg": text for n in names})
     return made
 
@@ -450,10 +564,40 @@ def mime_icons(palette):
     return made
 
 
+def settings_icons(palette):
+    """Settings dialogs: the glyph carved into the pumpkin master, dark like an
+    unlit jack-o'-lantern. The pumpkin's body is flattened to two oranges so
+    the glyph stays readable at 16 px; the stem keeps its colours."""
+    pumpkin = load("settings-pumpkin")
+    if pumpkin is None:
+        return {}
+    frame = union(s.bbox() for s in pumpkin)
+    top = frame[1] + (frame[3] - frame[1]) * 0.25          # below the stem
+    lower = [s for s in pumpkin if s.bbox()[1] >= top]
+    body = union(s.bbox() for s in lower)
+    size = min(body[2] - body[0], body[3] - body[1]) * SETTINGS_EMBLEM_SIZE / EMBLEM_SCALE
+    cx, cy = (body[0] + body[2]) / 2, (body[1] + body[3]) / 2
+    box = (cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2)
+    face = palette["pumpkin"]
+
+    def flat(s):
+        if s not in lower:
+            return normalise(s.colour, palette)
+        return rgb(palette["ember"] if luminance(s.colour) < 0.45 else face)
+    pumpkin_markup = "".join(s.markup(flat(s)) for s in pumpkin)
+    made = {}
+    for emblem, names in SETTINGS.items():
+        shapes = load(emblem)
+        if shapes:
+            carved = emblem_markup(shapes, box, palette["complementary"], face)
+            made.update({f"scalable/apps/{n}.svg": icon(pumpkin_markup + carved, frame, 0.06) for n in names})
+    return made
+
+
 def icons(palette):
     """Every icon the masters can make: {path relative to the theme: SVG text}."""
     made = {**folder_icons(palette), **other_icons(palette), **app_icons(palette), **symbolic_icons(palette),
-            **device_icons(palette), **mime_icons(palette)}
+            **device_icons(palette), **mime_icons(palette), **settings_icons(palette)}
     if "scalable/places/folder.svg" in made:
         made["scalable/mimetypes/inode-directory.svg"] = made["scalable/places/folder.svg"]
     for alias, name in ALIASES.items():

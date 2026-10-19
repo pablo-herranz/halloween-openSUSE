@@ -26,6 +26,7 @@ plum = "#A77BCA"           # visited links
 olive = "#A9BA4B"          # positive
 cranberry = "#E5484D"      # negative
 moss = "#4A5D23"           # decoration only, never text
+plum_icon = "#8952A0"      # icon bodies: the icon masters' purples are held to its hue
 
 # Text on the ember selection background
 sel_inactive = "#F6D3C2"
