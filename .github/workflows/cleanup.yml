@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
+# SPDX-License-Identifier: CC0-1.0
+
+# GitHub deletes a pull request's branch when it merges, except when the
+# merge is done by github-actions, as auto-merge.yml's merges are. Once a
+# day, delete the branches of merged pull requests from this repository,
+# unless they got new commits after the merge.
+name: Clean up branches
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  delete:
+    name: Delete merged branches
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - name: Delete merged branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api "repos/$REPO/pulls?state=closed&sort=updated&direction=desc&per_page=100" \
+            --jq '.[] | select(.merged_at != null and .head.repo.full_name == env.REPO) | "\(.head.ref) \(.head.sha)"' |
+          while read -r branch sha; do
+            [ "$branch" != main ] || continue
+            current=$(gh api "repos/$REPO/git/ref/heads/$branch" --jq .object.sha 2>/dev/null) || continue
+            if [ "$current" = "$sha" ]; then
+              echo "deleting $branch"
+              gh api -X DELETE "repos/$REPO/git/refs/heads/$branch"
+            fi
+          done

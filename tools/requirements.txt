@@ -2,3 +2,4 @@ Pillow>=12.3.0
 reuse[charset-normalizer]>=6.2.0
 scour>=0.38.2
 resvg-py>=0.5
+jsonschema>=4.26.0

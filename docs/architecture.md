@@ -58,10 +58,17 @@ so it stays compatible with Plasma's element IDs (which `check.py` verifies).
 ## Checks
 
 `tools/check.py` runs after every build (`make check`): metadata syntax,
-leftover tokens, colour contrast, image sizes and file size limits, the
-Plasma style's element IDs, icon SVG sanity, the Firefox theme, and
-`reuse lint`. CI runs it on every pull request, together with ruff and
-ShellCheck.
+leftover tokens, the Plasma `metadata.json` files against KDE's KPlugin
+schema (pinned in `tools/upstream.toml`), colour contrast, image sizes and
+file size limits, the Plasma style's element IDs, the icon theme's
+`index.theme` and SVGs, the Firefox theme, and `reuse lint`.
+
+`make lint` checks the sources: ruff, ShellCheck, actionlint and zizmor for
+the workflows, typos, editorconfig-checker and `reuse lint`.
+
+CI (`.github/workflows/check.yml`) runs both on every pull request, as the
+Lint and Build and check jobs. A final CI job passes only when both did; it
+is the one check `main`'s ruleset requires.
 
 ## Install
 

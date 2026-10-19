@@ -8,7 +8,7 @@ start with [README.md](README.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 ```bash
 git lfs install && git lfs pull   # the art masters; without them the build stops or uses placeholders
 make check                        # build into build/ and validate it (creates tools/.venv)
-make lint                         # ruff and ShellCheck
+make lint                         # ruff, ShellCheck, actionlint, zizmor, typos, editorconfig, reuse
 make icon-preview                 # build/icon-preview.png: every icon at 16 to 64 px
 make release-check                # make check, and fail while any placeholder is in use
 ```

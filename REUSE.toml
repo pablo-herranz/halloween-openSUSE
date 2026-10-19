@@ -27,7 +27,7 @@ SPDX-License-Identifier = "GPL-2.0-or-later"
 path = [
     "README.md", "CHANGELOG.md", "CONTRIBUTING.md", "AGENTS.md",
     "CODE_OF_CONDUCT.md", "SECURITY.md", "docs/*.md", ".github/**",
-    ".gitignore", ".gitattributes", "REUSE.toml",
+    ".gitignore", ".gitattributes", "REUSE.toml", "_typos.toml", ".editorconfig-checker.json",
     "tools/requirements.txt", "tools/requirements-dev.txt", "tools/upstream.toml", "plasma/sddm/**",
     "gnome/**", "xfce/**",
     "art/*.toml", "art/*.md", "art/prompts/**",

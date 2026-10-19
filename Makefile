@@ -23,9 +23,18 @@ $(VENV)/.dev: tools/requirements-dev.txt $(VENV)/.ok
 	$(VENV)/bin/pip install -q -r tools/requirements-dev.txt
 	touch $@
 
+# zizmor's online audits (known-vulnerable actions, impostor commits) need a
+# GitHub token; CI runs them with ZIZMOR_FLAGS=--format=github.
+ZIZMOR_FLAGS ?= --offline
+
 lint: $(VENV)/.dev
 	$(VENV)/bin/ruff check tools
 	$(VENV)/bin/shellcheck -x -P install install/*.sh tools/*.sh
+	PATH="$(CURDIR)/$(VENV)/bin:$$PATH" $(VENV)/bin/actionlint
+	$(VENV)/bin/zizmor $(ZIZMOR_FLAGS) .github
+	$(VENV)/bin/typos
+	$(VENV)/bin/ec
+	$(VENV)/bin/reuse lint
 
 build: $(VENV)/.ok
 	$(PY) tools/build.py
