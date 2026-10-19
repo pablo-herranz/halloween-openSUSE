@@ -54,30 +54,36 @@ ALIASES = {
 }
 EMBLEM_SCALE = 1.12      # emblem size relative to the master's leaf
 
-# Colour application icons: master -> the icon names apps ask for. Other
-# projects' logos (Qt, the ArtCraft suite, btop) are left to their own themes,
-# like the distribution logo. Web browsers, Firefox included, get an original
-# browser icon, never a modified Firefox logo.
+# Colour application icons: master -> the icon names apps ask for, on KDE,
+# GNOME and Xfce alike (a file manager is the bat folder everywhere, a
+# terminal the same terminal). Other projects' logos (Qt, the ArtCraft suite,
+# btop) are left to their own themes, like the distribution logo. Web
+# browsers, Firefox included, get an original browser icon, never a modified
+# Firefox logo.
 APPS = {
     "app-browser": ("web-browser", "internet-web-browser", "firefox", "firefox-esr", "org.mozilla.firefox",
-                    "firefox-developer-edition", "firefox-nightly"),
-    "app-discover": ("plasmadiscover",),
-    "app-konsole": ("utilities-terminal", "utilities-terminal_su", "org.kde.konsole"),
-    "app-settings": ("preferences-system", "systemsettings"),
-    "app-kate": ("kate", "org.kde.kate"),
-    "app-spectacle": ("spectacle", "org.kde.spectacle"),
-    "app-ark": ("ark", "org.kde.ark"),
-    "app-gwenview": ("gwenview", "org.kde.gwenview"),
-    "app-help": ("help-browser", "khelpcenter", "org.kde.khelpcenter"),
+                    "firefox-developer-edition", "firefox-nightly", "org.xfce.webbrowser"),
+    "app-discover": ("plasmadiscover", "org.gnome.Software", "system-software-install"),
+    "app-konsole": ("utilities-terminal", "utilities-terminal_su", "org.kde.konsole", "org.gnome.Console",
+                    "org.gnome.Terminal", "org.xfce.terminal", "org.xfce.terminalemulator"),
+    "app-settings": ("preferences-system", "systemsettings", "org.gnome.Settings", "org.xfce.settings.manager"),
+    "app-kate": ("kate", "org.kde.kate", "kwrite", "org.kde.kwrite", "accessories-text-editor",
+                 "org.gnome.TextEditor", "org.xfce.mousepad"),
+    "app-spectacle": ("spectacle", "org.kde.spectacle", "org.gnome.Screenshot", "org.xfce.screenshooter"),
+    "app-ark": ("ark", "org.kde.ark", "org.gnome.FileRoller", "file-roller"),
+    "app-gwenview": ("gwenview", "org.kde.gwenview", "org.gnome.Loupe", "org.xfce.ristretto"),
+    "app-help": ("help-browser", "khelpcenter", "org.kde.khelpcenter", "org.gnome.Yelp"),
     "app-infocenter": ("hwinfo", "org.kde.kinfocenter"),
     "app-kdeconnect": ("kdeconnect", "org.kde.kdeconnect.app"),
-    "app-kwallet": ("kwalletmanager", "kwalletmanager2"),
-    "app-menuedit": ("kmenuedit",),
+    "app-kwallet": ("kwalletmanager", "kwalletmanager2", "org.gnome.Seahorse", "seahorse"),
+    "app-menuedit": ("kmenuedit", "menulibre"),
     "app-qrca": ("org.kde.qrca",),
-    "app-skanpage": ("skanpage", "org.kde.skanpage"),
-    "app-sysmon": ("utilities-system-monitor", "org.kde.plasma-systemmonitor"),
+    "app-skanpage": ("skanpage", "org.kde.skanpage", "skanlite", "org.kde.skanlite", "org.gnome.SimpleScan",
+                     "simple-scan"),
+    "app-sysmon": ("utilities-system-monitor", "org.kde.plasma-systemmonitor", "org.gnome.SystemMonitor",
+                   "org.xfce.taskmanager"),
     "app-bug": ("tools-report-bug", "drkonqi"),
-    "app-emoji": ("preferences-desktop-emoticons",),
+    "app-emoji": ("preferences-desktop-emoticons", "org.gnome.Characters", "accessories-character-map"),
     "app-bridge": ("org.kde.xwaylandvideobridge",),
 }
 # Devices: master -> the names drives and media are shown with
@@ -113,7 +119,7 @@ MIME_EMBLEMS = {
 MIME_EMBLEM_SIZE = 0.5   # emblem size relative to the page's width
 
 # Dolphin is the master folder with a bat, like Breeze's folder with a dolphin
-DOLPHIN = ("org.kde.dolphin", "system-file-manager")
+DOLPHIN = ("org.kde.dolphin", "system-file-manager", "org.gnome.Nautilus", "org.xfce.thunar", "org.xfce.filemanager")
 
 # One-colour icons of the app menu and the leave/power actions: master ->
 # (directory, names). They take the colour scheme's text colour.

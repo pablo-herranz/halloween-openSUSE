@@ -34,7 +34,7 @@ friendly chameleon in a witch hat.
 | Plasma style: autumn colours, leaf sprig on popups, ember tooltip glow, pumpkin clock | `openSUSE-halloween` | Plasma |
 | Colour scheme | `openSUSEHalloween` | Plasma and KDE apps |
 | Global theme with a pumpkin splash screen | `org.openSUSE.halloween.desktop` | Plasma |
-| Icon theme over Breeze Dark: folders, file types, drives, trash, KDE apps, a web-browser icon (also for Firefox), app-menu and power icons | `openSUSE-halloween` | Plasma |
+| Icon theme over Breeze Dark: folders, file types, drives, trash, the common apps (files, terminal, settings, editor, image viewer, software, system monitor, archives, scanner, screenshots, also for GNOME's and Xfce's own apps), a web-browser icon (also for Firefox), app-menu and power icons | `openSUSE-halloween` | Plasma |
 | The same icons over Adwaita | `openSUSE-halloween-adwaita` | GNOME, Xfce |
 | GTK 3 theme: night colours with ember and pumpkin accents, built on [adw-gtk3](https://github.com/lassekongo83/adw-gtk3) | `openSUSE-halloween` | GNOME, Xfce, GTK 3 apps |
 | GNOME Shell theme: top bar, menus, quick settings, calendar | `openSUSE-halloween` | GNOME with the User Themes extension |

@@ -31,7 +31,9 @@ The first release, 2026.10.0, is being prepared.
 - Xfce edition: the GTK 3 theme with panel styling, xfwm4's default theme in
   the palette at three scales, and a notification theme
 - Icon theme `openSUSE-halloween-adwaita`: the same icons over Adwaita, for
-  GNOME and Xfce
+  GNOME and Xfce, including GNOME's and Xfce's own file manager, terminal,
+  settings, editor, image viewer, software, system monitor, archive,
+  scanner, screenshot, passwords and characters apps
 - Firefox theme, with a header that stays sharp on HiDPI screens
 - `make install`, which installs the theme like a package: it copies the files
   into the system paths and changes no settings; `make install-defaults` adds
