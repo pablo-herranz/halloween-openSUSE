@@ -6,7 +6,9 @@ calendar-based: `YEAR.MONTH.PATCH`, the month without a leading zero.
 
 ## [Unreleased]
 
-The first release, 2026.10.0, is being prepared.
+## [2026.10.0] - 2026-10-19
+
+The first release.
 
 ### Added
 
@@ -65,3 +67,6 @@ The first release, 2026.10.0, is being prepared.
 - Checks that the supported screens keep working: how much of the chameleon
   each desktop shows on common screens, and the boot splash's layout from
   720p to 4K
+
+[Unreleased]: https://github.com/plusky/halloween-openSUSE/compare/v2026.10.0...HEAD
+[2026.10.0]: https://github.com/plusky/halloween-openSUSE/releases/tag/v2026.10.0

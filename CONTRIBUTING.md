@@ -254,7 +254,7 @@ after 2026.10.0, `2026.11.0~git20261020.1a2b3c4` for one on the way to
    `make release-check` (which fails while placeholders are in use), builds
    the archives with `make dist` (the sources with the masters, and the
    build), attests their build provenance and publishes a GitHub release
-   with them.
+   named after the version alone, such as `2026.10.0`.
 
 Releases are immutable, and release tags can't be moved or deleted: a broken
 release needs a new version. `make dist` builds the same archives locally,
