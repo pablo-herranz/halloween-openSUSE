@@ -63,6 +63,9 @@ apply_theme() {
     apply plasma-apply-colorscheme "$SCHEME_ID" || true
     kwriteconfig6 --file kdeglobals --group Icons --key Theme "$ICONS_ID"
     [ -x /usr/libexec/plasma-changeicons ] && apply /usr/libexec/plasma-changeicons "$ICONS_ID" || true
+    # Same theme name, new icons: running apps only reload them when told to
+    rm -f "${XDG_CACHE_HOME:-$HOME/.cache}"/icon-cache.kcache
+    dbus-send --session --type=signal /KIconLoader org.kde.KIconLoader.iconChanged int32:0 || true
     kwriteconfig6 --file ksplashrc --group KSplash --key Engine KSplashQML
     kwriteconfig6 --file ksplashrc --group KSplash --key Theme "$LNF_ID"
 

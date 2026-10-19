@@ -29,7 +29,7 @@ VARIANTS = ("", "translucent/", "opaque/", "solid/")
 
 # Ornament placement: (ornament file, target height in px, opacity, hint elements)
 OVERLAYS = {
-    "dialogs/background.svg": ("popup-sprig.svg", 56, 0.55, ["hint-overlay-pos-right"]),
+    "dialogs/background.svg": ("popup-sprig.svg", 40, 0.4, ["hint-overlay-pos-right"]),
     "widgets/panel-background.svg": ("panel-garland.svg", 12, 0.7, ["hint-overlay-tile-horizontal"]),
 }
 ORNAMENTS = [o[0] for o in OVERLAYS.values()] + ["clock-face.svg"]

@@ -5,7 +5,7 @@
 # Show each themed screen in test mode and screenshot it into screenshots/
 # next to this build. Run as the desktop user (also works over SSH).
 #
-# usage: test-screens.sh [desktop|splash|lock|sddm|plymouth|all]
+# usage: test-screens.sh [desktop|splash|lock|sddm|widgets|dolphin|plymouth|all]
 #   plymouth needs sudo and the plymouth-x11-renderer package; it switches the
 #   default theme only while the test runs and never touches the initrd.
 set -euo pipefail
@@ -17,6 +17,14 @@ OUT=$BUILD_DIR/screenshots
 WL=${WAYLAND_SESSION_SOCKET:-wayland-1}   # the Plasma session's socket, not SSH's
 BASE_URL="file://$DATA/wallpapers/$WALLPAPER_ID"
 mkdir -p "$OUT"
+
+# Apps started from SSH need the session's desktop variables, or Qt skips
+# KDE's platform theme and draws them with its default light palette
+if pid=$(pgrep -u "$(id -u)" -x plasmashell | head -1); then
+    while IFS= read -r -d '' var; do
+        case $var in XDG_CURRENT_DESKTOP=*|KDE_FULL_SESSION=*|KDE_SESSION_VERSION=*|DESKTOP_SESSION=*) export "$var" ;; esac
+    done < "/proc/$pid/environ"
+fi
 
 shot() {
     WAYLAND_DISPLAY=$WL spectacle -b -n -f -o "$OUT/$1.png"
@@ -62,6 +70,28 @@ sddm() {
     kill "$pid" 2>/dev/null || true
 }
 
+widgets() {
+    # An analog clock for the pumpkin face, removed again afterwards
+    local id
+    id=$(plasma_script 'var w = desktops()[0].addWidget("org.kde.plasma.analogclock", 1180, 140, 360, 360); print(w.id)')
+    sleep 4
+    shot clock
+    plasma_script "desktops().forEach(d => d.widgets().forEach(w => { if (w.id == $id) w.remove() }))" >/dev/null
+    # The app launcher, for the popup frame and its leaf sprig
+    qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.activateLauncherMenu
+    sleep 2
+    shot kickoff
+    qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.activateLauncherMenu
+}
+
+dolphin() {
+    pgrep -u "$(id -u)" -x dolphin >/dev/null && die "close Dolphin first; this test closes the window it opens"
+    WAYLAND_DISPLAY=$WL command dolphin --new-window "$HOME" >/dev/null 2>&1 &
+    sleep 9     # the first start with KDE's platform theme is slow
+    shot dolphin
+    pkill -u "$(id -u)" -x dolphin
+}
+
 plymouth() {
     rpm -q plymouth-x11-renderer >/dev/null || die "install plymouth-x11-renderer first"
     local display=${DISPLAY:-:0} xauth previous
@@ -85,7 +115,7 @@ plymouth() {
 }
 
 case ${1:-all} in
-    desktop|splash|lock|sddm|plymouth) "$1" ;;
-    all) desktop; splash; lock; sddm ;;
-    *) die "usage: $0 [desktop|splash|lock|sddm|plymouth|all]" ;;
+    desktop|splash|lock|sddm|widgets|dolphin|plymouth) "$1" ;;
+    all) desktop; splash; lock; sddm; widgets; dolphin ;;
+    *) die "usage: $0 [desktop|splash|lock|sddm|widgets|dolphin|plymouth|all]" ;;
 esac

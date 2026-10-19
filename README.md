@@ -16,7 +16,7 @@ the layout leaves room for other desktops.
 | Plasma style: autumn colours, leaf trim, ember tooltip glow, pumpkin clock | `openSUSE-halloween` | panel, popups, widgets |
 | Colour scheme | `openSUSEHalloween` | applications |
 | Look-and-feel with pumpkin splash | `org.openSUSE.halloween.desktop` | ties the above together |
-| Icons (places, trash, launcher) over Breeze Dark | `openSUSE-halloween` | any freedesktop desktop |
+| Icons (places, trash, launcher, KDE apps, app menu and power actions) over Breeze Dark | `openSUSE-halloween` | any freedesktop desktop |
 | Login screen | `breeze-openSUSE-halloween` | SDDM |
 | Boot splash | `openSUSE-halloween` | Plymouth |
 

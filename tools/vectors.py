@@ -35,7 +35,67 @@ FOLDER_EMBLEMS = {
     "user-desktop": "emblem-monitor",
 }
 LAUNCHERS = ("start-here-kde-plasma", "start-here-kde", "start-here")
+# Other names Breeze uses for the same places (symlinks in Breeze); without
+# them those names fall through to Breeze Dark's versions.
+ALIASES = {
+    "folder-public": "folder-publicshare",
+    "folder-downloads": "folder-download",
+    "folder-video": "folder-videos",
+    "folder-images": "folder-pictures",
+    "folder-picture": "folder-pictures",
+    "folder-desktop": "user-desktop",
+}
 EMBLEM_SCALE = 1.12      # emblem size relative to the master's leaf
+
+# Colour application icons: master -> the icon names apps ask for. Brand
+# logos of other projects (Firefox, Qt, the ArtCraft suite, btop) are left
+# to their own themes, like the distribution logo.
+APPS = {
+    "app-discover": ("plasmadiscover",),
+    "app-konsole": ("utilities-terminal", "utilities-terminal_su", "org.kde.konsole"),
+    "app-settings": ("preferences-system", "systemsettings"),
+    "app-kate": ("kate", "org.kde.kate"),
+    "app-spectacle": ("spectacle", "org.kde.spectacle"),
+    "app-ark": ("ark", "org.kde.ark"),
+    "app-gwenview": ("gwenview", "org.kde.gwenview"),
+    "app-help": ("help-browser", "khelpcenter", "org.kde.khelpcenter"),
+    "app-infocenter": ("hwinfo", "org.kde.kinfocenter"),
+    "app-kdeconnect": ("kdeconnect", "org.kde.kdeconnect.app"),
+    "app-kwallet": ("kwalletmanager", "kwalletmanager2"),
+    "app-menuedit": ("kmenuedit",),
+    "app-qrca": ("org.kde.qrca",),
+    "app-skanpage": ("skanpage", "org.kde.skanpage"),
+    "app-sysmon": ("utilities-system-monitor", "org.kde.plasma-systemmonitor"),
+    "app-bug": ("tools-report-bug", "drkonqi"),
+    "app-emoji": ("preferences-desktop-emoticons",),
+    "app-bridge": ("org.kde.xwaylandvideobridge",),
+}
+# Dolphin is the master folder with a bat, like Breeze's folder with a dolphin
+DOLPHIN = ("org.kde.dolphin", "system-file-manager")
+
+# One-colour icons of the app menu and the leave/power actions: master ->
+# (directory, names). They take the colour scheme's text colour.
+SYMBOLIC = {
+    "glyph-bookmark": ("actions", ("bookmarks", "favorites")),
+    "glyph-grid": ("actions", ("applications-all-symbolic",)),
+    "glyph-wand": ("categories", ("applications-development-symbolic",)),
+    "glyph-brush": ("categories", ("applications-graphics-symbolic",)),
+    "glyph-crystal": ("categories", ("help-about-symbolic",)),
+    "glyph-web": ("categories", ("applications-internet-symbolic",)),
+    "emblem-note": ("categories", ("applications-multimedia-symbolic",)),
+    "glyph-quill": ("categories", ("applications-office-symbolic",)),
+    "glyph-gear": ("categories", ("applications-system-symbolic", "preferences-system-symbolic")),
+    "glyph-broom": ("categories", ("applications-utilities-symbolic",)),
+    "glyph-signpost": ("actions", ("compass",)),
+    "glyph-sleep": ("actions", ("system-suspend", "system-suspend-symbolic")),
+    "glyph-coffin": ("actions", ("system-suspend-hibernate", "system-suspend-hibernate-symbolic")),
+    "glyph-reboot": ("actions", ("system-reboot", "system-reboot-symbolic")),
+    "glyph-candle": ("actions", ("system-shutdown", "system-shutdown-symbolic")),
+    "glyph-lock": ("actions", ("system-lock-screen", "system-lock-screen-symbolic")),
+    "glyph-door": ("actions", ("system-log-out", "system-log-out-symbolic")),
+    "glyph-ghosts": ("actions", ("system-switch-user", "system-switch-user-symbolic")),
+}
+SYMBOLIC_SIZE = 16
 
 
 class Shape:
@@ -107,11 +167,12 @@ def svg(body, view, size=None):
             f"{body}</svg>\n")
 
 
-def tidy(text, precision=5):
+def tidy(text, precision=5, groups=True):
     """Shorten coordinates and drop redundancy with scour."""
     from scour import scour
-    opts = scour.parse_args([f"--set-precision={precision}", "--remove-metadata", "--enable-comment-stripping",
-                             "--strip-xml-prolog", "--create-groups", "--no-line-breaks"])
+    args = [f"--set-precision={precision}", "--remove-metadata", "--enable-comment-stripping",
+            "--strip-xml-prolog", "--no-line-breaks"]
+    opts = scour.parse_args(args + (["--create-groups"] if groups else []))
     return scour.scourString(text, opts) + "\n"
 
 
@@ -264,9 +325,58 @@ def other_icons(palette):
     return icons
 
 
+def app_icons(palette):
+    made = {}
+    for master, names in APPS.items():
+        shapes = load(master)
+        if shapes:
+            text = icon("".join(s.markup() for s in shapes), union(s.bbox() for s in shapes), 0.06)
+            made.update({f"scalable/apps/{n}.svg": text for n in names})
+    folder, bat = load("folder"), load("emblem-bat")
+    if folder and bat:
+        body, leaf, front = split_folder(folder)
+        text = icon("".join(s.markup() for s in body)
+                    + emblem_markup(bat, union(s.bbox() for s in leaf), palette["cream"], front),
+                    union(s.bbox() for s in folder), 0.06)
+        made.update({f"scalable/apps/{n}.svg": text for n in DOLPHIN})
+    return made
+
+
+def symbolic_icon(shapes, palette):
+    """A one-colour icon in KDE's symbolic format: the dark parts of a glyph in
+    the colour scheme's text colour, the light details inside them cut out as
+    holes (each dark shape plus the light shapes drawn on top of it, even-odd)."""
+    dark = [(i, s) for i, s in enumerate(shapes) if luminance(s.colour) < 0.5]
+    light = [(i, s) for i, s in enumerate(shapes) if luminance(s.colour) >= 0.5]
+    paths = []
+    for i, s in dark:
+        holes = [h for j, h in light if j > i and inside(h.bbox(), s.bbox())]
+        d = " ".join([s.d] + [h.d for h in holes])
+        paths.append(f'<path class="ColorScheme-Text" d="{d}" fill="currentColor" fill-rule="evenodd"/>')
+    box = union(s.bbox() for _, s in dark)
+    style = ('<style type="text/css" id="current-color-scheme">'
+             f'.ColorScheme-Text {{ color:{palette["cream"]}; }}</style>')
+    size = SYMBOLIC_SIZE
+    return tidy(svg(style + fit("".join(paths), box, (0.5, 0.5, size - 1)), (0, 0, size, size)), groups=False)
+
+
+def symbolic_icons(palette):
+    made = {}
+    for master, (folder, names) in SYMBOLIC.items():
+        shapes = load(master)
+        if shapes:
+            text = symbolic_icon(shapes, palette)
+            made.update({f"scalable/{folder}/{n}.svg": text for n in names})
+    return made
+
+
 def icons(palette):
     """Every icon the masters can make: {path relative to the theme: SVG text}."""
-    return {**folder_icons(palette), **other_icons(palette)}
+    made = {**folder_icons(palette), **other_icons(palette), **app_icons(palette), **symbolic_icons(palette)}
+    for alias, name in ALIASES.items():
+        if f"scalable/places/{name}.svg" in made:
+            made[f"scalable/places/{alias}.svg"] = made[f"scalable/places/{name}.svg"]
+    return made
 
 
 # --- Plasma style ornaments ------------------------------------------------------
