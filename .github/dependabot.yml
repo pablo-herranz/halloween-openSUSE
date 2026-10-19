@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
+# SPDX-License-Identifier: CC0-1.0
+
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
+    cooldown:
+      default-days: 7
+  - package-ecosystem: pip
+    directory: /tools
+    schedule:
+      interval: monthly
+    groups:
+      python:
+        patterns: ["*"]
+    cooldown:
+      default-days: 7

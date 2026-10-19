@@ -43,8 +43,8 @@ The outlines differ by 256 of 1,048,576 pixels.
 
 ## Post-processing
 
-1. `picsart_remove_bg` on lit B.
-2. `tools/cutout.py lit-b-cut.png art/source/lantern-lit.png`
-3. `tools/cutout.py lit-b-cut.png art/source/lantern-unlit.png --colour-from unlit-b.png`:
+1. Picsart background removal (model `picsart-sod-v8-2`) on lit B.
+2. `tools/cutout.py <lit cut-out.png> art/source/lantern-lit.png`
+3. `tools/cutout.py <lit cut-out.png> art/source/lantern-unlit.png --colour-from <unlit render.png>`:
    the unlit master reuses the lit cut-out's alpha, so both line up exactly
    (653x659).

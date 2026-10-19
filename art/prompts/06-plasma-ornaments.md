@@ -21,9 +21,9 @@ pieces touching the canvas edge are dropped.
 
 A tiled vine garland along the panel's top edge, from a 2:1
 `recraftv4_1_utility_vector` render ("a thin horizontal autumn vine garland
-border that spans the full width …"). On the real panel it read as
-a busy dotted line and the owner found it disruptive, so it was removed on
-2026-10-19: the panel keeps Breeze's plain frame in the autumn colours.
+border that spans the full width …"). On a real panel it read as a busy
+dotted line behind the launcher, tasks and tray, so it was dropped: the panel
+keeps Breeze's plain frame in the autumn colours.
 
 ## Clock face (widgets/clock.svg `ClockFace`)
 

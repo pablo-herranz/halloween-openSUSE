@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
+# SPDX-License-Identifier: CC0-1.0
+
+# Pushing a tag vYYYY.MM.N builds the release archives (`make dist`) and
+# attaches them to a GitHub release. The tag must match VERSION in
+# tools/common.py.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # No caches here: a cache written by another workflow must not end up
+      # in a published release
+      - run: git lfs pull
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Check the tag matches the version
+        run: |
+          version=$(python3 -c 'import sys; sys.path.insert(0, "tools"); from common import VERSION; print(VERSION)')
+          [ "$GITHUB_REF_NAME" = "v$version" ] || { echo "tag $GITHUB_REF_NAME, but tools/common.py says $version"; exit 1; }
+      - run: make release-check
+      - run: make dist
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --title "halloween-openSUSE ${GITHUB_REF_NAME#v}" --generate-notes

@@ -10,7 +10,7 @@ REMOTE := .cache/halloween-openSUSE
 VENV := tools/.venv
 PY := $(VENV)/bin/python
 
-.PHONY: all need-target build check release-check deploy install-user install-root plymouth verify screens fetch-screenshots previews icon-preview clean
+.PHONY: all need-target build check lint dist release-check deploy install-user install-root plymouth verify screens fetch-screenshots previews icon-preview clean
 
 all: check
 
@@ -18,6 +18,14 @@ $(VENV)/.ok: tools/requirements.txt
 	python3 -m venv $(VENV)
 	$(VENV)/bin/pip install -q -r tools/requirements.txt
 	touch $@
+
+$(VENV)/.dev: tools/requirements-dev.txt $(VENV)/.ok
+	$(VENV)/bin/pip install -q -r tools/requirements-dev.txt
+	touch $@
+
+lint: $(VENV)/.dev
+	$(VENV)/bin/ruff check tools
+	$(VENV)/bin/shellcheck -x -P install install/*.sh tools/*.sh
 
 build: $(VENV)/.ok
 	$(PY) tools/build.py
@@ -27,6 +35,9 @@ check: build
 
 release-check: build
 	$(PY) tools/check.py --release
+
+dist:
+	tools/dist.sh
 
 need-target:
 	@test -n "$(TARGET)" || { echo "name the test machine: make $(MAKECMDGOALS) TARGET=user@host" >&2; exit 1; }
@@ -59,4 +70,4 @@ icon-preview: build
 	$(PY) tools/icon_preview.py
 
 clean:
-	rm -rf build/user build/root build/firefox build/install build/*.txt build/*.json build/MANIFEST.sha256
+	rm -rf dist build/user build/root build/firefox build/install build/*.txt build/*.json build/MANIFEST.sha256

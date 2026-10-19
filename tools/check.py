@@ -22,9 +22,8 @@ from pathlib import Path
 
 from PIL import Image
 
-from common import BUILD, CACHE, FIREFOX_ID, ROOT, VERSION, contrast, rgb
+from common import BUILD, CACHE, FIREFOX, FIREFOX_ID, ROOT, SYSTEM, USER, VERSION, contrast, rgb
 
-USER, SYSTEM, FIREFOX = BUILD / "user", BUILD / "root", BUILD / "firefox"
 STYLE = USER / "plasma/desktoptheme/openSUSE-halloween"
 LNF = USER / "plasma/look-and-feel/org.openSUSE.halloween.desktop/contents"
 INI_NAMES = ("defaults", "plasmarc", "colors", "index.theme")
@@ -199,8 +198,9 @@ def check_firefox():
         fail(f"firefox add-on ID is not {FIREFOX_ID}")
 
     # Text on its background: (text, background, minimum)
-    pairs = [("tab_text", "tab_selected", 4.5), ("tab_text", "toolbar", 4.5), ("tab_background_text", "frame", 4.5),
-             ("tab_background_text", "frame_inactive", 4.5), ("toolbar_text", "toolbar", 4.5), ("icons", "toolbar", 3.0),
+    pairs = [("tab_text", "tab_selected", 4.5), ("tab_text", "toolbar", 4.5),
+             ("tab_background_text", "frame", 4.5), ("tab_background_text", "frame_inactive", 4.5),
+             ("toolbar_text", "toolbar", 4.5), ("icons", "toolbar", 3.0),
              ("toolbar_field_text", "toolbar_field", 4.5), ("toolbar_field_text_focus", "toolbar_field_focus", 4.5),
              ("toolbar_field_highlight_text", "toolbar_field_highlight", 4.5), ("popup_text", "popup", 4.5),
              ("popup_highlight_text", "popup_highlight", 4.5), ("sidebar_text", "sidebar", 4.5),
@@ -230,8 +230,9 @@ def check_firefox():
         over = Image.new("RGBA", img.size, rgb(colors["frame"]) + (255,))
         over.alpha_composite(img.convert("RGBA"))
         strip = over.convert("RGB").crop((0, 0, img.width, 44))
-        title = min(contrast(colors["tab_background_text"], strip.crop((x, 0, x + 100, 44)).resize((1, 1), Image.BOX).getpixel((0, 0)))
-                    for x in range(0, img.width - 99, 10))
+        def average(x, strip=strip):
+            return strip.crop((x, 0, x + 100, 44)).resize((1, 1), Image.BOX).getpixel((0, 0))
+        title = min(contrast(colors["tab_background_text"], average(x)) for x in range(0, img.width - 99, 10))
         if title < 4.5:
             fail(f"firefox tab titles over {name} {title:.2f}:1 < 4.5:1")
 

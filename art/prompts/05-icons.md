@@ -2,7 +2,7 @@
 
 ## Master folder icon
 
-Sets the style for every other icon and ornament: once approved, it is the
+Sets the style for every other icon and ornament: it is the
 one-image style reference (`imageWeight` about 80) for the rest.
 
 | Model | Settings |
@@ -32,7 +32,7 @@ render with resvg (QuickLook always draws SVGs on white).
 | 3 | Red-orange, leaf shape OK |
 | 4 | Red-orange, leaf built from 10 separate pieces |
 
-**2** approved on 2026-10-19: `art/source/vectors/folder.svg`.
+Chosen: **2**, saved as `art/source/vectors/folder.svg`.
 
 ## How the set is built
 

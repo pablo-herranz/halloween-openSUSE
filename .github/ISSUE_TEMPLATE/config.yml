@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
+# SPDX-License-Identifier: CC0-1.0
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security problem
+    url: https://github.com/plusky/halloween-openSUSE/security/advisories/new
+    about: Please report vulnerabilities privately, not in a public issue.
+  - name: General openSUSE help
+    url: https://forums.opensuse.org/
+    about: Questions about openSUSE or KDE Plasma itself belong in the openSUSE forums.

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Turn the Recraft SVG masters in art/source/vectors/ into icons and ornaments.
@@ -33,6 +32,14 @@ FOLDER_EMBLEMS = {
     "folder-publicshare": "emblem-lantern",
     "user-home": "emblem-cottage",
     "user-desktop": "emblem-monitor",
+    "folder-development": "glyph-wand",
+    "folder-cloud": "glyph-cloud",
+    "folder-recent": "glyph-hourglass",
+    "folder-games": "glyph-gamepad",
+    "folder-network": "glyph-web",
+    "folder-remote": "glyph-web",
+    "folder-image-people": "glyph-ghosts",
+    "folder-favorites": "glyph-bookmark",
 }
 LAUNCHERS = ("start-here-kde-plasma", "start-here-kde", "start-here")
 # Other names Breeze uses for the same places (symlinks in Breeze); without
@@ -47,10 +54,13 @@ ALIASES = {
 }
 EMBLEM_SCALE = 1.12      # emblem size relative to the master's leaf
 
-# Colour application icons: master -> the icon names apps ask for. Brand
-# logos of other projects (Firefox, Qt, the ArtCraft suite, btop) are left
-# to their own themes, like the distribution logo.
+# Colour application icons: master -> the icon names apps ask for. Other
+# projects' logos (Qt, the ArtCraft suite, btop) are left to their own themes,
+# like the distribution logo. Web browsers, Firefox included, get an original
+# browser icon, never a modified Firefox logo.
 APPS = {
+    "app-browser": ("web-browser", "internet-web-browser", "firefox", "firefox-esr", "org.mozilla.firefox",
+                    "firefox-developer-edition", "firefox-nightly"),
     "app-discover": ("plasmadiscover",),
     "app-konsole": ("utilities-terminal", "utilities-terminal_su", "org.kde.konsole"),
     "app-settings": ("preferences-system", "systemsettings"),
@@ -70,6 +80,38 @@ APPS = {
     "app-emoji": ("preferences-desktop-emoticons",),
     "app-bridge": ("org.kde.xwaylandvideobridge",),
 }
+# Devices: master -> the names drives and media are shown with
+DEVICES = {
+    "device-harddisk": ("drive-harddisk", "drive-harddisk-root", "drive-partition", "drive-multidisk",
+                        "drive-multipartition"),
+    "device-usb": ("drive-removable-media", "drive-removable-media-usb", "drive-removable-media-usb-pendrive",
+                   "media-flash", "media-flash-memory-stick", "media-flash-sd-mmc", "media-flash-smart-media"),
+    "device-optical": ("media-optical", "media-optical-audio", "media-optical-blu-ray", "media-optical-data",
+                       "media-optical-dvd", "media-optical-recordable", "media-optical-video", "drive-optical",
+                       "media-write-cd", "media-write-dvd"),
+    "device-server": ("network-server", "network-workgroup"),
+}
+
+# File types: the page master with an emblem -> the MIME type icon names.
+# File managers ask for the specific name first (image-png before
+# image-x-generic), so the common specific names are listed too.
+MIME_EMBLEMS = {
+    "glyph-quill": ("text-x-generic", "text-plain", "text-markdown"),
+    "emblem-scroll": ("application-pdf", "application-vnd.oasis.opendocument.text", "x-office-document"),
+    "emblem-picture": ("image-x-generic", "image-png", "image-jpeg", "image-gif", "image-webp", "image-svg+xml"),
+    "emblem-note": ("audio-x-generic", "audio-mpeg", "audio-flac", "audio-ogg", "audio-x-vorbis+ogg",
+                    "audio-x-wav"),
+    "emblem-reel": ("video-x-generic", "video-mp4", "video-webm", "video-x-matroska"),
+    "glyph-chest": ("package-x-generic", "application-x-archive", "application-zip", "application-x-tar",
+                    "application-x-compressed-tar", "application-x-xz-compressed-tar",
+                    "application-x-7z-compressed", "application-x-rpm"),
+    "glyph-web": ("text-html",),
+    "glyph-wand": ("text-x-script", "text-x-python", "application-x-shellscript", "application-json",
+                   "application-xml"),
+    "glyph-gear": ("application-x-executable", "application-x-sharedlib"),
+}
+MIME_EMBLEM_SIZE = 0.5   # emblem size relative to the page's width
+
 # Dolphin is the master folder with a bat, like Breeze's folder with a dolphin
 DOLPHIN = ("org.kde.dolphin", "system-file-manager")
 
@@ -113,7 +155,7 @@ class Shape:
 
 
 def hexcolour(c):
-    return c if isinstance(c, str) else "#%02X%02X%02X" % c
+    return c if isinstance(c, str) else "#{:02X}{:02X}{:02X}".format(*c)
 
 
 def luminance(c):
@@ -267,10 +309,10 @@ def folder_icons(palette):
 def to_chameleon_green(colour, chameleon):
     """Move greens and teals to the chameleon's hue, keeping lightness and saturation."""
     import colorsys
-    h, l, s = colorsys.rgb_to_hls(*(c / 255 for c in colour))
+    h, light, s = colorsys.rgb_to_hls(*(c / 255 for c in colour))
     if 70 / 360 <= h <= 185 / 360 and s > 0.2:
         h = colorsys.rgb_to_hls(*(c / 255 for c in rgb(chameleon)))[0]
-        return tuple(round(c * 255) for c in colorsys.hls_to_rgb(h, l, s))
+        return tuple(round(c * 255) for c in colorsys.hls_to_rgb(h, light, s))
     return colour
 
 
@@ -370,9 +412,44 @@ def symbolic_icons(palette):
     return made
 
 
+def device_icons(palette):
+    made = {}
+    for master, names in DEVICES.items():
+        shapes = load(master)
+        if shapes:
+            text = icon("".join(s.markup() for s in shapes), union(s.bbox() for s in shapes), 0.06)
+            made.update({f"scalable/devices/{n}.svg": text for n in names})
+    return made
+
+
+def mime_icons(palette):
+    """File types: the page master with an emblem on its sheet, dark parts of
+    the glyph in pumpkin, light details in the page's colour."""
+    page = load("mime-page")
+    if page is None:
+        return {}
+    sheet = max(page, key=lambda s: area(s.bbox()) if luminance(s.colour) > 0.7 else 0)
+    x0, y0, x1, y1 = sheet.bbox()
+    size = (x1 - x0) * MIME_EMBLEM_SIZE / EMBLEM_SCALE
+    cx, cy = (x0 + x1) / 2, y0 + (y1 - y0) * 0.58
+    box = (cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2)
+    page_markup = "".join(s.markup() for s in page)
+    frame = union(s.bbox() for s in page)
+    made = {}
+    for emblem, names in MIME_EMBLEMS.items():
+        shapes = load(emblem)
+        if shapes:
+            text = icon(page_markup + emblem_markup(shapes, box, palette["pumpkin"], sheet.colour), frame, 0.06)
+            made.update({f"scalable/mimetypes/{n}.svg": text for n in names})
+    return made
+
+
 def icons(palette):
     """Every icon the masters can make: {path relative to the theme: SVG text}."""
-    made = {**folder_icons(palette), **other_icons(palette), **app_icons(palette), **symbolic_icons(palette)}
+    made = {**folder_icons(palette), **other_icons(palette), **app_icons(palette), **symbolic_icons(palette),
+            **device_icons(palette), **mime_icons(palette)}
+    if "scalable/places/folder.svg" in made:
+        made["scalable/mimetypes/inode-directory.svg"] = made["scalable/places/folder.svg"]
     for alias, name in ALIASES.items():
         if f"scalable/places/{name}.svg" in made:
             made[f"scalable/places/{alias}.svg"] = made[f"scalable/places/{name}.svg"]
@@ -381,31 +458,9 @@ def icons(palette):
 
 # --- Plasma style ornaments ------------------------------------------------------
 
-def panel_decoration(stem, palette):
-    """Tiled panel decorations: a thin pumpkin trim, or faint tone-on-tone
-    leaves made from the master folder's leaf. No leaf crosses the tile edge,
-    so the tile repeats seamlessly."""
-    if stem == "panel-trim":
-        return svg(f'<rect width="96" height="2" fill="{palette["pumpkin"]}"/>'
-                   f'<rect y="2" width="96" height="1" fill="{palette["ember"]}" opacity="0.6"/>', (0, 0, 96, 3))
-    folder = load("folder")
-    if folder is None:
-        return None
-    _, leaf, _ = split_folder(folder)
-    box = union(s.bbox() for s in leaf)
-    shape = "".join(s.markup(palette["plum"]) for s in leaf if luminance(s.colour) > 0.93)
-    leaves = ""
-    for x, y, size, turn, alpha in ((14, 8, 22, -20, 0.13), (86, 20, 15, 35, 0.10), (150, 5, 19, 12, 0.12)):
-        leaves += (f'<g opacity="{alpha}" transform="rotate({turn} {x + size / 2} {y + size / 2})">'
-                   + fit(shape, box, (x, y, size)) + "</g>")
-    return tidy(svg(leaves, (0, 0, 192, 40)))
-
-
 def ornament(name, palette):
     """SVG text for plasma/desktoptheme ornaments/<name>, or None without a master."""
     stem = name.removesuffix(".svg")
-    if stem.startswith("panel-"):
-        return panel_decoration(stem, palette)
     shapes = load({"popup-sprig": "sprig", "clock-face": "clock"}[stem])
     if shapes is None:
         return None

@@ -14,7 +14,7 @@ from common import rgb
 
 
 def mix(a, b, t):
-    return tuple(round(x + (y - x) * t) for x, y in zip(a, b))
+    return tuple(round(x + (y - x) * t) for x, y in zip(a, b, strict=True))
 
 
 def vertical_gradient(size, stops):
@@ -24,7 +24,7 @@ def vertical_gradient(size, stops):
     draw = ImageDraw.Draw(img)
     for y in range(h):
         t = y / (h - 1)
-        for (p0, c0), (p1, c1) in zip(stops, stops[1:]):
+        for (p0, c0), (p1, c1) in zip(stops, stops[1:], strict=False):
             if p0 <= t <= p1:
                 draw.line([(0, y), (w, y)], fill=mix(c0, c1, (t - p0) / (p1 - p0)))
                 break
