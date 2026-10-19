@@ -147,7 +147,8 @@ Versions are calendar-based (`YYYY.MM.patch`).
 AI tools are welcome for code and art, as long as you say so:
 
 - Mention the tools in the pull request.
-- Add an `Assisted-by: <tool or model>` trailer to the commits.
+- Don't credit them in commits: no `Assisted-by:` or `Co-Authored-By:`
+  trailers naming an AI tool.
 - You are responsible for the result: review it, test it, and make sure you
   have the right to contribute it under the project's licences.
 
