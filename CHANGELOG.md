@@ -6,6 +6,28 @@ calendar-based: `YEAR.MONTH.PATCH`, the month without a leading zero.
 
 ## [Unreleased]
 
+### Added
+
+- Icons for KDE System Settings' modules and categories, carved into
+  pumpkins, and one-colour icons for GNOME Settings' panels; at 16 and 22 px,
+  where settings lists show them, the glyph nearly fills the pumpkin
+- One-colour twins of the settings icons that Plasma asks for in trays,
+  menus and applets (`preferences-security-symbolic`, ...)
+- `LICENSES/LGPL-2.1-only.txt`: the GTK theme, adw-gtk3's CSS and our
+  recolouring alike, is LGPL-2.1-only
+
+### Fixed
+
+- Plasma showed our icons for Breeze icons that only extend a name we ship:
+  the battery indicator, every KWin effect, YaST's modules, `-symbolic` folders
+  and drives and more. The theme now links those to Breeze's own, and a check
+  runs Plasma's lookup over all Breeze names.
+- Settings lists no longer show the same icon twice on one page
+- From a release archive, `tools/check.py` lints the sources file by file, so
+  packages can run it in full; `license-expression` is in the requirements,
+  and Pillow 11.3 and jsonschema 4.24 are enough (Leap 16.0)
+- The README says how to install the openSUSE packages
+
 ## [2026.10.0] - 2026-10-19
 
 The first release.

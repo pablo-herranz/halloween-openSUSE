@@ -111,15 +111,18 @@ APPS = {
     "app-updates": ("system-software-update", "gpk-update-viewer", "gpk-prefs", "update-manager"),
     "app-notes": ("org.xfce.notes", "xfce4-notes", "org.gnome.Notes", "knotes", "org.kde.knotes"),
     "app-dictionary": ("org.xfce.Dictionary", "accessories-dictionary", "org.gnome.Dictionary"),
-    "app-search": ("org.xfce.appfinder",),
+    "app-search": ("org.xfce.appfinder", "krunner"),
     "app-sensors": ("xfce-sensors", "psensor"),
     "app-clipboard": ("xfce4-clipman-plugin", "klipper", "org.kde.klipper"),
     "app-color": ("gnome-color-manager", "preferences-color"),
-    "app-yast": ("yast-control-center", "yast"),
+    # not "yast": every YaST module's icon (yast-network, yast-sw_single, ...,
+    # in hicolor) extends it, so Plasma would show the toolbox for all of them
+    "app-yast": ("yast-control-center",),
     "app-volume": ("org.pulseaudio.pavucontrol", "pavucontrol", "multimedia-volume-control",
                    "preferences-desktop-sound"),
-    "app-bluetooth": ("blueman", "blueman-device", "preferences-system-bluetooth", "bluetooth"),
-    "device-harddisk": ("org.gnome.DiskUtility", "gnome-disks"),
+    "app-bluetooth": ("blueman", "preferences-system-bluetooth", "bluetooth"),
+    "device-harddisk": ("org.gnome.DiskUtility", "gnome-disks", "preferences-system-disks",
+                        "preferences-smart-status"),
 }
 # Devices: master -> the names drives and media are shown with
 DEVICES = {
@@ -149,30 +152,49 @@ DEVICES = {
 # glyph carved into the pumpkin master, large enough to tell apart at 16 px
 SETTINGS = {
     "glyph-brush": ("org.xfce.settings.appearance", "preferences-desktop-theme", "preferences-desktop-theme-global"),
-    "emblem-monitor": ("org.xfce.settings.display", "preferences-desktop-display"),
+    "emblem-stencil": ("preferences-desktop-plasma-theme", "org.xfce.PanelProfiles"),
+    "emblem-monitor": ("org.xfce.settings.display", "preferences-desktop-display", "preferences-desktop-display-randr"),
     "glyph-keyboard": ("org.xfce.settings.keyboard", "preferences-desktop-keyboard"),
     "glyph-mouse": ("org.xfce.settings.mouse", "preferences-desktop-mouse", "preferences-desktop-touchpad"),
     "emblem-picture": ("org.xfce.xfdesktop", "preferences-desktop-wallpaper"),
-    "glyph-panel": ("org.xfce.panel", "org.xfce.PanelProfiles"),
-    "glyph-grid": ("org.xfce.workspaces", "preferences-desktop-virtual"),
-    "glyph-window": ("org.xfce.xfwm4", "preferences-system-windows"),
-    "glyph-wand": ("org.xfce.xfwm4-tweaks",),
+    "glyph-panel": ("org.xfce.panel",),
+    "glyph-grid": ("org.xfce.workspaces", "preferences-desktop-virtual", "preferences-desktop-activities"),
+    "glyph-window": ("org.xfce.xfwm4", "preferences-system-windows", "preferences-system-windows-actions",
+                     "preferences-desktop-theme-applications"),
+    "glyph-wand": ("org.xfce.xfwm4-tweaks", "preferences-desktop-effects", "preferences-desktop-animations"),
     "glyph-bell": ("org.xfce.notification", "preferences-desktop-notification",
                    "preferences-desktop-notification-bell"),
     "glyph-battery": ("org.xfce.powermanager", "xfce4-power-manager-settings", "preferences-system-power-management",
                       "preferences-system-power"),
-    "glyph-hourglass": ("org.xfce.session", "preferences-system-session"),
+    "glyph-hourglass": ("org.xfce.session", "preferences-system-session", "preferences-system-session-services"),
+    "glyph-gear": ("preferences-desktop",),
     "glyph-access": ("org.xfce.settings.accessibility", "preferences-desktop-accessibility"),
-    "glyph-signpost": ("org.xfce.settings.default-applications", "preferences-desktop-default-applications"),
-    "glyph-quill": ("org.xfce.settings.editor", "ca.desrt.dconf-editor"),
-    "glyph-crystal": ("org.xfce.about",),
+    "glyph-signpost": ("org.xfce.settings.default-applications", "preferences-desktop-default-applications",
+                       "preferences-system-network-proxy"),
+    "emblem-scroll": ("preferences-desktop-filetype-association",),
+    "glyph-quill": ("org.xfce.settings.editor", "ca.desrt.dconf-editor", "preferences-desktop-font"),
+    "glyph-crystal": ("org.xfce.about", "ktip"),
     "glyph-screensaver": ("org.xfce.ScreenSaver", "preferences-desktop-screensaver"),
+    "emblem-lantern": ("preferences-system-splash",),
     "glyph-logout": ("lightdm-gtk-greeter-settings", "preferences-system-login"),
-    "glyph-web": ("preferences-system-network", "nm-connection-editor"),
-    "glyph-lock": ("org.freedesktop.MalcontentControl",),
-    "glyph-ghosts": ("mugshot", "preferences-desktop-user", "system-users"),
+    "glyph-web": ("preferences-system-network", "nm-connection-editor", "preferences-system-network-connection"),
+    "glyph-lock": ("org.freedesktop.MalcontentControl", "preferences-desktop-user-password"),
+    "glyph-shield": ("preferences-security",),
+    "glyph-ghosts": ("mugshot", "preferences-desktop-user", "system-users", "preferences-system-users"),
+    "glyph-apps": ("preferences-desktop-icons",),
+    "glyph-palette": ("preferences-desktop-color", "preferences-desktop-display-color"),
+    "glyph-cursor": ("preferences-desktop-cursors",),
+    "glyph-speech": ("preferences-desktop-feedback",),
+    "glyph-globe": ("preferences-desktop-locale",),
+    "glyph-magnifier": ("preferences-desktop-search", "plasma-search"),
+    "glyph-chest": ("preferences-desktop-baloo",),
+    "glyph-stylus": ("preferences-desktop-tablet",),
+    "glyph-touch": ("preferences-desktop-touchscreen",),
+    "glyph-gamepad": ("preferences-desktop-gaming",),
+    "emblem-note": ("preferences-desktop-multimedia",),
 }
 SETTINGS_EMBLEM_SIZE = 0.68   # glyph size relative to the pumpkin's body
+SETTINGS_EMBLEM_SIZE_SMALL = 0.95   # at 16 and 22 px
 
 # File types: the page master with an emblem -> the MIME type icon names.
 # File managers ask for the specific name first (image-png before
@@ -215,7 +237,6 @@ SYMBOLIC = {
     "glyph-brush": ("categories", ("applications-graphics-symbolic",)),
     "glyph-crystal": ("categories", ("help-about-symbolic",)),
     "glyph-web": ("categories", ("applications-internet-symbolic",)),
-    "emblem-note": ("categories", ("applications-multimedia-symbolic",)),
     "glyph-quill": ("categories", ("applications-office-symbolic",)),
     "glyph-gear": ("categories", ("applications-system-symbolic", "preferences-system-symbolic")),
     "glyph-broom": ("categories", ("applications-utilities-symbolic",)),
@@ -223,6 +244,7 @@ SYMBOLIC = {
     # Thunar's side pane asks for go-home for Home; Dolphin's Home button too
     "emblem-cottage": ("actions", ("go-home",)),
     "emblem-monitor": ("apps", ("org.xfce.panel.showdesktop",)),
+    "emblem-note": ("categories", ("applications-multimedia-symbolic", "emblem-music-symbolic")),
     "glyph-sleep": ("actions", ("system-suspend", "system-suspend-symbolic")),
     "glyph-hibernate": ("actions", ("system-suspend-hibernate", "system-suspend-hibernate-symbolic", "system-hibernate",
                                     "system-hibernate-symbolic")),
@@ -233,6 +255,19 @@ SYMBOLIC = {
     "glyph-ghosts": ("actions", ("system-switch-user", "system-switch-user-symbolic")),
 }
 SYMBOLIC_SIZE = 16
+
+# GNOME Settings' sidebar: master -> its panels' one-colour icons. Bluetooth
+# (the rune is a trademark), Wi-Fi, the mobile network and Sharing (it sits
+# next to Network) keep Adwaita's.
+GNOME_SETTINGS = {
+    "glyph-crystal": ("about",), "glyph-access": ("accessibility",), "glyph-brush": ("appearance",),
+    "glyph-apps": ("applications",), "glyph-palette": ("color",), "emblem-monitor": ("display",),
+    "glyph-keyboard": ("keyboard",), "glyph-mouse": ("mouse",), "glyph-window": ("multitasking",),
+    "glyph-web": ("network",), "glyph-bell": ("notifications",), "glyph-cloud": ("online-accounts",),
+    "glyph-battery": ("power",), "glyph-printer": ("printers",), "glyph-shield": ("privacy",),
+    "glyph-globe": ("region",), "glyph-magnifier": ("search",), "emblem-note": ("sound",), "glyph-gear": ("system",),
+    "glyph-hourglass": ("time",), "glyph-stylus": ("wacom",), "glyph-heart": ("wellbeing",),
+}
 
 
 class Shape:
@@ -532,6 +567,11 @@ def symbolic_icons(palette):
         if shapes:
             text = symbolic_icon(shapes, palette)
             made.update({f"scalable/{folder}/{n}.svg": text for n in names})
+    for master, panels in GNOME_SETTINGS.items():
+        shapes = load(master)
+        if shapes:
+            text = symbolic_icon(shapes, palette)
+            made.update({f"scalable/apps/org.gnome.Settings-{p}-symbolic.svg": text for p in panels})
     return made
 
 
@@ -570,7 +610,9 @@ def mime_icons(palette):
 def settings_icons(palette):
     """Settings dialogs: the glyph carved into the pumpkin master, dark like an
     unlit jack-o'-lantern. The pumpkin's body is flattened to two oranges so
-    the glyph stays readable at 16 px; the stem keeps its colours."""
+    the glyph stays readable; at 16 and 22 px, where settings lists show them,
+    the body fills the icon and the glyph nearly fills the body, so the
+    entries of a list tell apart."""
     pumpkin = load("settings-pumpkin")
     if pumpkin is None:
         return {}
@@ -578,9 +620,7 @@ def settings_icons(palette):
     top = frame[1] + (frame[3] - frame[1]) * 0.25          # below the stem
     lower = [s for s in pumpkin if s.bbox()[1] >= top]
     body = union(s.bbox() for s in lower)
-    size = min(body[2] - body[0], body[3] - body[1]) * SETTINGS_EMBLEM_SIZE / EMBLEM_SCALE
     cx, cy = (body[0] + body[2]) / 2, (body[1] + body[3]) / 2
-    box = (cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2)
     face = palette["pumpkin"]
 
     def flat(s):
@@ -588,12 +628,32 @@ def settings_icons(palette):
             return normalise(s.colour, palette)
         return rgb(palette["ember"] if luminance(s.colour) < 0.45 else face)
     pumpkin_markup = "".join(s.markup(flat(s)) for s in pumpkin)
+
+    def glyph_box(share):
+        size = min(body[2] - body[0], body[3] - body[1]) * share / EMBLEM_SCALE
+        return cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2
+    # small: a square around the body, so the stem only peeks in at the top
+    side = max(body[2] - body[0], body[3] - body[1])
+    small_frame = (cx - side / 2, cy - side / 2, cx + side / 2, cy + side / 2)
+    # Where Breeze has a one-colour twin of a name (Plasma asks for those in
+    # trays, menus and applets), ours is the glyph in one colour
+    import kde_lookup
+    breeze = kde_lookup.breeze()
     made = {}
     for emblem, names in SETTINGS.items():
         shapes = load(emblem)
-        if shapes:
-            carved = emblem_markup(shapes, box, palette["complementary"], face)
-            made.update({f"scalable/apps/{n}.svg": icon(pumpkin_markup + carved, frame, 0.06) for n in names})
+        if not shapes:
+            continue
+        carved = emblem_markup(shapes, glyph_box(SETTINGS_EMBLEM_SIZE), palette["complementary"], face)
+        big = icon(pumpkin_markup + carved, frame, 0.06)
+        carved = emblem_markup(shapes, glyph_box(SETTINGS_EMBLEM_SIZE_SMALL), palette["complementary"], face)
+        small = {px: icon(pumpkin_markup + carved, small_frame, 0.0, px) for px in (16, 22)}
+        one_colour = symbolic_icon(shapes, palette)
+        for n in names:
+            made[f"scalable/apps/{n}.svg"] = big
+            made.update({f"{px}x{px}/apps/{n}.svg": text for px, text in small.items()})
+            if f"{n}-symbolic" in breeze:
+                made[f"scalable/apps/{n}-symbolic.svg"] = one_colour
     return made
 
 

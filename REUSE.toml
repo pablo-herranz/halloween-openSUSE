@@ -28,7 +28,7 @@ path = [
     "README.md", "CHANGELOG.md", "CONTRIBUTING.md", "AGENTS.md",
     "CODE_OF_CONDUCT.md", "SECURITY.md", "docs/*.md", ".github/**",
     ".gitignore", ".gitattributes", "REUSE.toml", "_typos.toml", ".editorconfig-checker.json",
-    "tools/requirements.txt", "tools/requirements-dev.txt", "tools/upstream.toml", "plasma/sddm/**",
+    "tools/requirements.txt", "tools/requirements-dev.txt", "tools/upstream.toml", "tools/breeze-icons.txt", "plasma/sddm/**",
     "gnome/**", "xfce/**", "shared/gtk/README", "shared/gtk/index.theme",
     "art/*.toml", "art/*.md", "art/prompts/**",
 ]
