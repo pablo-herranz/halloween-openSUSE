@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Build every installable piece of halloween-openSUSE into build/.
 
-build/user/  goes to ~/.local/share (no root needed)
-build/root/  goes to /usr/share (SDDM and Plymouth)
+build/user/     goes to ~/.local/share (no root needed)
+build/root/     goes to /usr/share (SDDM and Plymouth)
+build/firefox/  the Firefox theme, unpacked and as an .xpi
 Any art master missing from art/source/ is replaced by a drawn placeholder,
 listed in build/placeholders.txt.
 """
@@ -14,22 +15,29 @@ import json
 import math
 import shutil
 import tomllib
+import zipfile
 
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 import placeholders as ph
 import plasma_style
 import vectors
-from common import BUILD, ROOT, fill_tokens, load_palette, rgb, write
+from common import BUILD, FIREFOX_ID, ROOT, VERSION, contrast, fill_tokens, load_palette, rgb, write
 
 USER = BUILD / "user"
 SYSTEM = BUILD / "root"
+FIREFOX = BUILD / "firefox"
 SIZES = [(3840, 2160), (2560, 1440), (1920, 1080), (1366, 768),   # 16:9
          (2560, 1600), (1920, 1200), (1440, 900)]                 # 16:10
 MAX_4K_BYTES = 3_000_000
 LNF_ID = "org.openSUSE.halloween.desktop"
 SDDM_DIR = "/usr/share/sddm/themes/breeze-openSUSE-halloween"
 PLYMOUTH_DIR = "/usr/share/plymouth/themes/openSUSE-halloween"
+FIREFOX_HEADER_H = 200   # Firefox's recommended header height
+FIREFOX_PAD = 150        # plain frame on the right, under the window buttons
+FIREFOX_DIM = 0.8        # the art's most opacity over the frame colour
+FIREFOX_TAB_STRIP_H = 44  # the top of the header that stays visible above the toolbar
+FIREFOX_TITLE_CONTRAST = 5.0
 CROPS = tomllib.loads((ROOT / "art/crops.toml").read_text())
 
 placeholders_used = []
@@ -228,6 +236,53 @@ def build_plymouth(p, hero, lit, unlit):
             save_png(frame, out / f"{prefix}-{i + 1:04d}.png")
 
 
+def firefox_header(p, night):
+    """A band of the night master (art/crops.toml [firefox]) that fades into the
+    frame colour: slowly to the left, where the tabs are, quickly to the right.
+    Bright parts (the moon) are made more transparent, so tab titles drawn over
+    them keep FIREFOX_TITLE_CONTRAST against the frame showing through."""
+    c = CROPS["firefox"]
+    w = c["width"]
+    h = round(night.height * w / night.width)
+    top, art_w = round(c["top"] * h), round(c["right"] * w)
+    art = night.resize((w, h), Image.LANCZOS).crop((0, top, art_w, top + FIREFOX_HEADER_H))
+    img = Image.new("RGBA", (art_w + FIREFOX_PAD, FIREFOX_HEADER_H), (0, 0, 0, 0))
+    img.paste(art, (0, 0))
+
+    # The most opacity each column can have behind the tab titles, spread out
+    # over a tab's width
+    frame = rgb(p["night"])
+    band = img.convert("RGB").crop((0, 0, img.width, FIREFOX_TAB_STRIP_H)).resize((img.width, 1), Image.BOX)
+
+    def readable(x):
+        col = band.getpixel((x, 0))
+        steps = [a / 50 for a in range(51)
+                 if contrast(p["cream"], [f + (v - f) * a / 50 for f, v in zip(frame, col)]) >= FIREFOX_TITLE_CONTRAST]
+        return round(255 * min(FIREFOX_DIM, max(steps, default=0)))
+    limit = Image.new("L", (img.width, 1))
+    limit.putdata([readable(x) for x in range(img.width)])
+    limit = limit.filter(ImageFilter.MinFilter(121)).filter(ImageFilter.BoxBlur(60))
+
+    fade_l, fade_r = round(art_w * 0.45), 60
+    row = [round(limit.getpixel((x, 0)) * min(1, x / fade_l) ** 1.6 * min(1, max(0, (art_w - x) / fade_r)) ** 1.2)
+           for x in range(img.width)]
+    img.putalpha(Image.frombytes("L", img.size, bytes(row * img.height)))
+    return img
+
+
+def build_firefox(p, wallpapers):
+    out = FIREFOX / "openSUSE-halloween"
+    header = "header.png"
+    save_png(firefox_header(p, wallpapers["night"]), out / header)
+    values = {**p, **{f"{k}_rgb": ", ".join(str(c) for c in rgb(v)) for k, v in p.items()},
+              "VERSION": VERSION, "FIREFOX_ID": FIREFOX_ID, "HEADER": header}
+    write(out / "manifest.json", fill_tokens((ROOT / "firefox/manifest.json.in").read_text(), values))
+    # A fixed timestamp keeps the .xpi identical between builds
+    with zipfile.ZipFile(FIREFOX / "openSUSE-halloween.xpi", "w", zipfile.ZIP_DEFLATED) as z:
+        for f in sorted(out.iterdir()):
+            z.writestr(zipfile.ZipInfo(f.name, (2026, 10, 1, 0, 0, 0)), f.read_bytes(), zipfile.ZIP_DEFLATED)
+
+
 def build_install_scripts():
     out = BUILD / "install"
     shutil.copytree(ROOT / "install", out)
@@ -248,7 +303,7 @@ def write_manifest():
 
 
 def main():
-    for d in (USER, SYSTEM, BUILD / "install"):
+    for d in (USER, SYSTEM, FIREFOX, BUILD / "install"):
         if d.exists():
             shutil.rmtree(d)
     p = load_palette()
@@ -265,6 +320,7 @@ def main():
     build_icons(p)
     build_sddm(p, wallpapers)
     build_plymouth(p, hero, lit, unlit)
+    build_firefox(p, wallpapers)
     build_install_scripts()
     write_manifest()
     print(f"built {BUILD}")

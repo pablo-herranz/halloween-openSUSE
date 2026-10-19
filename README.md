@@ -19,6 +19,7 @@ the layout leaves room for other desktops.
 | Icons (places, trash, launcher, KDE apps, app menu and power actions) over Breeze Dark | `openSUSE-halloween` | any freedesktop desktop |
 | Login screen | `breeze-openSUSE-halloween` | SDDM |
 | Boot splash | `openSUSE-halloween` | Plymouth |
+| Firefox theme "openSUSE Halloween": plum toolbars, pumpkin accents, jack-o'-lanterns by moonlight behind the tabs | `openSUSE-halloween@pluskal.org` | Firefox |
 
 openSUSE's green and blue are replaced by an all-autumn palette
 ([`art/palette.toml`](art/palette.toml)); openSUSE green appears only on the
@@ -59,6 +60,30 @@ The user install keeps your panels and widgets. It saves the previous
 settings on first run, and `install/uninstall-user.sh` restores them;
 `sudo install/uninstall-root.sh` restores the login screen and boot splash.
 
+### Firefox
+
+`make build` makes `build/firefox/openSUSE-halloween.xpi`, plus the same
+theme unpacked in `build/firefox/openSUSE-halloween/`. It only recolours
+Firefox; Firefox's own icon and logo stay as they are.
+
+The `.xpi` isn't signed by Mozilla yet, and regular Firefox releases
+(openSUSE's included) only install signed add-ons:
+
+- **Firefox, signed:** upload the `.xpi` to
+  [addons.mozilla.org](https://addons.mozilla.org/developers/), either
+  listed or "on your own" (unlisted, signed for self-distribution). Then
+  install it from its AMO page, or open the signed `.xpi` in Firefox.
+- **Firefox Developer Edition, Nightly or ESR:** set
+  `xpinstall.signatures.required` to `false` in `about:config`, then in
+  `about:addons` choose ⚙ → *Install Add-on From File…* and pick the `.xpi`.
+  Release builds ignore this setting.
+- **Any Firefox, until it restarts:** in
+  `about:debugging#/runtime/this-firefox` choose *Load Temporary Add-on…* and
+  pick the `.xpi`.
+
+`install/test-screens.sh firefox` does the last one in a throwaway profile
+and takes a screenshot; it leaves your own Firefox profiles alone.
+
 ### If the boot splash causes trouble
 
 - Press <kbd>Esc</kbd> during boot to see the text log.
@@ -81,7 +106,14 @@ Breeze's SVGs, pinned to libplasma v6.8.0 by hash in `tools/upstream.toml`.
 
 `tools/check.py` validates metadata, colour contrast (7:1 for text, 4.5:1
 for the rest), image sizes, file budgets, the Plasma style's SVG element IDs,
-icon SVGs, and REUSE compliance.
+icon SVGs, the Firefox theme (manifest, 4.5:1 for every text colour and for
+tab titles over the header image, a header of at most 200 px and 300 kB,
+an `.xpi` that matches the unpacked theme) and REUSE compliance.
+
+The Firefox theme's colours come from `art/palette.toml` through
+`firefox/manifest.json.in`. Its header is a band of the night wallpaper
+(`[firefox]` in `art/crops.toml`). Bright parts like the moon are made more
+transparent, so tab titles drawn over them stay readable.
 
 ## Roadmap
 
@@ -102,6 +134,9 @@ not affiliated with or endorsed by SUSE or the openSUSE Project. The
 chameleon here is an original character inspired by the Geeko; it is not the
 openSUSE logo or a modification of it.
 
+Firefox is a trademark of the Mozilla Foundation. The Firefox theme only sets
+colours and a header image; it does not change or replace Firefox's logo.
+
 ## Credits
 
 - KDE Visual Design Group: Breeze, the Breeze Plasma style and splash
@@ -113,7 +148,7 @@ openSUSE logo or a modification of it.
 [REUSE](https://reuse.software)-compliant; see [`REUSE.toml`](REUSE.toml)
 and the file headers.
 
-- Artwork: CC-BY-SA-4.0
+- Artwork, including the Firefox theme: CC-BY-SA-4.0
 - Plasma style: LGPL-2.0-or-later (derived from Breeze)
 - Colour scheme: LGPL-2.0-or-later (derived from Breeze Dark)
 - Splash, look-and-feel, Plymouth theme, tools and scripts: GPL-2.0-or-later

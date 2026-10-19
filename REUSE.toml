@@ -3,9 +3,10 @@ SPDX-PackageName = "halloween-openSUSE"
 SPDX-PackageSupplier = "Martin Pluskal <martin@pluskal.org>"
 SPDX-PackageDownloadLocation = "https://github.com/plusky/halloween-openSUSE"
 
-# Artwork: wallpapers, icons, characters, previews and screenshots
+# Artwork: wallpapers, icons, characters, previews, screenshots and the
+# Firefox theme (CC BY-SA is also one of the licences addons.mozilla.org offers)
 [[annotations]]
-path = ["art/**", "wallpapers/**", "icons/**"]
+path = ["art/**", "wallpapers/**", "icons/**", "firefox/**"]
 SPDX-FileCopyrightText = "2026 Martin Pluskal <martin@pluskal.org>"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
 

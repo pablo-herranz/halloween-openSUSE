@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 BUILD = ROOT / "build"
 CACHE = BUILD / "cache"
 VERSION = "2026.10.0"
+FIREFOX_ID = "openSUSE-halloween@pluskal.org"
 
 
 def load_palette():

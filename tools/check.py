@@ -4,8 +4,9 @@
 """Validate build/ before it is deployed.
 
 Checks metadata syntax, leftover tokens, colour contrast, image sizes and
-file budgets, the Plasma style's SVG element IDs, icon SVG sanity and REUSE
-compliance. `--release` also fails while placeholders are still in use.
+file budgets, the Plasma style's SVG element IDs, icon SVG sanity, the Firefox
+theme and REUSE compliance. `--release` also fails while placeholders are
+still in use.
 """
 
 import argparse
@@ -16,13 +17,14 @@ import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+import zipfile
 from pathlib import Path
 
 from PIL import Image
 
-from common import BUILD, CACHE, ROOT, contrast
+from common import BUILD, CACHE, FIREFOX_ID, ROOT, VERSION, contrast, rgb
 
-USER, SYSTEM = BUILD / "user", BUILD / "root"
+USER, SYSTEM, FIREFOX = BUILD / "user", BUILD / "root", BUILD / "firefox"
 STYLE = USER / "plasma/desktoptheme/openSUSE-halloween"
 LNF = USER / "plasma/look-and-feel/org.openSUSE.halloween.desktop/contents"
 INI_NAMES = ("defaults", "plasmarc", "colors", "index.theme")
@@ -183,6 +185,70 @@ def check_icons():
     ok(f"icons: {n} SVGs")
 
 
+def check_firefox():
+    theme = FIREFOX / "openSUSE-halloween"
+    try:
+        manifest = json.loads((theme / "manifest.json").read_text())
+        colors, images = manifest["theme"]["colors"], manifest["theme"]["images"]["additional_backgrounds"]
+    except (OSError, ValueError, KeyError) as e:
+        fail(f"firefox manifest.json: {e!r}")
+        return
+    if manifest.get("version") != VERSION:
+        fail(f"firefox version {manifest.get('version')} is not {VERSION}")
+    if manifest.get("browser_specific_settings", {}).get("gecko", {}).get("id") != FIREFOX_ID:
+        fail(f"firefox add-on ID is not {FIREFOX_ID}")
+
+    # Text on its background: (text, background, minimum)
+    pairs = [("tab_text", "tab_selected", 4.5), ("tab_text", "toolbar", 4.5), ("tab_background_text", "frame", 4.5),
+             ("tab_background_text", "frame_inactive", 4.5), ("toolbar_text", "toolbar", 4.5), ("icons", "toolbar", 3.0),
+             ("toolbar_field_text", "toolbar_field", 4.5), ("toolbar_field_text_focus", "toolbar_field_focus", 4.5),
+             ("toolbar_field_highlight_text", "toolbar_field_highlight", 4.5), ("popup_text", "popup", 4.5),
+             ("popup_highlight_text", "popup_highlight", 4.5), ("sidebar_text", "sidebar", 4.5),
+             ("sidebar_highlight_text", "sidebar_highlight", 4.5), ("ntp_text", "ntp_background", 4.5),
+             ("ntp_text", "ntp_card_background", 4.5)]
+    worst = 99
+    for text, bg, need in pairs:
+        if text not in colors or bg not in colors:
+            fail(f"firefox colours lack {text} or {bg}")
+            continue
+        c = contrast(colors[text], colors[bg])
+        worst = min(worst, c)
+        if c < need:
+            fail(f"firefox contrast {text} on {bg} {c:.2f}:1 < {need}:1")
+
+    title = 99
+    for name in images:
+        f = theme / name
+        if not f.exists():
+            fail(f"firefox image {name} missing")
+            continue
+        img = Image.open(f)
+        if img.height > 200 or f.stat().st_size > 300_000:
+            fail(f"firefox {name} is {img.width}x{img.height}, {f.stat().st_size / 1e3:.0f} kB (> 200 px or 300 kB)")
+        # Background tab titles over the image: every tab-sized patch of the
+        # 44 px tab strip, with the frame colour showing through
+        over = Image.new("RGBA", img.size, rgb(colors["frame"]) + (255,))
+        over.alpha_composite(img.convert("RGBA"))
+        strip = over.convert("RGB").crop((0, 0, img.width, 44))
+        title = min(contrast(colors["tab_background_text"], strip.crop((x, 0, x + 100, 44)).resize((1, 1), Image.BOX).getpixel((0, 0)))
+                    for x in range(0, img.width - 99, 10))
+        if title < 4.5:
+            fail(f"firefox tab titles over {name} {title:.2f}:1 < 4.5:1")
+
+    xpi = FIREFOX / "openSUSE-halloween.xpi"
+    try:
+        with zipfile.ZipFile(xpi) as z:
+            packed = {i.filename: z.read(i) for i in z.infolist()}
+    except (OSError, zipfile.BadZipFile) as e:
+        fail(f"firefox {xpi.name}: {e}")
+        return
+    unpacked = {f.name: f.read_bytes() for f in theme.iterdir()}
+    if packed != unpacked:
+        fail(f"firefox {xpi.name} does not match {theme.name}/")
+    ok(f"firefox theme {manifest['version']}: contrast {worst:.1f}, tab titles over the header {title:.1f}, "
+       f"{xpi.name} {xpi.stat().st_size / 1e3:.0f} kB")
+
+
 def check_reuse():
     reuse = shutil.which("reuse") or str(ROOT / "tools/.venv/bin/reuse")
     if not Path(reuse).exists():
@@ -206,6 +272,7 @@ def main():
     check_images()
     check_plasma_style()
     check_icons()
+    check_firefox()
     check_reuse()
     placeholders = (BUILD / "placeholders.txt").read_text().split("\n") if (BUILD / "placeholders.txt").exists() else []
     placeholders = [p for p in placeholders if p]

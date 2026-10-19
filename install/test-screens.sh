@@ -5,9 +5,10 @@
 # Show each themed screen in test mode and screenshot it into screenshots/
 # next to this build. Run as the desktop user (also works over SSH).
 #
-# usage: test-screens.sh [desktop|splash|lock|sddm|widgets|dolphin|plymouth|all]
+# usage: test-screens.sh [desktop|splash|lock|sddm|widgets|dolphin|firefox|plymouth|all]
 #   plymouth needs sudo and the plymouth-x11-renderer package; it switches the
 #   default theme only while the test runs and never touches the initrd.
+#   firefox uses a throwaway profile; your own Firefox profiles are not touched.
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 session_env
@@ -92,6 +93,92 @@ dolphin() {
     pkill -u "$(id -u)" -x dolphin
 }
 
+firefox() {
+    # Release Firefox only keeps signed add-ons, so the theme is loaded as a
+    # temporary add-on over the remote debugging protocol, as web-ext does
+    local profile port=6080 xpi=$BUILD_DIR/firefox/openSUSE-halloween.xpi
+    [ -f "$xpi" ] || die "missing $xpi"
+    profile=$(mktemp -d)
+    # shellcheck disable=SC2064 # expand now: $profile is gone when the trap runs
+    trap "pkill -u $(id -u) -f -- '--profile $profile' || true; sleep 2; rm -rf '$profile'" EXIT
+    cat > "$profile/user.js" <<'EOF'
+user_pref("devtools.chrome.enabled", true);
+user_pref("devtools.debugger.remote-enabled", true);
+user_pref("devtools.debugger.prompt-connection", false);
+user_pref("browser.shell.checkDefaultBrowser", false);
+user_pref("browser.aboutwelcome.enabled", false);
+user_pref("browser.startup.homepage_override.mstone", "ignore");
+user_pref("datareporting.policy.dataSubmissionPolicyBypassNotification", true);
+user_pref("toolkit.telemetry.reportingpolicy.firstRun", false);
+user_pref("browser.tabs.warnOnClose", false);
+EOF
+    echo '{"chrome://browser/content/browser.xhtml":{"main-window":{"sizemode":"maximized"}}}' > "$profile/xulstore.json"
+    WAYLAND_DISPLAY=$WL command firefox --no-remote --profile "$profile" --start-debugger-server "$port" \
+        https://en.wikipedia.org/wiki/Jack-o%27-lantern https://www.opensuse.org/ https://news.opensuse.org/ \
+        https://en.opensuse.org/Portal:Tumbleweed https://en.wikipedia.org/wiki/Halloween about:addons >/dev/null 2>&1 &
+    timeout 60 python3 - "$port" "$xpi" <<'EOF'
+import json, socket, sys, time
+
+port, xpi = int(sys.argv[1]), sys.argv[2]
+for _ in range(30):
+    try:
+        sock = socket.create_connection(("127.0.0.1", port))
+        break
+    except OSError:
+        time.sleep(1)
+else:
+    sys.exit("Firefox's debugger server did not start")
+stream = sock.makefile("rb")
+
+def receive():
+    length = b""
+    while (c := stream.read(1)) != b":":
+        if not c:
+            raise EOFError
+        length += c
+    return json.loads(stream.read(int(length)))
+
+def request(to, kind, **args):
+    data = json.dumps({"to": to, "type": kind, **args}).encode()
+    sock.sendall(b"%d:%s" % (len(data), data))
+    while (reply := receive()).get("from") != to:
+        pass
+    if "error" in reply:
+        sys.exit(f"{kind}: {reply['error']}: {reply.get('message', '')}")
+    return reply
+
+receive()   # the greeting
+addons = request("root", "getRoot")["addonsActor"]
+print("loaded", request(addons, "installTemporaryAddon", addonPath=xpi)["addon"]["id"], flush=True)
+
+# Close the debugger server's listener, or the URL bar keeps its striped
+# "remote control" cue in the screenshot. This connection closes with it.
+process = request("root", "getProcess", id=0)["processDescriptor"]["actor"]
+console = request(process, "getTarget")["process"]["consoleActor"]
+try:
+    request(console, "evaluateJSAsync", text="""
+        const { useDistinctSystemPrincipalLoader, releaseDistinctSystemPrincipalLoader } = ChromeUtils.importESModule(
+            "resource://devtools/shared/loader/DistinctSystemPrincipalLoader.sys.mjs", { global: "shared" });
+        const owner = {};
+        useDistinctSystemPrincipalLoader(owner).require("resource://devtools/server/devtools-server.js")
+            .DevToolsServer.closeAllSocketListeners();
+        releaseDistinctSystemPrincipalLoader(owner);
+    """)
+    while receive().get("type") != "evaluationResult":
+        pass
+except EOFError:
+    pass
+time.sleep(1)
+try:
+    socket.create_connection(("127.0.0.1", port)).close()
+    sys.exit("Firefox's debugger server is still listening")
+except OSError:
+    pass
+EOF
+    sleep 6     # the pages load and the window settles
+    shot firefox
+}
+
 plymouth() {
     rpm -q plymouth-x11-renderer >/dev/null || die "install plymouth-x11-renderer first"
     local display=${DISPLAY:-:0} xauth previous
@@ -115,7 +202,7 @@ plymouth() {
 }
 
 case ${1:-all} in
-    desktop|splash|lock|sddm|widgets|dolphin|plymouth) "$1" ;;
-    all) desktop; splash; lock; sddm; widgets; dolphin ;;
-    *) die "usage: $0 [desktop|splash|lock|sddm|widgets|dolphin|plymouth|all]" ;;
+    desktop|splash|lock|sddm|widgets|dolphin|firefox|plymouth) "$1" ;;
+    all) desktop; splash; lock; sddm; widgets; dolphin; firefox ;;
+    *) die "usage: $0 [desktop|splash|lock|sddm|widgets|dolphin|firefox|plymouth|all]" ;;
 esac

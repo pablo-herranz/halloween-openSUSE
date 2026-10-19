@@ -15,3 +15,6 @@
 - Start menu: Halloween icons for the KDE apps, the menu categories and tabs,
   and the sleep, hibernate, restart, shut down, lock, log out and switch
   user actions; other projects' logos stay as they are
+- Firefox theme "openSUSE Halloween" (`build/firefox/openSUSE-halloween.xpi`):
+  palette colours and a moonlit jack-o'-lantern header cut from the night
+  wallpaper; unsigned for now

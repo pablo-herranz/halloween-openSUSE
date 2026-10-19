@@ -53,4 +53,4 @@ icon-preview: build
 	$(PY) tools/icon_preview.py
 
 clean:
-	rm -rf build/user build/root build/install build/*.txt build/*.json build/MANIFEST.sha256
+	rm -rf build/user build/root build/firefox build/install build/*.txt build/*.json build/MANIFEST.sha256

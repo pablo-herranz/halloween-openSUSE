@@ -1,0 +1,65 @@
+{
+  "manifest_version": 3,
+  "name": "openSUSE Halloween",
+  "version": "@VERSION@",
+  "description": "A cosy autumn Halloween night: plum toolbars, pumpkin accents and jack-o'-lanterns by moonlight.",
+  "author": "Martin Pluskal",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "@FIREFOX_ID@",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+  "theme": {
+    "images": {
+      "additional_backgrounds": ["@HEADER@"]
+    },
+    "properties": {
+      "additional_backgrounds_alignment": ["right top"],
+      "additional_backgrounds_tiling": ["no-repeat"],
+      "color_scheme": "dark"
+    },
+    "colors": {
+      "frame": "@night@",
+      "frame_inactive": "@complementary@",
+      "tab_background_text": "@cream@",
+      "tab_selected": "@header@",
+      "tab_text": "@cream@",
+      "tab_line": "@pumpkin@",
+      "tab_loading": "@pumpkin@",
+      "toolbar": "@header@",
+      "toolbar_text": "@cream@",
+      "toolbar_top_separator": "@header@",
+      "toolbar_bottom_separator": "@night@",
+      "toolbar_vertical_separator": "@button@",
+      "icons": "@cream@",
+      "icons_attention": "@pumpkin@",
+      "button_background_hover": "rgba(@cream_rgb@, 0.12)",
+      "button_background_active": "rgba(@cream_rgb@, 0.2)",
+      "toolbar_field": "@view@",
+      "toolbar_field_text": "@cream@",
+      "toolbar_field_border": "@button@",
+      "toolbar_field_focus": "@view@",
+      "toolbar_field_text_focus": "@cream@",
+      "toolbar_field_border_focus": "@pumpkin@",
+      "toolbar_field_highlight": "@ember@",
+      "toolbar_field_highlight_text": "@white@",
+      "popup": "@header@",
+      "popup_text": "@cream@",
+      "popup_border": "@button@",
+      "popup_highlight": "@ember@",
+      "popup_highlight_text": "@white@",
+      "sidebar": "@night@",
+      "sidebar_text": "@cream@",
+      "sidebar_border": "@button@",
+      "sidebar_highlight": "@ember@",
+      "sidebar_highlight_text": "@white@",
+      "ntp_background": "@night@",
+      "ntp_card_background": "@header@",
+      "ntp_text": "@cream@"
+    }
+  }
+}

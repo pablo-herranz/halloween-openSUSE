@@ -14,3 +14,12 @@ focus_y = 0.5
 # so the splash's own chameleon isn't doubled by the one in the wallpaper.
 [splash]
 box = [0.0, 0.2, 0.58, 0.785]
+
+# The Firefox header: the night master drawn `width` px wide, cut at `right`
+# (0..1 of its width) just past the jack-o'-lanterns, with `top` (0..1 of its
+# height) at the top of the tab strip. A 44 px tab strip can only show a slice
+# of the chameleon, so the band stops short of it.
+[firefox]
+width = 1320
+right = 0.775
+top = 0.584
