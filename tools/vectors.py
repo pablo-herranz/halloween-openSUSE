@@ -277,6 +277,9 @@ def ornament(name, palette):
     shapes = load({"popup-sprig": "sprig", "panel-garland": "garland", "clock-face": "clock"}[stem])
     if shapes is None:
         return None
+    # Ornaments have no white of their own: any left is backdrop trapped
+    # between shapes (between a twig and a leaf, say)
+    shapes = [s for s in shapes if luminance(s.colour) <= 0.97]
     markup = "".join(s.markup() for s in shapes)
     x0, y0, x1, y1 = union(s.bbox() for s in shapes)
     if stem == "popup-sprig":
