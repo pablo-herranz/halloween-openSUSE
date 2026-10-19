@@ -27,10 +27,10 @@ from pathlib import Path
 
 import resvg_py
 from jsonschema import Draft7Validator
-from PIL import Image
+from PIL import Image, ImageFilter
 
 import install
-from common import BUILD, CACHE, FIREFOX, FIREFOX_ID, ROOT, SYSTEM, USER, VERSION, contrast, fetch, rgb
+from common import BUILD, CACHE, FIREFOX, FIREFOX_ID, ROOT, SYSTEM, USER, VERSION, contrast, fetch, load_palette, rgb
 
 STYLE = USER / "plasma/desktoptheme/openSUSE-halloween"
 LNF = USER / "plasma/look-and-feel/org.openSUSE.halloween.desktop/contents"
@@ -121,22 +121,26 @@ def kde_colors(path):
 def check_contrast():
     get = kde_colors(USER / "color-schemes/openSUSEHalloween.colors")
     worst = {}
-    for group in ("Window", "View", "Button", "Header", "Tooltip", "Complementary"):
+    status = ("ForegroundLink", "ForegroundVisited", "ForegroundNegative", "ForegroundNeutral",
+              "ForegroundPositive", "ForegroundActive")
+    # WCAG 2.2: 4.5:1 for text (7:1 for body text here), 3:1 for focus rings
+    # and for the selection against the lists and windows it sits in
+    for group in ("Window", "View", "Button", "Header", "Tooltip", "Complementary", "Selection"):
         bg = get(group, "BackgroundNormal")
-        rules = [("ForegroundNormal", 7.0), ("ForegroundInactive", 4.5)]
-        if group in ("Window", "View"):
-            rules += [(k, 4.5) for k in ("ForegroundLink", "ForegroundVisited", "ForegroundNegative",
-                                         "ForegroundNeutral", "ForegroundPositive", "ForegroundActive")]
+        rules = [("ForegroundNormal", 4.5 if group == "Selection" else 7.0), ("ForegroundInactive", 4.5)]
+        rules += [(k, 4.5) for k in status] + [("DecorationFocus", 3.0)]
         for key, need in rules:
             c = contrast(get(group, key), bg)
             worst[key] = min(worst.get(key, 99), c)
             if c < need:
                 fail(f"contrast {group}/{key} {c:.2f}:1 < {need}:1")
-    c = contrast(get("Selection", "ForegroundNormal"), get("Selection", "BackgroundNormal"))
-    if c < 4.5:
-        fail(f"contrast Selection text {c:.2f}:1 < 4.5:1")
-    ok("contrast: " + ", ".join(f"{k.removeprefix('Foreground')} {v:.1f}" for k, v in worst.items())
-       + f", Selection {c:.1f}")
+    selection = get("Selection", "BackgroundNormal")
+    for group in ("View", "Window"):
+        c = contrast(selection, get(group, "BackgroundNormal"))
+        worst["Selection"] = min(worst.get("Selection", 99), c)
+        if c < 3.0:
+            fail(f"contrast Selection against {group} {c:.2f}:1 < 3:1")
+    ok("contrast: " + ", ".join(f"{k.removeprefix('Foreground')} {v:.1f}" for k, v in worst.items()))
 
 
 def dir_size(d):
@@ -192,6 +196,19 @@ def check_look_and_feel():
     ok(f"look-and-feel: previews, splash {dir_size(LNF / 'splash') / 1e3:.0f} kB")
 
 
+def check_plymouth_colours():
+    """The pinned dialog images are recoloured from the palette: no blue left
+    (the password prompt was the only blue between boot and login)."""
+    theme = SYSTEM / "plymouth/openSUSE-halloween"
+    for name in ("entry", "lock", "bullet", "keyboard", "capslock"):
+        px = Image.open(theme / f"{name}.png").convert("RGBA").tobytes()
+        blue = sum(1 for i in range(0, len(px), 4)
+                   if px[i + 3] > 128 and px[i + 2] > px[i] + 40 and px[i + 2] > px[i + 1] + 20)
+        if blue:
+            fail(f"plymouth {name}.png: {blue} blue pixels; recolour it from the palette")
+    ok("plymouth colours: dialog images from the palette")
+
+
 def check_plymouth_layout():
     """two-step places each image at alignment x (screen - image). The chameleon
     stays on screen during a passphrase prompt (the lantern stops), so the prompt
@@ -202,9 +219,12 @@ def check_plymouth_layout():
     s = {k.lower(): v for k, v in cp["two-step"].items()}
     size = {n: Image.open(theme / f"{n}.png").size for n in ("watermark", "entry", "throbber-0001")}
 
-    def box(name, h_key, v_key, sw, sh, pad=0):
+    def box(name, h_key, v_key, sw, sh, pad=0, centred=False):
         w, h = size[name]
-        x, y = (sw - w) * float(s[h_key]), (sh - h) * float(s[v_key])
+        if centred:     # the animation is centred on the alignment point (plugin.c)
+            x, y = float(s[h_key]) * sw - w / 2, float(s[v_key]) * sh - h / 2
+        else:
+            x, y = (sw - w) * float(s[h_key]), (sh - h) * float(s[v_key])
         return (x - pad, y - pad, x + w + pad, y + h + pad)
 
     def overlap(a, b):
@@ -214,7 +234,7 @@ def check_plymouth_layout():
         chameleon = box("watermark", "watermarkhorizontalalignment", "watermarkverticalalignment", sw, sh)
         # The entry with the prompt text and lock icon around it
         prompt = box("entry", "dialoghorizontalalignment", "dialogverticalalignment", sw, sh, pad=30)
-        lantern = box("throbber-0001", "horizontalalignment", "verticalalignment", sw, sh)
+        lantern = box("throbber-0001", "horizontalalignment", "verticalalignment", sw, sh, centred=True)
         title_y = (sh - 80) * float(s["titleverticalalignment"])
         title = (0, title_y, sw, title_y + 80)
         for name, other in (("passphrase prompt", prompt), ("lantern", lantern), ("update title", title)):
@@ -223,6 +243,21 @@ def check_plymouth_layout():
         if prompt[3] > sh:
             fail(f"plymouth at {sw}x{sh}: the passphrase prompt runs off the screen")
     ok("plymouth layout: the prompt, lantern and title clear the chameleon from 720p to 4K and portrait")
+
+
+def login_label_contrast(path):
+    """Worst contrast of the login screen's action labels (cream at the 0.85
+    opacity KDE's ActionButton uses) over the band of the background they sit
+    on, blurred as SDDM blurs it while the login form shows."""
+    cream = rgb(load_palette()["cream"])
+    img = Image.open(path).convert("RGB").resize((1920, 1200), Image.LANCZOS).filter(ImageFilter.GaussianBlur(25))
+    band = img.crop((660, 900, 1260, 1000)).resize((60, 10))
+    worst = 99
+    for y in range(band.height):
+        for x in range(band.width):
+            bg = band.getpixel((x, y))
+            worst = min(worst, contrast(tuple(round(0.85 * c + 0.15 * b) for c, b in zip(cream, bg, strict=True)), bg))
+    return worst
 
 
 def check_sddm():
@@ -238,7 +273,10 @@ def check_sddm():
     background = cp.get("General", "background", fallback="")
     if background != f"{sddm.INSTALL_DIR}/background.jpg" or not (theme / "background.jpg").exists():
         fail(f"sddm theme.conf background {background!r} is not the theme's own background.jpg")
-    ok(f"sddm: {len(sddm.BASE_FILES)} links to {sddm.BASE}, own background")
+    labels = login_label_contrast(theme / "background.jpg")
+    if labels < 4.5:
+        fail(f"sddm: the power action labels are {labels:.2f}:1 over the background (< 4.5:1)")
+    ok(f"sddm: {len(sddm.BASE_FILES)} links to {sddm.BASE}, own background, action labels {labels:.1f}:1")
 
 
 def svg_ids(path):
@@ -265,8 +303,8 @@ def check_plasma_style():
             if str(rel).endswith(suffix) and not req <= ids:
                 fail(f"plasma style {rel} lacks {sorted(req - ids)}")
         n += 1
-    if not (STYLE / "colors").exists():
-        fail("plasma style has no colors file")
+    if (STYLE / "colors").exists():
+        fail("plasma style has a colors file: it would override the user's colour scheme, high contrast included")
     ok(f"plasma style: {n} SVGs keep every Breeze element ID")
 
 
@@ -329,6 +367,11 @@ def check_icons():
             fail(f"icon {rel}: {f.stat().st_size / 1e3:.0f} kB (> 60 kB)")
         if re.search(r"<(\w+:)?(text|script|image)\b", text) or re.search(r'href="(https?:|file:)', text):
             fail(f"icon {rel}: contains text, script, raster images or external links")
+        # Qt resolves currentColor where fill is set: without the class there, the glyph turns black
+        for el in root.iter():
+            if el.get("fill") == "currentColor" and "ColorScheme-Text" not in (el.get("class") or "").split():
+                fail(f"icon {rel}: fill=currentColor on a <{el.tag.split('}')[-1]}> without class ColorScheme-Text")
+                break
         n += 1
     ok(f"icons: {n} SVGs in the {len(dirs)} directories index.theme lists")
 
@@ -354,7 +397,9 @@ def check_firefox():
              ("toolbar_field_highlight_text", "toolbar_field_highlight", 4.5), ("popup_text", "popup", 4.5),
              ("popup_highlight_text", "popup_highlight", 4.5), ("sidebar_text", "sidebar", 4.5),
              ("sidebar_highlight_text", "sidebar_highlight", 4.5), ("ntp_text", "ntp_background", 4.5),
-             ("ntp_text", "ntp_card_background", 4.5)]
+             ("ntp_text", "ntp_card_background", 4.5),
+             # the address bar's edge and focus ring are what show where it is
+             ("toolbar_field_border", "toolbar", 3.0), ("toolbar_field_border_focus", "toolbar", 3.0)]
     worst = 99
     for text, bg, need in pairs:
         if text not in colors or bg not in colors:
@@ -485,7 +530,7 @@ def css_colours(text):
 
 def check_gtk():
     """Every colour we set is one adw-gtk3 defines, and text stays readable."""
-    from targets.gtk import ID
+    from targets.gtk import FOCUS, ID
     css = (THEMES / ID / "gtk-3.0/gtk.css").read_text()
     upstream, ours = css.split("openSUSE Halloween: appended", 1)
     ours = css_colours(ours)
@@ -496,14 +541,24 @@ def check_gtk():
              ("headerbar_fg_color", "headerbar_bg_color", 7.0), ("sidebar_fg_color", "sidebar_bg_color", 7.0),
              ("popover_fg_color", "popover_bg_color", 4.5), ("dialog_fg_color", "dialog_bg_color", 4.5),
              ("accent_fg_color", "accent_bg_color", 4.5), ("accent_color", "window_bg_color", 4.5),
-             ("success_color", "window_bg_color", 4.5), ("warning_color", "window_bg_color", 4.5),
-             ("error_color", "window_bg_color", 4.5)]
+             ("accent_color", "view_bg_color", 3.0), ("accent_color", "popover_bg_color", 3.0)]
+    # Status colours as text on every surface, and behind their own text
+    for status in ("success", "warning", "error", "destructive"):
+        pairs += [(f"{status}_color", f"{bg}_bg_color", 4.5) for bg in ("window", "view", "headerbar", "popover",
+                                                                          "dialog", "sidebar")]
+        pairs.append((f"{status}_fg_color", f"{status}_bg_color", 4.5))
     worst = 99
     for fg, bg, need in pairs:
+        if fg not in ours or bg not in ours:
+            fail(f"gtk theme doesn't set {fg if fg not in ours else bg}")
+            continue
         c = contrast(ours[fg], ours[bg])
         worst = min(worst, c)
         if c < need:
             fail(f"gtk contrast {fg} on {bg} {c:.2f}:1 < {need}:1")
+    # Half-transparent pumpkin rings are below 3:1 (tools/targets/gtk.py draws them solid)
+    if FOCUS in upstream:
+        fail(f"gtk theme still draws focus with {FOCUS}")
     for f in ("gtk-dark.css", "assets/check-symbolic.svg"):
         if not (THEMES / ID / "gtk-3.0" / f).exists():
             fail(f"gtk theme lacks gtk-3.0/{f}")
@@ -545,8 +600,16 @@ def check_gnome():
     xml = ET.parse(USER / "gnome-background-properties/openSUSEhalloween.xml")
     if xml.findtext("wallpaper/filename-dark") != gnome.DARK:
         fail("gnome background XML has no dark picture")
-    if not (THEMES / "openSUSE-halloween/gnome-shell/gnome-shell.css").exists():
+    shell = THEMES / "openSUSE-halloween/gnome-shell/gnome-shell.css"
+    if not shell.exists():
         fail("gnome shell theme missing")
+    else:
+        # St knows rgba(), st-transparentize(), st-mix() and the accent; it drops
+        # a declaration with GTK's colour functions without a word
+        css = re.sub(r"/\*.*?\*/", "", shell.read_text(), flags=re.S)
+        gtk_only = sorted(set(re.findall(r"(?<![\w-])(alpha|mix|shade|lighter|darker)\(", css)))
+        if gtk_only:
+            fail(f"gnome shell theme uses GTK colour functions St ignores: {gtk_only}")
     for f in [*(BUILD / "defaults/dconf/db/gdm.d").iterdir(), *(BUILD / "defaults/glib-2.0/schemas").iterdir()]:
         cp = configparser.ConfigParser(interpolation=None)
         try:
@@ -625,6 +688,7 @@ def main():
     check_syntax()
     check_metadata()
     check_images()
+    check_plymouth_colours()
     check_plymouth_layout()
     check_icons()
     check_firefox()

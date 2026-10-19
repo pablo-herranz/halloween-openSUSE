@@ -32,11 +32,81 @@
 @define-color panel_bg_color @complementary@;
 @define-color panel_fg_color @cream@;
 
-/* Status colours as text */
+/* Status colours as text, and behind white (dark on warning) text */
 @define-color success_color @olive@;
 @define-color warning_color @candle@;
 @define-color error_color @cranberry@;
 @define-color destructive_color @cranberry@;
+@define-color success_bg_color @moss@;
+@define-color warning_bg_color @candle@;
+@define-color error_bg_color @cranberry_dark@;
+@define-color destructive_bg_color @cranberry_dark@;
+@define-color success_fg_color @white@;
+@define-color warning_fg_color @night@;
+@define-color error_fg_color @white@;
+@define-color destructive_fg_color @white@;
+
+/* adw-gtk3 draws error and warning labels and entries in the background
+   colours; on the night background they need the text colours */
+label.error,
+entry.error,
+spinbutton.error,
+headerbar entry.error,
+.titlebar entry.error {
+  color: @error_color;
+  border-color: @error_color;
+}
+
+entry.warning,
+headerbar entry.warning,
+.titlebar entry.warning {
+  color: @warning_color;
+  border-color: @warning_color;
+}
+
+/* On/off states and levels in pumpkin: 3:1 against their troughs, where
+   ember is not. Focus rings are solid pumpkin too (tools/targets/gtk.py). */
+switch:checked,
+progressbar progress,
+scale highlight {
+  background-color: @accent_color;
+  border-color: @accent_color;
+}
+
+check:checked,
+radio:checked,
+check:indeterminate,
+radio:indeterminate {
+  background-image: image(@accent_color);
+  border-color: @accent_color;
+}
+
+check:not(:checked):not(:indeterminate),
+radio:not(:checked):not(:indeterminate) {
+  border-color: alpha(currentColor, 0.4);
+}
+
+/* Selected rows: solid ember behind white text, as in Plasma */
+row:selected,
+treeview.view:selected,
+.view:selected,
+iconview:selected {
+  background-color: @accent_bg_color;
+  color: @accent_fg_color;
+}
+
+/* Links in apricot, visited links in plum, as in Plasma */
+button:link > label,
+button:link,
+*:link {
+  color: @apricot@;
+}
+
+button:visited > label,
+button:visited,
+*:link:visited {
+  color: @plum@;
+}
 
 /* Xfce panel (xfce4-panel 4.20): night with pumpkin highlights */
 .xfce4-panel.background {

@@ -11,6 +11,7 @@ from common import SHARED, USER, fill_tokens, upstream_archive, write
 DESKTOP = ("gnome", "xfce")
 ID = "openSUSE-halloween"
 THEME = USER / "themes" / ID
+FOCUS = "alpha(@accent_color,0.5)"
 
 
 def build(ctx):
@@ -19,6 +20,9 @@ def build(ctx):
     shutil.copytree(src / "assets", out / "assets")
     ours = fill_tokens((SHARED / "gtk/halloween.css.in").read_text(), ctx.palette)
     for name in ("gtk.css", "gtk-dark.css"):
-        write(out / name, (src / name).read_text().rstrip("\n") + "\n\n" + ours)
+        # Focus rings and focused entries at half-transparent pumpkin are
+        # below 3:1 against the night background; draw them solid
+        upstream = (src / name).read_text().replace(FOCUS, "@accent_color")
+        write(out / name, upstream.rstrip("\n") + "\n\n" + ours)
     for name in ("index.theme", "README"):
         shutil.copyfile(SHARED / "gtk" / name, THEME / name)

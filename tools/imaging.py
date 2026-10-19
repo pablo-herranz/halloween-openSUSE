@@ -86,3 +86,31 @@ def vignette(img, strength=0.55):
     mask = Image.radial_gradient("L").resize((w, h), Image.LANCZOS)
     mask = mask.point(lambda v: int(min(255, max(0, (v - 90) * 1.6)) * strength))
     return Image.composite(Image.new("RGB", (w, h), (0, 0, 0)), img.convert("RGB"), mask)
+
+
+def scrim(img, height=0.3, strength=0.45):
+    """Darken the bottom `height` of `img`, smoothly, up to `strength` at the
+    edge: text drawn there (login actions) stays readable over a bright scene."""
+    w, h = img.size
+    top = int(h * (1 - height))
+    ramp = Image.linear_gradient("L").resize((1, h - top), Image.LANCZOS).point(lambda v: int(v * strength))
+    mask = Image.new("L", (w, h), 0)
+    mask.paste(ramp.resize((w, h - top)), (0, top))
+    return Image.composite(Image.new("RGB", (w, h), (0, 0, 0)), img.convert("RGB"), mask)
+
+
+def recolour(img, mapping):
+    """Swap an image's key colours ({source rgb: target rgb}), keeping alpha.
+    Each pixel blends the targets by how close it is to each source, so the
+    antialiased edges between two key colours stay smooth."""
+    sources, targets = list(mapping), list(mapping.values())
+    out = img.convert("RGBA").copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            *c, a = px[x, y]
+            weights = [1 / (sum((u - v) ** 2 for u, v in zip(c, s, strict=True)) + 1) ** 2 for s in sources]
+            total = sum(weights)
+            pairs = list(zip(weights, targets, strict=True))
+            px[x, y] = (*(round(sum(w * t[i] for w, t in pairs) / total) for i in range(3)), a)
+    return out

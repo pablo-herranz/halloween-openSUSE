@@ -13,11 +13,11 @@
 }
 
 #XfceNotifyWindow:hover {
-  background-color: @button@;
+  background-color: @raised@;
 }
 
 #XfceNotifyWindow label#summary {
-  color: @candle@;
+  color: @cream@;
   font-weight: bold;
 }
 

@@ -10,12 +10,14 @@ import tomllib
 from PIL import Image
 
 import placeholders as ph
-from common import CACHE, ROOT, SHARED, SYSTEM, fetch, fill_tokens, write
-from imaging import fit, save_png
+from common import CACHE, ROOT, SHARED, SYSTEM, fetch, fill_tokens, rgb, write
+from imaging import fit, recolour, save_png
 
 DESKTOP = "shared"
 ID = "openSUSE-halloween"
 INSTALL_DIR = f"/usr/share/plymouth/themes/{ID}"
+# The pinned dialog images are blue and grey: their key colours -> palette names
+DIALOG_COLOURS = {"#363A3D": "button", "#1B6ACB": "pumpkin", "#C0C0C0": "cream", "#EEEEEC": "cream"}
 
 
 def build(ctx):
@@ -27,8 +29,13 @@ def build(ctx):
           fill_tokens((src / f"{ID}.plymouth.in").read_text(), {**hexes, "IMAGEDIR": INSTALL_DIR}))
     save_png(fit(ctx.hero, 300), out / "watermark.png")
     pins = tomllib.loads((ROOT / "tools/upstream.toml").read_text())["plymouth"]
+    mapping = {rgb(k): rgb(p[v]) for k, v in DIALOG_COLOURS.items()}
     for name, sha256 in pins["files"].items():
-        shutil.copyfile(fetch(f"{pins['base']}/{name}", sha256, CACHE / "plymouth" / name), out / name)
+        image = fetch(f"{pins['base']}/{name}", sha256, CACHE / "plymouth" / name)
+        if name.endswith(".png"):
+            save_png(recolour(Image.open(image), mapping), out / name)
+        else:
+            shutil.copyfile(image, out / name)
     lit, unlit = ctx.lanterns
     size, frames = 64, 40
     small_lit, small_unlit = fit(lit, 48), fit(unlit, 48)

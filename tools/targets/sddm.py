@@ -9,7 +9,7 @@ import os
 from PIL import Image, ImageEnhance
 
 from common import DEFAULTS, ROOT, SYSTEM, fill_tokens, write
-from imaging import crop_to, save_jpeg, save_png, vignette
+from imaging import crop_to, save_jpeg, save_png, scrim, vignette
 
 DESKTOP = "plasma"
 ID = "breeze-openSUSE-halloween"
@@ -34,7 +34,9 @@ def build(ctx):
     defaults = ROOT / "plasma/sddm/defaults/zz-openSUSE-halloween.conf"
     write(DEFAULTS / "sddm.conf.d" / defaults.name, defaults.read_text())
     bg = crop_to(ctx.wallpapers, "night", BACKGROUND[0] / BACKGROUND[1], zoomed=True).resize(BACKGROUND, Image.LANCZOS)
-    bg = vignette(ImageEnhance.Brightness(bg).enhance(0.9))
+    # the power actions sit low on the screen, in a band that is light in the
+    # picture: a scrim keeps their labels readable
+    bg = scrim(vignette(ImageEnhance.Brightness(bg).enhance(0.9)))
     save_jpeg(bg, out / "background.jpg")
     shots = ROOT / "art/previews/sddm.png"
     preview = Image.open(shots) if shots.exists() else bg
