@@ -53,7 +53,8 @@ Never edit anything in `build/`: it is generated. See
 
 `main` is protected: every change goes through a pull request, and a pull
 request can only be merged when CI passes (ShellCheck, Ruff, REUSE and Build
-and check).
+and check). The maintainer's own pull requests merge by themselves once CI
+passes; everyone else's are reviewed and merged by the maintainer.
 
 1. Fork the repository and create a branch for one change.
 2. Make the change, then run `make check` and `make lint`.

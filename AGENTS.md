@@ -68,6 +68,8 @@ config CC0-1.0.
   the user asks.
 - Push to `main`: it is protected. Work on a branch and open a pull request;
   CI (ShellCheck, Ruff, REUSE, Build and check) must pass before it can merge.
+  Pull requests opened as the repository owner merge on their own once CI
+  passes, so open one as a draft if it isn't ready to merge.
 
 ## Commits and pull requests
 
