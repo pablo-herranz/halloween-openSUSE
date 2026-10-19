@@ -117,8 +117,15 @@ so updates of that package keep flowing in.
 The Firefox theme goes to `LIBDIR/firefox/browser/extensions/`: openSUSE
 builds Firefox with `--with-unsigned-addon-scopes=app`, so an unsigned add-on
 only loads from Firefox's own folder, not from the shared
-`/usr/share/mozilla/extensions/`. Its package is therefore
-architecture-specific; a Mozilla-signed `.xpi` could use the shared folder.
+`/usr/share/mozilla/extensions/` (Firefox 157's `AppConstants` say
+`MOZ_REQUIRE_SIGNING: true`, `MOZ_UNSIGNED_APP_SCOPE: true`,
+`MOZ_UNSIGNED_SYSTEM_SCOPE: false`). Its package is therefore
+architecture-specific, and it must be built for the machine's own
+architecture: an i586 package puts the theme in `/usr/lib/firefox`, which a
+64-bit Firefox never reads. A Mozilla-signed `.xpi` could use the shared folder.
+
+The SDDM theme builds on openSUSE's `breeze-openSUSE`, as the theme is made
+for openSUSE; another distribution would link plain `breeze` instead.
 
 The development helpers in `tools/dev/` do change settings: they apply the
 theme to a Plasma session, save and restore the previous settings, and switch

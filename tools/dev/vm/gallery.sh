@@ -7,6 +7,7 @@
 # picked the way a user would. Run on the VM's host; `make gallery` runs it.
 #
 # usage: gallery.sh halloween-openSUSE-VERSION.tar.gz
+#        gallery.sh --installed   (what is installed already, e.g. the packages)
 # The screenshots land in $HALLOWEEN_VM/shots/gallery/, named as
 # tools/previews.py expects.
 set -euo pipefail
@@ -14,14 +15,14 @@ HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 V=$HERE/vm.sh
 VM=${HALLOWEEN_VM:-$HOME/vm-halloween}
 OUT=$VM/shots/gallery
-TARBALL=${1:?usage: gallery.sh halloween-openSUSE-VERSION.tar.gz}
+TARBALL=${1:?usage: gallery.sh halloween-openSUSE-VERSION.tar.gz | --installed}
 export HALLOWEEN_VM_RES=1920x1080   # the README's screenshots are 16:9
 
 log() { printf '\033[1;33m==>\033[0m %s\n' "$*"; }
 rm -rf "$OUT" && mkdir -p "$OUT"
 "$V" stop 2>/dev/null || true
 "$V" boot
-"$V" install "$TARBALL"
+[ "$TARBALL" = --installed ] || "$V" install "$TARBALL"
 
 log "KDE Plasma: the screens tools/dev/test-screens.sh takes"
 "$V" desktop plasma
@@ -34,7 +35,7 @@ log "KDE Plasma: the screens tools/dev/test-screens.sh takes"
 # test-screens.sh expects a build tree: its helpers in install/, the Firefox
 # theme in firefox/ (the installed copy: logging in rebooted away /tmp)
 "$V" ssh "rm -rf /tmp/gallery && mkdir -p /tmp/gallery/install /tmp/gallery/firefox \
-          && cp /usr/lib64/firefox/browser/extensions/openSUSE-halloween@pluskal.org.xpi \
+          && cp \$(ls /usr/lib*/firefox/browser/extensions/openSUSE-halloween@pluskal.org.xpi | head -1) \
                 /tmp/gallery/firefox/openSUSE-halloween.xpi"
 scp -q -F "$VM/ssh_config" "$HERE/../common.sh" "$HERE/../test-screens.sh" vm:/tmp/gallery/install/
 sleep 10
