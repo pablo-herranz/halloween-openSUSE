@@ -25,7 +25,6 @@ import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
-import resvg_py
 from jsonschema import Draft7Validator
 from PIL import Image, ImageFilter
 
@@ -105,7 +104,21 @@ def check_metadata():
                 fail(f"{rel}: KPlugin has no {key}")
         if plugin.get("Version") and plugin["Version"] != VERSION:
             fail(f"{rel}: version {plugin['Version']} is not {VERSION}")
-    ok(f"metadata: {len(files)} metadata.json files match KDE's KPlugin schema")
+        spdx(rel, plugin.get("License", ""))
+    for f in sorted(SYSTEM.glob("sddm/*/metadata.desktop")):
+        cp = configparser.ConfigParser(interpolation=None)
+        cp.read_string(f.read_text())
+        spdx(f.relative_to(BUILD), cp.get("SddmGreeterTheme", "License", fallback=""))
+    ok(f"metadata: {len(files)} metadata.json files match KDE's KPlugin schema, licences are SPDX")
+
+
+def spdx(rel, expression):
+    """Packages take their License tags from these fields, so they must be
+    exact SPDX expressions ("LGPL-2.0-or-later", not "LGPL")."""
+    from license_expression import get_spdx_licensing
+    errors = get_spdx_licensing().validate(expression).errors if expression else ["empty"]
+    if errors:
+        fail(f"{rel}: licence {expression!r} is not an SPDX expression: {errors[0]}")
 
 
 def kde_colors(path):
@@ -206,6 +219,15 @@ def check_plymouth_colours():
                    if px[i + 3] > 128 and px[i + 2] > px[i] + 40 and px[i + 2] > px[i + 1] + 20)
         if blue:
             fail(f"plymouth {name}.png: {blue} blue pixels; recolour it from the palette")
+    # two-step plays an end animation in every mode that doesn't turn it off,
+    # and without animation-* frames it takes the throbber's (plugin.c)
+    cp = configparser.ConfigParser(interpolation=None)
+    cp.read_string((theme / "openSUSE-halloween.plymouth").read_text())
+    for mode in ("boot-up", "shutdown", "reboot", "updates", "system-upgrade", "firmware-upgrade", "system-reset"):
+        if cp.get(mode, "UseEndAnimation", fallback="true").lower() != "false":
+            fail(f"plymouth [{mode}] doesn't set UseEndAnimation=false")
+    if list(theme.glob("animation-*.png")):
+        fail("plymouth ships animation-*.png, which no mode plays")
     ok("plymouth colours: dialog images from the palette")
 
 
@@ -381,6 +403,11 @@ def check_icons():
                 fail(f"icon {rel}: fill=currentColor on a <{el.tag.split('}')[-1]}> without class ColorScheme-Text")
                 break
         n += 1
+    # The Icon Theme Specification's Example key: the icon that stands for the theme
+    for theme in (icons, adwaita):
+        example = re.search(r"^Example=(.+)$", (theme / "index.theme").read_text(), re.M)
+        if not example or not list(theme.glob(f"*/*/{example.group(1)}.svg")):
+            fail(f"icons {theme.name}: index.theme has no Example= naming one of its icons")
     for name, where in ONE_COLOUR_SEEN.items():
         found = [f for f in icons.glob(f"*/*/{name}.svg")]
         if not found:
@@ -388,6 +415,29 @@ def check_icons():
         elif "ColorScheme-Text" not in found[0].read_text():
             fail(f"icon {name} should be one colour: {where}")
     ok(f"icons: {n} SVGs in the {len(dirs)} directories index.theme lists")
+
+
+def header_svg_image(text):
+    """(the header SVG drawn at its 1x size, the picture inside it), drawn as
+    tools/targets/firefox.py composes it: the embedded JPEG under a horizontal
+    gradient mask whose grey stops are each column's opacity."""
+    ns = {"svg": "http://www.w3.org/2000/svg"}
+    root = ET.fromstring(text)
+    w, h = (round(float(root.get(k) or root.get("viewBox").split()[i])) for k, i in (("width", 2), ("height", 3)))
+    data = text.split("data:image/jpeg;base64,", 1)[1].split('"', 1)[0]
+    inner = Image.open(io.BytesIO(base64.b64decode(data)))
+    stops = [(float(s.get("offset")), int(s.get("stop-color")[1:3], 16)) for s in root.iterfind(".//svg:stop", ns)]
+    alpha = []
+    for x in range(w):
+        at = x / (w - 1)
+        (o0, a0), (o1, a1) = next(((s, e) for s, e in zip(stops, stops[1:], strict=False) if s[0] <= at <= e[0]),
+                                  (stops[-1], stops[-1]))
+        alpha.append(round(a0 + (a1 - a0) * ((at - o0) / (o1 - o0) if o1 > o0 else 0)))
+    img = inner.convert("RGB").resize((w, h), Image.LANCZOS).convert("RGBA")
+    mask = Image.new("L", (w, 1))
+    mask.putdata(alpha)
+    img.putalpha(mask.resize((w, h)))
+    return img, inner
 
 
 def check_firefox():
@@ -398,6 +448,9 @@ def check_firefox():
     except (OSError, ValueError, KeyError) as e:
         fail(f"firefox manifest.json: {e!r}")
         return
+    # YEAR.MONTH.PATCH; Firefox rejects version parts with leading zeros
+    if not re.fullmatch(r"20\d\d\.(?:[1-9]|1[0-2])\.(?:0|[1-9]\d*)", VERSION):
+        fail(f"VERSION {VERSION} is not YEAR.MONTH.PATCH without leading zeros")
     if manifest.get("version") != VERSION:
         fail(f"firefox version {manifest.get('version')} is not {VERSION}")
     if manifest.get("browser_specific_settings", {}).get("gecko", {}).get("id") != FIREFOX_ID:
@@ -431,16 +484,13 @@ def check_firefox():
             fail(f"firefox image {name} missing")
             continue
         if f.suffix == ".svg":
-            # Drawn at its 1x size, as Firefox lays it out; the picture inside is 2x
-            img = Image.open(io.BytesIO(bytes(resvg_py.svg_to_bytes(svg_path=str(f)))))
             text = f.read_text()
             if "data:image/jpeg" not in text or 'href="http' in text:
                 fail(f"firefox {name} should embed its picture, not link to it")
-            else:
-                data = text.split("data:image/jpeg;base64,", 1)[1].split('"', 1)[0]
-                inner = Image.open(io.BytesIO(base64.b64decode(data)))
-                if inner.width < 2 * img.width:
-                    fail(f"firefox {name}: its picture is {inner.width} px for {img.width} px, not 2x (HiDPI)")
+                continue
+            img, inner = header_svg_image(text)
+            if inner.width < 2 * img.width:
+                fail(f"firefox {name}: its picture is {inner.width} px for {img.width} px, not 2x (HiDPI)")
         else:
             img = Image.open(f)
         if img.height > 200 or f.stat().st_size > 600_000:
@@ -573,6 +623,9 @@ def check_gtk():
     # Half-transparent pumpkin rings are below 3:1 (tools/targets/gtk.py draws them solid)
     if FOCUS in upstream:
         fail(f"gtk theme still draws focus with {FOCUS}")
+    obsolete = re.findall(r"^(MetacityTheme|Encoding)=", (THEMES / ID / "index.theme").read_text(), re.M)
+    if obsolete:
+        fail(f"gtk theme index.theme has obsolete keys: {obsolete}")
     for f in ("gtk-dark.css", "assets/check-symbolic.svg"):
         if not (THEMES / ID / "gtk-3.0" / f).exists():
             fail(f"gtk theme lacks gtk-3.0/{f}")
@@ -624,7 +677,7 @@ def check_gnome():
         gtk_only = sorted(set(re.findall(r"(?<![\w-])(alpha|mix|shade|lighter|darker)\(", css)))
         if gtk_only:
             fail(f"gnome shell theme uses GTK colour functions St ignores: {gtk_only}")
-    for f in [*(BUILD / "defaults/dconf/db/gdm.d").iterdir(), *(BUILD / "defaults/glib-2.0/schemas").iterdir()]:
+    for f in (BUILD / "defaults/glib-2.0/schemas").iterdir():
         cp = configparser.ConfigParser(interpolation=None)
         try:
             cp.read_string(f.read_text())
@@ -640,6 +693,21 @@ def check_gnome():
     elif contrast(rgb(ibus), rgb(load_palette()["night"])) < 4.5:
         fail(f"IBus's layout colour {ibus} is below 4.5:1 on the panel")
     ok("gnome: shell theme, wallpaper entry, gsettings and GDM defaults")
+
+
+def check_manifest():
+    """MANIFEST.sha256 covers every file install.py installs, so comparing
+    manifests shows whether two builds ship the same."""
+    listed = {line.split("  ", 1)[1].split(" -> ")[0] for line in (BUILD / "MANIFEST.sha256").read_text().splitlines()}
+    shipped = set()
+    for src, _ in [*install.FILES, *install.DEFAULTS]:
+        path = BUILD / src
+        files = [path] if path.is_file() else [f for f in path.rglob("*") if f.is_file() or f.is_symlink()]
+        shipped |= {str(f.relative_to(BUILD)) for f in files}
+    missing = sorted(shipped - listed)
+    if missing:
+        fail(f"MANIFEST.sha256 leaves out {len(missing)} installed files, such as {missing[0]}")
+    ok(f"manifest: {len(listed)} files, every installed one")
 
 
 def check_install():
@@ -661,11 +729,10 @@ def check_install():
                      "usr/share/icons/openSUSE-halloween-adwaita/16x16/places"]
         if (USER / "gnome-background-properties").exists():
             need += ["usr/share/gnome-background-properties/openSUSEhalloween.xml",
-                     "usr/share/glib-2.0/schemas/30_openSUSE-halloween.gschema.override",
-                     "etc/dconf/db/gdm.d/30-openSUSE-halloween"]
+                     "usr/share/glib-2.0/schemas/30_openSUSE-halloween.gschema.override"]
         if (SYSTEM / "sddm").exists():
             need += ["usr/share/sddm/themes/breeze-openSUSE-halloween/Main.qml",
-                     "etc/sddm.conf.d/zz-openSUSE-halloween.conf"]
+                     "usr/lib/sddm/sddm.conf.d/30-breeze-openSUSE-halloween.conf"]
         missing = [n for n in need if not (Path(tmp) / n).is_symlink() and not (Path(tmp) / n).exists()]
         if missing:
             fail(f"install lacks {missing}")
@@ -674,6 +741,15 @@ def check_install():
         left = [p.relative_to(tmp) for p in Path(tmp).rglob("*") if not p.is_dir() or p.is_symlink()]
         if left:
             fail(f"uninstall leaves {left[:3]}")
+    # Under another prefix, the files that name our own files follow it
+    with tempfile.TemporaryDirectory() as tmp:
+        for extra in ([], ["--defaults"]):
+            install.main(["--destdir", tmp, "--prefix", "/opt/halloween", "--quiet", *extra])
+        stale = [p.relative_to(tmp) for p in Path(tmp).rglob("*")
+                 if p.is_file() and not p.is_symlink() and p.suffix not in (".png", ".jpg", ".svg", ".xpm", ".xpi")
+                 and b"/usr/share/" in p.read_bytes()]
+        if stale:
+            fail(f"install --prefix leaves /usr/share paths in {[str(s) for s in stale[:3]]}")
     ok(f"install: {len(staged)} files under usr/ and etc/, all removed again by uninstall")
 
 
@@ -727,6 +803,7 @@ def main():
     if "xfce" in desktops:
         check_xfwm4()
     check_resolutions()
+    check_manifest()
     check_install()
     check_readme_images()
     check_reuse()

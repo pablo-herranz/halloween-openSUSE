@@ -2,6 +2,7 @@
 Name=openSUSE Halloween
 Comment=Autumn Halloween folders, file types, devices, apps, menu and launcher icons over Breeze Dark
 Inherits=breeze-dark,breeze,hicolor
+Example=folder
 FollowsColorScheme=true
 DesktopDefault=48
 ToolbarDefault=22

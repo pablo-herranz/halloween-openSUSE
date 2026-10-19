@@ -43,6 +43,12 @@ scp -q -F "$VM/ssh_config" 'vm:/tmp/gallery/screenshots/*.png' "$OUT/"
 
 log "GNOME: Files and the quick settings, and the app grid"
 "$V" desktop gnome
+# The defaults give the accent, dark style, wallpaper and Shell theme name;
+# the GTK theme, icons and the User Themes extension are the user's to pick
+"$V" run "gsettings set org.gnome.desktop.interface gtk-theme openSUSE-halloween
+          gsettings set org.gnome.desktop.interface icon-theme openSUSE-halloween-adwaita
+          gnome-extensions enable user-theme@gnome-shell-extensions.gcampax.github.com"
+sleep 3
 "$V" key esc
 "$V" run "nohup nautilus --new-window ~ >/dev/null 2>&1 &"
 sleep 15

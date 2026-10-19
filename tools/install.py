@@ -36,13 +36,11 @@ FILES = [
     ("firefox/openSUSE-halloween.xpi", "{libdir}/firefox/browser/extensions/" + FIREFOX_ID + ".xpi"),
 ]
 DEFAULTS = [
-    ("defaults/sddm.conf.d", "{sysconfdir}/sddm.conf.d"),
+    ("defaults/sddm.conf.d", "{prefix}/lib/sddm/sddm.conf.d"),
     ("defaults/glib-2.0/schemas", "{datadir}/glib-2.0/schemas"),
-    ("defaults/dconf/profile", "{sysconfdir}/dconf/profile"),
-    ("defaults/dconf/db/gdm.d", "{sysconfdir}/dconf/db/gdm.d"),
 ]
-# Files that name other installed files by their /usr/share path
-REWRITE = (".xml", ".override")
+# Files that name our own installed files by their /usr/share path
+REWRITE = (".xml", ".override", ".conf", ".plymouth")
 
 
 def entries(table, dirs):
@@ -102,7 +100,7 @@ def main(argv=None):
     args = ap.parse_args(argv)
     if not (BUILD / "MANIFEST.sha256").exists():
         sys.exit(f"{BUILD} has no build: run `make check` first")
-    dirs = {"datadir": f"{args.prefix}/share", "libdir": args.libdir or f"{args.prefix}/lib64",
+    dirs = {"prefix": args.prefix, "datadir": f"{args.prefix}/share", "libdir": args.libdir or f"{args.prefix}/lib64",
             "sysconfdir": args.sysconfdir}
     for src, dest in entries(DEFAULTS if args.defaults else FILES, dirs):
         target = under(args.destdir.rstrip("/"), dest)

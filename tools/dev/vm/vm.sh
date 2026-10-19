@@ -160,6 +160,9 @@ install_tarball() {
     name=$(basename "$tarball" .tar.gz)
     log "installing $name like a package, with its defaults"
     scp -q -F "$VM/ssh_config" "$tarball" vm:/tmp/
+    # Older versions of the defaults installed these into /etc
+    vssh "sudo rm -f /etc/sddm.conf.d/zz-openSUSE-halloween.conf /etc/dconf/profile/gdm \
+          /etc/dconf/db/gdm.d/30-openSUSE-halloween"
     vssh "cd /tmp && rm -rf $name && tar xzf $name.tar.gz && cd $name \
           && sudo make uninstall >/dev/null && sudo make install install-defaults >/dev/null \
           && sudo glib-compile-schemas /usr/share/glib-2.0/schemas && sudo dconf update \

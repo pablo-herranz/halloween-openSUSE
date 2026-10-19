@@ -95,13 +95,21 @@ is the one check `main`'s ruleset requires.
 
 `tools/install.py` (`make install`) copies the build into the system paths, as
 an RPM's `%install` will: its `FILES` table maps each folder in `build/` to an
-install path under `PREFIX` (`/usr`), `LIBDIR` or `SYSCONFDIR`, honouring
-`DESTDIR`. Every entry inside a mapped folder is ours, so `make uninstall`
+install path under `PREFIX` (`/usr`) or `LIBDIR`, honouring `DESTDIR`; the
+files that name our own installed files (`.xml`, `.override`, `.conf`,
+`.plymouth`) follow `PREFIX`. Every entry inside a mapped folder is ours, so `make uninstall`
 removes exactly those. `--defaults` (`make install-defaults`) installs the
-`DEFAULTS` table instead: declarative files, such as an SDDM `conf.d`
-drop-in, that make the theme the default the way a separate defaults package
-would. Nothing that is installed changes settings. `check.py` stages an
-install and uninstall into a temporary folder on every check.
+`DEFAULTS` table instead: declarative vendor files under `/usr`, an SDDM
+`conf.d` drop-in in `/usr/lib/sddm/sddm.conf.d/` and a GSettings override,
+that make the theme the default the way a separate defaults package would,
+while an administrator's choice in `/etc` still wins. Nothing that is
+installed changes settings. `check.py` stages an install and uninstall into a
+temporary folder on every check, and one under another prefix.
+
+`make dist` packs the release archive: every tracked file, art masters
+included (the preferred form for rebuilding), and the build, so `make
+install` works from it directly. `MANIFEST.sha256` lists every file the
+build installs.
 
 The SDDM theme links openSUSE's `breeze-openSUSE` QML with relative symlinks,
 so updates of that package keep flowing in.
