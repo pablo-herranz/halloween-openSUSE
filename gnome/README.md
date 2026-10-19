@@ -25,4 +25,8 @@ libadwaita (GTK 4) apps keep GNOME's own colours and take the orange accent;
 recolouring them would mean overwriting each user's `~/.config/gtk-4.0/gtk.css`,
 which GNOME doesn't support.
 
+The edition is dark only, like the Plasma colour scheme: the Shell stylesheet
+and the GTK 3 theme have no light variant. With GNOME's light style the Shell's
+menus stay dark while libadwaita apps turn light.
+
 Tested on Tumbleweed with GNOME 50, in the development VM (`tools/dev/vm/`).

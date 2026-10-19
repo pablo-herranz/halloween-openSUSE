@@ -14,6 +14,7 @@ SPDX-License-Identifier: CC0-1.0
 ## Checklist
 
 - [ ] `make check` and `make lint` pass
+- [ ] Visible change: the design review in CONTRIBUTING.md is done, and what it found, fixed and left is listed above
 - [ ] Visible change: the README screenshots are retaken (`make gallery TARGET=user@host`), or not affected
 - [ ] New files have an SPDX header or a path in `REUSE.toml`
 - [ ] New or changed art: the masters are in `art/source/` and the provenance is recorded in `art/prompts/`

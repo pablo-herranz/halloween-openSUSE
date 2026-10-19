@@ -62,8 +62,8 @@ commit meaningful and self-contained.
 
 1. Fork the repository and create a branch for one change.
 2. Make the change, then run `make check` and `make lint`.
-3. If it changes how something looks, add before/after screenshots to the
-   pull request.
+3. If it changes how something looks, do the [design review](#design-review)
+   and add before/after screenshots to the pull request.
 4. Open the pull request and fill in its checklist.
 
 Keep pull requests focused: one icon set, one fix, one feature.
@@ -131,7 +131,7 @@ licence:
 
 - **Agree on the idea first** in an art request issue.
 - **Use the palette** in [`art/palette.toml`](art/palette.toml). `make check`
-  enforces contrast (7:1 for text, 4.5:1 for the rest) and size limits.
+  enforces contrast (see the [design review](#design-review)) and size limits.
 - **Masters go in `art/source/`** (Git LFS): raster masters as PNG, icon and
   ornament masters as SVG in `art/source/vectors/`. The build makes every size
   and format from them; don't commit generated sizes.
@@ -151,11 +151,85 @@ scales in the test VM (`HALLOWEEN_VM_RES=2256x1504 tools/dev/vm/vm.sh boot`).
 ### Adding icons
 
 Icons are composed by [`tools/vectors.py`](tools/vectors.py) from the SVG
-masters: folder icons are the master folder plus an emblem glyph, and the
-mapping from masters to icon names is in `FOLDER_EMBLEMS`, `APPS`, `SYMBOLIC`
-and `ALIASES` there. `make icon-preview` renders the whole set at 16 to 64 px
-into `build/icon-preview.png`; check the small sizes before opening a pull
-request.
+masters: folder icons are the master folder plus an emblem glyph, file types
+the page master plus one, settings icons a glyph carved into the pumpkin
+master. The mapping from masters to icon names is in `FOLDER_EMBLEMS`, `APPS`,
+`DEVICES`, `SETTINGS`, `MIME_EMBLEMS`, `SYMBOLIC` and `ALIASES` there, and
+`normalise()` holds every colour master to the palette. Generate colour icons
+with the master folder as style reference, so they stay one family (see the
+latest record in `art/prompts/`). `make icon-preview` renders each distinct
+icon at 16 to 64 px on the dark, light and selection colours into
+`build/icon-preview.png`, for the design review.
+
+## Design review
+
+Every pull request that changes how something looks gets a design review
+before it is opened: art, icons, colours, CSS, layouts. Review it to find
+faults, not to approve it: for each point below, look for the case where it
+fails, on `build/icon-preview.png`, the screenshots from `make gallery` and the
+built files. Most of the measurable rules are tests in `make check`; the rest
+need eyes. Put what you looked at, what you found, what you fixed and what
+you left (and why) in the pull request.
+
+### The brief
+
+- **Cosy autumn Halloween**: warm, friendly and seasonal (pumpkins, candles,
+  lanterns, moons, leaves, acorns, bats, the chameleon), never gory or really
+  scary, and still a desktop for every day.
+- **One seasonal accent per icon, at most**, and it never hides what the icon
+  is. Prefer autumn (a leaf, an acorn, a candle, a pumpkin); bats on no more
+  than about one icon in five. Nothing from another season (gifts, snow).
+- **One family**: the flat style of the master folder, `art/source/vectors/folder.svg`:
+  a few large flat shapes, two tones per colour, a front view, no outlines,
+  gradients, textures or shadows.
+- **No brand marks**: nothing that reads as the openSUSE logo, Firefox's, the
+  Bluetooth rune or another project's mark, even by accident (a rounded square
+  with a ring and a corner dot is Instagram's).
+
+### Icons
+
+- Legible at 16, 22 and 32 px on the dark panel, a light background and the
+  ember selection. A detail smaller than a pixel goes.
+- The picture fits every name it is mapped to. If it doesn't fit one, map
+  fewer names and let Breeze or Adwaita show theirs. Two apps that sit side by
+  side never share an icon.
+- Action and status names (`system-search`, `go-*`, `edit-*`, `*-symbolic`)
+  stay one colour; apps, places, devices and file types may be in colour.
+- One-colour icons take the colour scheme's text colour: the class
+  `ColorScheme-Text` and `fill="currentColor"` on the same element, or Qt
+  draws them black (`make check`), and straight edges on the 16 px grid.
+- Colours come from the palette (`normalise()` in `tools/vectors.py`).
+
+### Colours and states
+
+- Contrast as in WCAG 2.2, measured by `make check` wherever it can: 7:1 for
+  body text here, 4.5:1 for other text (links, status colours, text on the
+  selection), 3:1 for focus rings, the selection, on/off states and the edges
+  of fields. Text over a picture (login, lock screen, splash) is measured too,
+  over the picture as it is shown; add a scrim where it falls short.
+- One role, one colour on every desktop: hover is a plum tint, keyboard focus
+  a pumpkin ring, selected and checked ember behind white text, levels and
+  sliders pumpkin, links apricot and visited links plum. Focus never looks
+  like hover.
+- The status colours (olive, candle, cranberry) mean status only: no
+  decoration in them, and status is never shown by colour alone.
+
+### Screens and platforms
+
+- Everything works on the screens in the README's "Supported screens" (see
+  [Artwork](#artwork)).
+- Follow the platform's own rules, checked in its source or specification
+  rather than from memory: the KDE and GNOME guidelines, the freedesktop icon
+  naming specification, what GNOME Shell's CSS understands (no `alpha()`),
+  what Plymouth's two-step plugin does. Pin what you rely on in
+  `tools/upstream.toml`.
+
+### Turning a finding into a check
+
+When a finding can be measured, add a test to `tools/check.py` so it stays
+fixed. Break it first: a check that has never failed is not yet a check. Run
+it on the build that has the fault and watch it fail, then fix the fault and
+watch it pass.
 
 ## Releasing (maintainers)
 
