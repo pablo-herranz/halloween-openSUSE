@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
 # Development helper: a throwaway openSUSE Tumbleweed VM with KDE Plasma, GNOME
-# and Xfce, for trying the theme on other desktops and screen sizes. It runs headless on
-# any x86_64 Linux host with KVM and QEMU:
+# and Xfce, for trying and verifying the theme on each desktop and screen
+# size. It runs headless on any x86_64 Linux host with KVM and QEMU:
 #   sudo zypper in --no-recommends qemu-x86 qemu-tools qemu-hw-display-virtio-vga xorriso
 # Everything lives in $HALLOWEEN_VM (default ~/vm-halloween). The VM's SSH is
 # on 127.0.0.1:$HALLOWEEN_VM_PORT (default 2222) with a key made for it, and
