@@ -34,21 +34,14 @@ chameleon.
 
 ## Install
 
-Build on any machine and deploy to the target over SSH:
+On the openSUSE machine itself, from a checkout of this repository:
 
 ```bash
-make install-user TARGET=user@host   # wallpaper, Plasma style, colours, icons, splash
-make install-root TARGET=user@host   # login screen; installs the boot splash (asks for sudo)
-make plymouth TARGET=user@host       # after testing it: activate the boot splash
-make verify TARGET=user@host         # report what is active
-```
-
-Or on the machine itself, from a copy of `build/`:
-
-```bash
-build/install/install-user.sh
-sudo build/install/install-root.sh
-sudo build/install/install-root.sh --plymouth
+make build                                      # needs Python 3.12+ and git lfs
+build/install/install-user.sh                   # wallpaper, Plasma style, colours, icons, splash
+sudo build/install/install-root.sh              # login screen; installs the boot splash
+sudo build/install/install-root.sh --plymouth   # after testing it: activate the boot splash
+build/install/verify.sh                         # report what is active
 ```
 
 `install-root.sh --files` installs without switching anything, for testing
@@ -59,6 +52,21 @@ can't pick it up by surprise.
 The user install keeps your panels and widgets. It saves the previous
 settings on first run, and `install/uninstall-user.sh` restores them;
 `sudo install/uninstall-root.sh` restores the login screen and boot splash.
+
+### Development: build on one machine, test on another
+
+The remote `make` targets are only useful while developing the theme: they
+build on your workstation, copy `build/` to `~/.cache/halloween-openSUSE` on
+a test machine over SSH, and run the same scripts there. Name the test
+machine with `TARGET`:
+
+```bash
+make install-user TARGET=user@testbox
+make install-root TARGET=user@testbox      # asks for sudo on the test machine
+make plymouth TARGET=user@testbox
+make verify TARGET=user@testbox
+make screens TARGET=user@testbox && make fetch-screenshots TARGET=user@testbox
+```
 
 ### Firefox
 
