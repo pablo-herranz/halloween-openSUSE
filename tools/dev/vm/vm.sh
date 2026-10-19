@@ -7,7 +7,7 @@
 # size. It runs headless on any x86_64 Linux host with KVM and QEMU:
 #   sudo zypper in --no-recommends qemu-x86 qemu-tools qemu-hw-display-virtio-vga xorriso
 # Everything lives in $HALLOWEEN_VM (default ~/vm-halloween). The VM's SSH is
-# on 127.0.0.1:$HALLOWEEN_VM_PORT (default 2222) with a key made for it, and
+# on $HALLOWEEN_VM_LISTEN:$HALLOWEEN_VM_PORT (default 127.0.0.1:2222) with a key made for it, and
 # screenshots come from QEMU's monitor, so no display is needed. The screen is
 # $HALLOWEEN_VM_RES (default 1920x1080); to try another, stop and boot again.
 #
@@ -28,6 +28,7 @@ set -euo pipefail
 
 VM=${HALLOWEEN_VM:-$HOME/vm-halloween}
 PORT=${HALLOWEEN_VM_PORT:-2222}
+LISTEN=${HALLOWEEN_VM_LISTEN:-127.0.0.1}
 export HALLOWEEN_VM_RES=${HALLOWEEN_VM_RES:-1920x1080}
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 IMAGES=https://download.opensuse.org/tumbleweed/appliances
@@ -65,7 +66,7 @@ boot() {
     log "booting the VM at $HALLOWEEN_VM_RES"
     qemu-system-x86_64 -enable-kvm -cpu host -smp 4 -m 4G -machine q35 \
         -drive if=virtio,file="$VM/disk.qcow2" -drive if=virtio,format=raw,readonly=on,file="$VM/seed.iso" \
-        -nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:"$PORT"-:22 \
+        -nic user,model=virtio-net-pci,hostfwd=tcp:"$LISTEN":"$PORT"-:22 \
         -device virtio-vga,xres="${HALLOWEEN_VM_RES%x*}",yres="${HALLOWEEN_VM_RES#*x}" -device qemu-xhci -device usb-kbd -device usb-tablet \
         -display none -serial file:"$VM/serial.log" \
         -qmp unix:"$VM/qmp.sock",server=on,wait=off -pidfile "$VM/qemu.pid" -daemonize
