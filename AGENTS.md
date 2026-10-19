@@ -3,76 +3,93 @@
 Instructions for AI coding agents working on halloween-openSUSE. People should
 start with [README.md](README.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Project
-
-A desktop theme for openSUSE Tumbleweed: wallpapers, a KDE Plasma style,
-colour scheme, global theme with splash, a freedesktop icon theme, an SDDM
-login theme, a Plymouth boot splash and a Firefox theme. Python scripts in
-`tools/` build every installable file into `build/` from the art masters in
-`art/source/` (Git LFS) and the sources in `shared/` and `plasma/`. Bash
-scripts in `install/` install them.
-
-## Setup and commands
+## Commands
 
 ```bash
-git lfs install && git lfs pull   # without the masters, the build stops or uses placeholders
-make check                        # build into build/ and validate it; must pass before every commit
-make lint                         # ruff (tools/) and ShellCheck (install/, tools/*.sh)
-make icon-preview                 # build/icon-preview.png, every icon at 16 to 64 px
-tools/.venv/bin/python tools/build.py --desktop plasma   # shared pieces plus one desktop
+git lfs install && git lfs pull   # the art masters; without them the build stops or uses placeholders
+make check                        # build into build/ and validate it (creates tools/.venv)
+make lint                         # ruff and ShellCheck
+make icon-preview                 # build/icon-preview.png: every icon at 16 to 64 px
+make release-check                # make check, and fail while any placeholder is in use
 ```
 
-`make check` uses the network once, to fetch pinned Breeze SVGs into
-`build/cache/`. The `make` targets that take `TARGET=user@host` need SSH access
-to a test machine; never run them unless the user asks.
+One file or one desktop at a time:
 
-## Layout
+```bash
+tools/.venv/bin/ruff check tools/check.py
+tools/.venv/bin/shellcheck -x -P install install/verify.sh
+tools/.venv/bin/reuse lint
+tools/.venv/bin/python tools/build.py --desktop plasma   # the shared pieces plus Plasma's
+```
 
-- `shared/`: desktop-neutral sources (wallpapers, icons, Plymouth, Firefox)
-- `plasma/`: KDE Plasma sources (colour scheme, Plasma style, global theme, SDDM)
-- `gnome/`, `xfce/`: notes for planned editions; no code yet
-- `tools/build.py`: runs the targets in `tools/targets/` (one module per
-  piece, with `DESKTOP` and `build(ctx)`); `tools/context.py` holds the
-  palette and masters; `tools/imaging.py` the image helpers
-- `tools/check.py`: everything `make check` validates
-- `tools/vectors.py`: composes icons and ornaments from the SVG masters
-- `art/palette.toml`: the only place colours are defined
-- `art/prompts/`: provenance of every generated asset
-- `docs/architecture.md`: how it fits together
+`make check` downloads pinned Breeze SVGs into `build/cache/` on its first
+run. CI runs the same checks on every pull request.
 
-## Conventions
+## Project
 
-- Python 3.11+, formatted for ruff's rules in `pyproject.toml` (line length
-  120). Bash with `set -euo pipefail`, clean under ShellCheck.
-- Colours come from `art/palette.toml`, never hard-coded hex values in
-  generated files. Keep the contrast rules in `tools/check.py` passing.
-- Generated SVG icons must stay under 60 kB, with no text, scripts, embedded
-  images or external links.
+A Halloween desktop theme for openSUSE Tumbleweed and KDE Plasma 6. Python in
+`tools/` builds every installable file into `build/`; bash in `install/`
+installs it.
+
+## Where things go
+
+- Colours: only in `art/palette.toml`, by name. Generated files take them from
+  the palette, never as hard-coded hex values.
+- Hand-written sources: `shared/` for any desktop, `plasma/` for KDE Plasma.
+  `gnome/` and `xfce/` are plans with no code yet.
+- A new build target: copy `tools/targets/sddm.py`, set `DESKTOP`, and add it
+  to `TARGETS` in `tools/targets/__init__.py`.
+- New icons: an SVG master in `art/source/vectors/`, mapped to icon names in
+  `tools/vectors.py`.
+- Generated art: record how it was made in `art/prompts/`, in the format of
+  `art/prompts/08-more-icons.md`.
+- `build/` is output. `art/source/` holds the masters, in Git LFS.
+
+Every new file starts with an SPDX header or gets a path in `REUSE.toml`:
+
+```python
+# SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
+# SPDX-License-Identifier: GPL-2.0-or-later
+```
+
+Tools and scripts are GPL-2.0-or-later, artwork CC-BY-SA-4.0, the Plasma style
+and colour scheme LGPL-2.0-or-later, docs and small config CC0-1.0.
+
+## Always
+
+- Run `make check` and `make lint` before committing.
 - Keep the build reproducible: the same masters give the same
   `build/MANIFEST.sha256`.
+- After changing art or icons, run `make icon-preview` and look at
+  `build/icon-preview.png`.
+- Add before/after screenshots to pull requests that change how something
+  looks.
 
-## Licensing
+## Ask first
 
-Every new file needs an SPDX header or a path in `REUSE.toml`; `make check`
-runs `reuse lint`. Artwork is CC-BY-SA-4.0, the Plasma style and colour
-scheme LGPL-2.0-or-later, tools and scripts GPL-2.0-or-later, docs and small
-config CC0-1.0.
+- The `make` targets that take `TARGET=user@host`: they install on a real
+  machine over SSH.
+- `sudo`, installing packages, or changing the user's desktop settings.
+- Opening a pull request that isn't a draft, unless the user asked for the
+  change to land: the owner's pull requests merge on their own once CI passes.
 
-## Don't
+## Never
 
-- Edit anything in `build/`, or hand-edit LFS masters in `art/source/`.
-- Commit generated sizes of art; the build makes them.
-- Reproduce or modify trademarks: the openSUSE logo, Firefox's logo, other
-  projects' brand icons. Image prompts never say "openSUSE", "Geeko" or "logo".
-- Use `sudo`, install packages or change the user's desktop settings, unless
-  the user asks.
-- Push to `main`: it is protected. Work on a branch and open a pull request;
-  CI (ShellCheck, Ruff, REUSE, Build and check) must pass before it can merge.
-  Pull requests opened as the repository owner merge on their own once CI
-  passes, so open one as a draft if it isn't ready to merge.
+- Push to `main`; it is protected. Work on a branch and open a pull request.
+- Edit files in `build/`, or hand-edit the masters in `art/source/`.
+- Reproduce trademarks: the openSUSE logo, Firefox's logo, other projects'
+  brand icons. Image prompts never say "openSUSE", "Geeko" or "logo".
+- Credit AI tools in commits: no `Assisted-by:` or `Co-Authored-By:` trailers
+  naming an AI.
 
 ## Commits and pull requests
 
-Imperative subject line, a body that says what changed and why, and an
-`Assisted-by:` trailer naming the agent. Record new generated art in
-`art/prompts/`. Fill in the pull request checklist.
+An imperative subject line, and a body that says what changed and why. Name
+the AI tools you used in the pull request description, and fill in its
+checklist.
+
+## When unsure
+
+Ask, or open a draft pull request and say what you're unsure about.
+
+Keep this file short: add a rule only after an agent got something wrong.

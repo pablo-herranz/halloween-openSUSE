@@ -87,7 +87,7 @@ sudo build/install/uninstall-root.sh   # restores the login screen and boot spla
 
 `make build` makes `build/firefox/openSUSE-halloween.xpi`. It only recolours
 Firefox; Firefox's own logo stays as it is. The `.xpi` isn't signed by
-Mozilla yet, and regular Firefox releases only install signed add-ons:
+Mozilla, and regular Firefox releases only install signed add-ons:
 
 - **openSUSE's Firefox, for everyone on the machine:** openSUSE builds Firefox
   to load add-ons from its own folder. The file name must be the add-on ID:
@@ -124,10 +124,8 @@ How the pieces fit together is in [docs/architecture.md](docs/architecture.md).
 
 - GNOME and Xfce editions sharing the wallpapers, icons and boot splash
   ([gnome/](gnome/), [xfce/](xfce/))
-- A fully recoloured Breeze icon set
-- Packages: the KDE Store for the Plasma pieces, and an openSUSE Build
-  Service package for the login screen and boot splash
-- A signed Firefox theme on addons.mozilla.org
+- openSUSE RPM packages, built in the Open Build Service, for the
+  distribution
 
 ## About the artwork
 

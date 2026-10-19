@@ -25,7 +25,7 @@ SPDX-License-Identifier = "GPL-2.0-or-later"
 # Docs, small config files and the art notes (palette, prompts)
 [[annotations]]
 path = [
-    "README.md", "CHANGELOG.md", "CONTRIBUTING.md", "AGENTS.md", "CLAUDE.md",
+    "README.md", "CHANGELOG.md", "CONTRIBUTING.md", "AGENTS.md",
     "CODE_OF_CONDUCT.md", "SECURITY.md", "docs/*.md", ".github/**",
     ".gitignore", ".gitattributes", "REUSE.toml",
     "tools/requirements.txt", "tools/requirements-dev.txt", "tools/upstream.toml", "plasma/sddm/**",
