@@ -190,8 +190,16 @@ you left (and why) in the pull request.
 - Legible at 16, 22 and 32 px on the dark panel, a light background and the
   ember selection. A detail smaller than a pixel goes.
 - The picture fits every name it is mapped to. If it doesn't fit one, map
-  fewer names and let Breeze or Adwaita show theirs. Two apps that sit side by
-  side never share an icon.
+  fewer names and let Breeze or Adwaita show theirs. Two apps or settings that
+  sit side by side, in one list or on one settings page, never share an icon.
+- Plasma looks a name up theme by theme and shortens it inside each before it
+  moves on (`battery-060-charging` → `battery-060` → `battery`), so a name we
+  ship takes over every Breeze icon that extends it. `make check` runs that
+  lookup over Breeze's names (`tools/breeze-icons.txt`), and the build links
+  the ones we don't mean to cover to Breeze's own (`kde/`). Before mapping a
+  short, general name (`battery`, `yast`), look at what extends it, in Breeze
+  and in apps' own hicolor icons, which the check can't see. When Breeze
+  changes, remake the list from an installed Breeze Dark, as its header says.
 - Action and status names (`system-search`, `go-*`, `edit-*`, `*-symbolic`)
   stay one colour; apps, places, devices and file types may be in colour.
 - One-colour icons take the colour scheme's text colour: the class

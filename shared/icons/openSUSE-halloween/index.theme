@@ -8,12 +8,24 @@ DesktopDefault=48
 ToolbarDefault=22
 PanelDefault=48
 DialogDefault=32
-# 16x16 comes first so its hand-simplified icons win at 16 px
-Directories=16x16/places,scalable/places,scalable/apps,scalable/categories,scalable/actions,scalable/mimetypes,scalable/devices
+# The fixed sizes come first so their simplified icons win at 16 and 22 px
+# kde: links to Breeze Dark's own icons for names Plasma would otherwise take
+# from ours (tools/kde_lookup.py); left out of the GNOME and Xfce variant
+Directories=16x16/places,16x16/apps,22x22/apps,scalable/places,scalable/apps,scalable/categories,scalable/actions,scalable/mimetypes,scalable/devices,kde
 
 [16x16/places]
 Size=16
 Context=Places
+Type=Fixed
+
+[16x16/apps]
+Size=16
+Context=Applications
+Type=Fixed
+
+[22x22/apps]
+Size=22
+Context=Applications
 Type=Fixed
 
 [scalable/places]
@@ -56,4 +68,11 @@ Size=64
 MinSize=16
 MaxSize=512
 Context=Devices
+Type=Scalable
+
+[kde]
+Size=22
+MinSize=8
+MaxSize=512
+Context=Status
 Type=Scalable

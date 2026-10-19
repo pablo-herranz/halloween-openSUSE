@@ -15,6 +15,7 @@ import base64
 import configparser
 import io
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -368,14 +369,18 @@ def check_icons():
         fail(f"icons {ADWAITA_ID} doesn't inherit Adwaita")
     icons = USER / "icons/openSUSE-halloween"
     dirs = icon_dirs(icons)
-    if set(adwaita_dirs) != set(dirs):
-        fail(f"icons {ADWAITA_ID} lists other directories than openSUSE-halloween")
+    # the same folders, but for kde/, Plasma's links to Breeze Dark
+    if set(adwaita_dirs) != set(dirs) - {"kde"}:
+        fail(f"icons {ADWAITA_ID} lists other directories than openSUSE-halloween (kde/ aside)")
+    # kde/ links to Breeze Dark's own icons, which aren't here: check_kde_lookup() checks them
     for f in icons.rglob("*"):
-        if f.is_symlink() and not f.exists():
+        if f.is_symlink() and not f.exists() and f.parent.name != "kde":
             fail(f"icon {f.relative_to(icons)}: broken symlink")
     n = 0
     for f in sorted(icons.rglob("*.svg")):
         rel = f.relative_to(icons)
+        if rel.parts[0] == "kde":
+            continue
         # Reverse-DNS app IDs keep their capitals (org.gnome.Nautilus)
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._+-]*\.svg", f.name):
             fail(f"icon {rel}: name has characters other than letters, digits and ._+-")
@@ -438,6 +443,35 @@ def header_svg_image(text):
     mask.putdata(alpha)
     img.putalpha(mask.resize((w, h)))
     return img, inner
+
+
+def check_kde_lookup():
+    """Plasma takes an icon from the first theme that has its name or a
+    shortened one (tools/kde_lookup.py): every Breeze icon that would land on
+    one of ours must be ours on purpose, or linked to Breeze's own."""
+    import kde_lookup
+    icons = USER / "icons/openSUSE-halloween"
+    if not icons.exists():
+        return
+    files = [f for f in icons.rglob("*") if f.suffix in (".svg", ".png")]
+    ours = {f.stem for f in files}
+    one_colour = {f.stem for f in files if not f.is_symlink() and f.suffix == ".svg"
+                  and "ColorScheme-Text" in f.read_text()}
+    breeze = kde_lookup.breeze()
+    wrong = sorted((name, hit) for name in breeze if name not in ours
+                   for hit in [kde_lookup.first_hit(name, ours)]
+                   if hit and not kde_lookup.wanted(name, hit, one_colour))
+    for name, hit in wrong[:5]:
+        fail(f"icons: Plasma shows our {hit} for Breeze's {name}")
+    if wrong:
+        fail(f"icons: {len(wrong)} Breeze icons in all would show ours; link them to Breeze's (kde_lookup.plan)")
+    links = [f for f in files if f.is_symlink()]
+    pinned = {"../../breeze-dark/" + path for path in breeze.values()}
+    for f in links:
+        target = os.readlink(f)
+        if target not in pinned:
+            fail(f"icon {f.relative_to(icons)} links to {target}, not to a pinned Breeze icon")
+    ok(f"icons: Plasma's lookup of {len(breeze)} Breeze names finds ours only where meant; {len(links)} left to Breeze")
 
 
 def check_firefox():
@@ -799,6 +833,7 @@ def main():
     check_plymouth_colours()
     check_plymouth_layout()
     check_icons()
+    check_kde_lookup()
     check_firefox()
     if "plasma" in desktops:
         check_contrast()
