@@ -6,6 +6,8 @@ calendar-based: `YEAR.MONTH.PATCH`, the month without a leading zero.
 
 ## [Unreleased]
 
+## [2026.10.2] - 2026-10-19
+
 ### Added
 
 - One-colour icons for rows on GNOME Settings' pages: Users, Screen Lock,
@@ -113,6 +115,7 @@ The first release.
   each desktop shows on common screens, and the boot splash's layout from
   720p to 4K
 
-[Unreleased]: https://github.com/plusky/halloween-openSUSE/compare/v2026.10.1...HEAD
+[Unreleased]: https://github.com/plusky/halloween-openSUSE/compare/v2026.10.2...HEAD
+[2026.10.2]: https://github.com/plusky/halloween-openSUSE/compare/v2026.10.1...v2026.10.2
 [2026.10.1]: https://github.com/plusky/halloween-openSUSE/compare/v2026.10.0...v2026.10.1
 [2026.10.0]: https://github.com/plusky/halloween-openSUSE/releases/tag/v2026.10.0
