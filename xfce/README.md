@@ -9,6 +9,7 @@ Firefox theme:
 | Window manager theme: xfwm4's default theme with the palette's colours, at 1×, 1.5× and 2× | `/usr/share/themes/openSUSE-halloween{,-hdpi,-xhdpi}/xfwm4/` | `tools/targets/xfce.py` from [`xfwm4/`](xfwm4/) |
 | Notification theme | `/usr/share/themes/openSUSE-halloween/xfce-notify-4.0/` | `tools/targets/xfce.py` from [`xfce-notify-4.0/`](xfce-notify-4.0/) |
 | Icons over Adwaita | `/usr/share/icons/openSUSE-halloween-adwaita/` | `tools/targets/icons.py` |
+| Wallpaper: one 16:10 picture for any screen, plus one per screen shape | `/usr/share/backgrounds/openSUSEhalloween/`, `/usr/share/wallpapers/openSUSEhalloween/contents/` | `tools/targets/wallpapers.py` |
 
 There are no defaults to install: Xfce's defaults and the LightDM greeter's
 configuration belong to openSUSE's branding packages, and a theme package

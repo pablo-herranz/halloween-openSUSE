@@ -11,7 +11,9 @@ REUSE compliance. `--release` also fails while placeholders are still in use.
 """
 
 import argparse
+import base64
 import configparser
+import io
 import json
 import re
 import shutil
@@ -23,6 +25,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
+import resvg_py
 from jsonschema import Draft7Validator
 from PIL import Image
 
@@ -152,13 +155,29 @@ def check_images():
                 fail(f"{f.relative_to(BUILD)} is {Image.open(f).size}, not {w}x{h}")
             if w >= 3840 and f.stat().st_size > 3_000_000:
                 fail(f"{f.relative_to(BUILD)} is {f.stat().st_size / 1e6:.1f} MB (> 3 MB)")
+    # A picture for every common screen shape, and 4K where one picture fills any screen
+    shapes = {"16:9": 16 / 9, "16:10": 16 / 10, "3:2": 3 / 2, "21:9": 43 / 18, "32:9": 32 / 9,
+              "4:3": 4 / 3, "5:4": 5 / 4, "portrait 9:16": 9 / 16}
+    sizes = [tuple(int(v) for v in f.stem.split("x")) for f in (wall / "images_dark").glob("*.jpg")]
+    for name, ratio in shapes.items():
+        if not any(abs(w / h - ratio) < 0.02 for w, h in sizes):
+            fail(f"wallpaper has no {name} size")
+    if max(w for w, h in sizes) < 5120:
+        fail("wallpaper has no 5K size")
+    big = {"zoomed wallpaper": USER / "backgrounds/openSUSEhalloween/night.jpg",
+           "login background": SYSTEM / "sddm/breeze-openSUSE-halloween/background.jpg",
+           "splash backdrop": LNF / "splash/images/background.jpg"}
+    for name, f in big.items():
+        if f.exists() and Image.open(f).width < 3840:
+            fail(f"{name} {f.relative_to(BUILD)} is narrower than 4K")
     plymouth = SYSTEM / "plymouth/openSUSE-halloween"
     if dir_size(plymouth) > 600_000:
         fail(f"{plymouth.relative_to(BUILD)} is {dir_size(plymouth) / 1e3:.0f} kB (> 600 kB)")
-    for f in ("throbber-0001.png", "throbber-0040.png", "watermark.png"):
+    for f in ("throbber-0001.png", "throbber-0040.png", "watermark.png", "entry.png", "bullet.png", "lock.png"):
         if not (plymouth / f).exists():
             fail(f"plymouth {f} missing")
-    ok(f"images: wallpapers, plymouth {dir_size(plymouth) / 1e3:.0f} kB")
+    ok(f"images: wallpapers for {len(shapes)} screen shapes up to 5K, 4K backgrounds, "
+       f"plymouth {dir_size(plymouth) / 1e3:.0f} kB")
 
 
 def check_look_and_feel():
@@ -171,6 +190,39 @@ def check_look_and_feel():
     if dir_size(LNF / "splash") > 1_000_000:
         fail(f"look-and-feel splash is {dir_size(LNF / 'splash') / 1e3:.0f} kB (> 1000 kB)")
     ok(f"look-and-feel: previews, splash {dir_size(LNF / 'splash') / 1e3:.0f} kB")
+
+
+def check_plymouth_layout():
+    """two-step places each image at alignment x (screen - image). The chameleon
+    stays on screen during a passphrase prompt (the lantern stops), so the prompt
+    and the update title must clear it, and the lantern must too, at common sizes."""
+    theme = SYSTEM / "plymouth/openSUSE-halloween"
+    cp = configparser.ConfigParser(interpolation=None)
+    cp.read_string((theme / "openSUSE-halloween.plymouth").read_text())
+    s = {k.lower(): v for k, v in cp["two-step"].items()}
+    size = {n: Image.open(theme / f"{n}.png").size for n in ("watermark", "entry", "throbber-0001")}
+
+    def box(name, h_key, v_key, sw, sh, pad=0):
+        w, h = size[name]
+        x, y = (sw - w) * float(s[h_key]), (sh - h) * float(s[v_key])
+        return (x - pad, y - pad, x + w + pad, y + h + pad)
+
+    def overlap(a, b):
+        return a[0] < b[2] and b[0] < a[2] and a[1] < b[3] and b[1] < a[3]
+
+    for sw, sh in ((1280, 720), (1024, 768), (1366, 768), (1920, 1080), (2560, 1440), (3840, 2160), (1080, 1920)):
+        chameleon = box("watermark", "watermarkhorizontalalignment", "watermarkverticalalignment", sw, sh)
+        # The entry with the prompt text and lock icon around it
+        prompt = box("entry", "dialoghorizontalalignment", "dialogverticalalignment", sw, sh, pad=30)
+        lantern = box("throbber-0001", "horizontalalignment", "verticalalignment", sw, sh)
+        title_y = (sh - 80) * float(s["titleverticalalignment"])
+        title = (0, title_y, sw, title_y + 80)
+        for name, other in (("passphrase prompt", prompt), ("lantern", lantern), ("update title", title)):
+            if overlap(chameleon, other):
+                fail(f"plymouth at {sw}x{sh}: the {name} overlaps the chameleon")
+        if prompt[3] > sh:
+            fail(f"plymouth at {sw}x{sh}: the passphrase prompt runs off the screen")
+    ok("plymouth layout: the prompt, lantern and title clear the chameleon from 720p to 4K and portrait")
 
 
 def check_sddm():
@@ -318,9 +370,21 @@ def check_firefox():
         if not f.exists():
             fail(f"firefox image {name} missing")
             continue
-        img = Image.open(f)
-        if img.height > 200 or f.stat().st_size > 300_000:
-            fail(f"firefox {name} is {img.width}x{img.height}, {f.stat().st_size / 1e3:.0f} kB (> 200 px or 300 kB)")
+        if f.suffix == ".svg":
+            # Drawn at its 1x size, as Firefox lays it out; the picture inside is 2x
+            img = Image.open(io.BytesIO(bytes(resvg_py.svg_to_bytes(svg_path=str(f)))))
+            text = f.read_text()
+            if "data:image/jpeg" not in text or 'href="http' in text:
+                fail(f"firefox {name} should embed its picture, not link to it")
+            else:
+                data = text.split("data:image/jpeg;base64,", 1)[1].split('"', 1)[0]
+                inner = Image.open(io.BytesIO(base64.b64decode(data)))
+                if inner.width < 2 * img.width:
+                    fail(f"firefox {name}: its picture is {inner.width} px for {img.width} px, not 2x (HiDPI)")
+        else:
+            img = Image.open(f)
+        if img.height > 200 or f.stat().st_size > 600_000:
+            fail(f"firefox {name} is {img.width}x{img.height}, {f.stat().st_size / 1e3:.0f} kB (> 200 px or 600 kB)")
         # Background tab titles over the image: every tab-sized patch of the
         # 44 px tab strip, with the frame colour showing through
         over = Image.new("RGBA", img.size, rgb(colors["frame"]) + (255,))
@@ -344,6 +408,74 @@ def check_firefox():
         fail(f"firefox {xpi.name} does not match {theme.name}/")
     ok(f"firefox theme {manifest['version']}: contrast {worst:.1f}, tab titles over the header {title:.1f}, "
        f"{xpi.name} {xpi.stat().st_size / 1e3:.0f} kB")
+
+
+# Common screens: (width, height, minimum share of the chameleon box Plasma
+# shows, minimum share GNOME, Xfce and SDDM show with their one zoomed picture)
+SCREENS = {
+    "1920x1080": (1920, 1080, 1.0, 1.0), "2560x1440": (2560, 1440, 1.0, 1.0),
+    "3840x2160": (3840, 2160, 1.0, 1.0), "1366x768": (1366, 768, 1.0, 1.0),
+    "5120x2880": (5120, 2880, 1.0, 1.0), "1920x1200": (1920, 1200, 1.0, 1.0),
+    "2560x1600": (2560, 1600, 1.0, 1.0), "1280x800": (1280, 800, 1.0, 1.0),
+    "2256x1504": (2256, 1504, 1.0, 1.0), "3000x2000": (3000, 2000, 1.0, 1.0),
+    "3440x1440": (3440, 1440, 1.0, 0.9), "2560x1080": (2560, 1080, 1.0, 0.9),
+    "1600x1200": (1600, 1200, 1.0, 0.85), "1280x1024": (1280, 1024, 1.0, 0.8),
+    "5120x1440": (5120, 1440, 0.7, 0.5), "1080x1920": (1080, 1920, 0.85, 0.0),
+}
+
+
+def check_resolutions():
+    """How much of the chameleon (art/crops.toml [night] keep) each desktop
+    shows on common screens: Plasma picks a size from the wallpaper package and
+    zooms it; GNOME, Xfce and SDDM zoom their one 16:10 picture."""
+    from imaging import CROPS, keep_window
+    from targets.wallpapers import SIZES, ZOOMED
+    try:
+        W, H = Image.open(ROOT / "art/source/wallpaper-night.png").size
+    except OSError:
+        print("skip  resolutions (no wallpaper master)")
+        return
+    c = CROPS["night"]
+    keep = (c["keep"][0] * W, c["keep"][1] * H, c["keep"][2] * W, c["keep"][3] * H)
+
+    def zoomed(box, ratio):
+        """The centred part of `box` a screen of `ratio` shows when the picture fills it."""
+        x0, y0, x1, y1 = box
+        w, h = x1 - x0, y1 - y0
+        if w / h > ratio:
+            cut = (w - h * ratio) / 2
+            return (x0 + cut, y0, x1 - cut, y1)
+        cut = (h - w / ratio) / 2
+        return (x0, y0 + cut, x1, y1 - cut)
+
+    def shown(box):
+        iw = max(0, min(box[2], keep[2]) - max(box[0], keep[0]))
+        ih = max(0, min(box[3], keep[3]) - max(box[1], keep[1]))
+        return iw * ih / ((keep[2] - keep[0]) * (keep[3] - keep[1]))
+
+    def picture(w, h, zoomed=False):
+        return keep_window((W, H), w / h, c["keep"], c["focus"], zoomed)
+
+    def plasma_pick(sw, sh):
+        # Plasma's own choice (plasma-workspace, image wallpaper's distance()):
+        # the closest aspect ratio first, then the closest width, upscaling
+        # counting double
+        def distance(size):
+            delta = size[0] - sw
+            return abs(size[0] / size[1] - sw / sh) * 25000 + (delta if delta >= 0 else -2 * delta)
+        return min(SIZES, key=distance)
+
+    worst = {"plasma": 1.0, "zoomed": 1.0}
+    for name, (sw, sh, need_plasma, need_zoomed) in SCREENS.items():
+        plasma = shown(zoomed(picture(*plasma_pick(sw, sh)), sw / sh))
+        one = shown(zoomed(picture(*ZOOMED, zoomed=True), sw / sh))
+        worst = {"plasma": min(worst["plasma"], plasma), "zoomed": min(worst["zoomed"], one)}
+        if plasma < need_plasma - 0.005:
+            fail(f"resolution {name}: Plasma shows {plasma:.0%} of the chameleon (< {need_plasma:.0%})")
+        if one < need_zoomed - 0.005:
+            fail(f"resolution {name}: GNOME, Xfce and SDDM show {one:.0%} of the chameleon (< {need_zoomed:.0%})")
+    ok(f"resolutions: {len(SCREENS)} screens, chameleon at least {worst['plasma']:.0%} on Plasma, "
+       f"{worst['zoomed']:.0%} with one zoomed picture")
 
 
 def css_colours(text):
@@ -406,7 +538,7 @@ def check_gnome():
     """The wallpaper entry and the defaults point at files the build installs."""
     from targets import gnome
     for path in (gnome.LIGHT, gnome.DARK):
-        built = USER / "wallpapers" / Path(path).relative_to("/usr/share/wallpapers")
+        built = USER / Path(path).relative_to("/usr/share")
         if not built.exists():
             fail(f"gnome wallpaper {path} isn't built")
     xml = ET.parse(USER / "gnome-background-properties/openSUSEhalloween.xml")
@@ -480,6 +612,7 @@ def main():
     check_syntax()
     check_metadata()
     check_images()
+    check_plymouth_layout()
     check_icons()
     check_firefox()
     if "plasma" in desktops:
@@ -493,6 +626,7 @@ def main():
         check_gnome()
     if "xfce" in desktops:
         check_xfwm4()
+    check_resolutions()
     check_install()
     check_reuse()
     placeholders = (BUILD / "placeholders.txt").read_text().split("\n") if (BUILD / "placeholders.txt").exists() else []

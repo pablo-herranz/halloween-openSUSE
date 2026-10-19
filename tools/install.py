@@ -24,6 +24,7 @@ FIREFOX_ID = "openSUSE-halloween@pluskal.org"
 # ours, so uninstalling removes exactly those entries from the install path.
 FILES = [
     ("user/wallpapers", "{datadir}/wallpapers"),
+    ("user/backgrounds", "{datadir}/backgrounds"),
     ("user/icons", "{datadir}/icons"),
     ("user/themes", "{datadir}/themes"),
     ("user/gnome-background-properties", "{datadir}/gnome-background-properties"),

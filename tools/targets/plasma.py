@@ -62,7 +62,7 @@ def build_look_and_feel(ctx):
     out = USER / "plasma/look-and-feel" / LNF_ID
     shutil.copytree(ROOT / "plasma/look-and-feel" / LNF_ID, out)
     splash = out / "contents/splash"
-    night = splash_backdrop(wallpapers["night"]).resize((1920, 1080), Image.LANCZOS)
+    night = splash_backdrop(wallpapers["night"]).resize((3840, 2160), Image.LANCZOS)
     bg = ImageEnhance.Brightness(night.filter(ImageFilter.GaussianBlur(8))).enhance(0.55)
     save_jpeg(bg, splash / "images/background.jpg")
     save_png(fit(ctx.hero, 512), splash / "images/hero.png")

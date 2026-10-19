@@ -36,3 +36,17 @@ sha256 = "a81780fadfc432be0fc3d89c4ebb41aa28e4f032d42c36f9789c57dd10cfa41c"
 [archives.xfwm4]
 url = "https://archive.xfce.org/src/xfce/xfwm4/4.20/xfwm4-4.20.0.tar.bz2"
 sha256 = "a58b63e49397aa0d8d1dcf0636be93c8bb5926779aef5165e0852890190dcf06"
+
+# Plymouth's password-dialog images, from its spinner theme (GPL-2.0-or-later),
+# copied into the boot splash by tools/targets/plymouth.py so it doesn't depend
+# on the spinner theme being installed. keymap-render.png is left out: it has
+# to match the installed Plymouth, and without it no layout name is shown.
+[plymouth]
+base = "https://gitlab.freedesktop.org/plymouth/plymouth/-/raw/26.134.222/themes/spinner"
+
+[plymouth.files]
+"bullet.png" = "f577b79cbe0a6576b285db18f127e07b9bb1e99f248acfecc38723c6cfad3035"
+"capslock.png" = "5e4877145fce9be41148542e36a49eca238452ee73723604af809a0527153c11"
+"entry.png" = "8325ccd1676dd318498d739a20af2f234ce35690cb89796af39afaeba179bc62"
+"keyboard.png" = "cf6674ab2f7fa5bc401dddd14f8818c4ceb86cdb5ba3ae5553e8878a5320aa0f"
+"lock.png" = "4854942e80051cec8cf6265ce011cad210954a8ee08609fce31dd59f973c7d9c"

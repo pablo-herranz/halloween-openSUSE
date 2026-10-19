@@ -82,10 +82,6 @@ install_plymouth() {
     local theme=$PLYMOUTH_THEMES/$PLYMOUTH_ID
     log "installing Plymouth theme $PLYMOUTH_ID"
     install_tree "$SRC/root/plymouth/$PLYMOUTH_ID" "$theme"
-    # Password dialog images come from the stock spinner theme
-    for f in entry bullet lock keyboard keymap-render capslock; do
-        cp "$PLYMOUTH_THEMES/spinner/$f.png" "$theme/"
-    done
     chmod -R u=rwX,go=rX "$theme"
 }
 

@@ -5,14 +5,15 @@
 
 usage: qmp.py SOCKET shot FILE.png | key KEY... | click X Y | quit
 Keys are QEMU qcodes (esc, ret, meta_l, s, …); X Y are pixels of the VM's
-1920x1080 display, sent through its USB tablet.
+display ($HALLOWEEN_VM_RES, 1920x1080 by default), sent through its USB tablet.
 """
 
 import json
+import os
 import socket
 import sys
 
-WIDTH, HEIGHT = 1920, 1080
+WIDTH, HEIGHT = (int(v) for v in os.environ.get("HALLOWEEN_VM_RES", "1920x1080").split("x"))
 
 
 def main():

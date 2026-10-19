@@ -10,9 +10,11 @@ from common import DEFAULTS, ROOT, USER, fill_tokens, write
 from targets.gtk import THEME
 
 DESKTOP = "gnome"
-WALLPAPERS = "/usr/share/wallpapers/openSUSEhalloween/contents"
-LIGHT = f"{WALLPAPERS}/images/3840x2160.jpg"
-DARK = f"{WALLPAPERS}/images_dark/3840x2160.jpg"
+# GNOME zooms one picture to fill every screen: the zoomed pictures from
+# targets/wallpapers.py (see check_resolutions in tools/check.py)
+BACKGROUNDS = "/usr/share/backgrounds/openSUSEhalloween"
+LIGHT = f"{BACKGROUNDS}/dusk.jpg"
+DARK = f"{BACKGROUNDS}/night.jpg"
 
 
 def background_xml(p):

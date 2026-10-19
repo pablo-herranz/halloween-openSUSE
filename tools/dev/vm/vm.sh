@@ -2,13 +2,14 @@
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
-# Development helper: a throwaway openSUSE Tumbleweed VM with GNOME and Xfce,
-# for trying the theme on desktops other than your own. It runs headless on
+# Development helper: a throwaway openSUSE Tumbleweed VM with KDE Plasma, GNOME
+# and Xfce, for trying the theme on other desktops and screen sizes. It runs headless on
 # any x86_64 Linux host with KVM and QEMU:
 #   sudo zypper in --no-recommends qemu-x86 qemu-tools qemu-hw-display-virtio-vga xorriso
 # Everything lives in $HALLOWEEN_VM (default ~/vm-halloween). The VM's SSH is
 # on 127.0.0.1:$HALLOWEEN_VM_PORT (default 2222) with a key made for it, and
-# screenshots come from QEMU's monitor, so no display is needed.
+# screenshots come from QEMU's monitor, so no display is needed. The screen is
+# $HALLOWEEN_VM_RES (default 1920x1080); to try another, stop and boot again.
 #
 # usage: vm.sh create               download and verify the cloud image, make the
 #                                   disk and cloud-init seed, boot, install the desktops
@@ -17,20 +18,22 @@
 #        vm.sh run CMD              CMD inside the logged-in desktop session
 #        vm.sh install TARBALL      install a release tarball (make dist) the way a
 #                                   package does, with its defaults
-#        vm.sh desktop gnome|xfce   log in to that desktop automatically (reboots)
+#        vm.sh desktop plasma|gnome|xfce
+#                                   log in to that desktop automatically (reboots)
 #        vm.sh shot NAME            screenshot to $HALLOWEEN_VM/shots/NAME.png
 #        vm.sh key KEY...           press keys (QEMU qcodes: esc, ret, meta_l, s, …)
-#        vm.sh click X Y            click at pixels X Y of the 1920x1080 display
+#        vm.sh click X Y            click at pixels X Y of the display
 set -euo pipefail
 
 VM=${HALLOWEEN_VM:-$HOME/vm-halloween}
 PORT=${HALLOWEEN_VM_PORT:-2222}
+export HALLOWEEN_VM_RES=${HALLOWEEN_VM_RES:-1920x1080}
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 IMAGES=https://download.opensuse.org/tumbleweed/appliances
 IMAGE=openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2
 # The desktops, plus what the minimal image lacks for a usable session
-PATTERNS="gnome_basis xfce_basis x11"
-PACKAGES="gdm lightdm lightdm-gtk-greeter gnome-shell-extension-user-theme xdg-desktop-portal-gnome"
+PATTERNS="kde_plasma gnome_basis xfce_basis x11"
+PACKAGES="sddm plasma6-sddm-theme-openSUSE plymouth-theme-spinner gdm lightdm lightdm-gtk-greeter gnome-shell-extension-user-theme xdg-desktop-portal-gnome"
 PACKAGES+=" nautilus gnome-console xfce4-notifyd xfce4-terminal make rsync"
 
 log() { printf '\033[1;33m==>\033[0m %s\n' "$*"; }
@@ -56,11 +59,11 @@ wait_session() {  # wait_session PROCESS: until the desktop runs, plus time to s
 
 boot() {
     [ -e "$VM/qemu.pid" ] && kill -0 "$(cat "$VM/qemu.pid")" 2>/dev/null && { log "already running"; return; }
-    log "booting the VM"
+    log "booting the VM at $HALLOWEEN_VM_RES"
     qemu-system-x86_64 -enable-kvm -cpu host -smp 4 -m 4G -machine q35 \
         -drive if=virtio,file="$VM/disk.qcow2" -drive if=virtio,format=raw,readonly=on,file="$VM/seed.iso" \
         -nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:"$PORT"-:22 \
-        -device virtio-vga,xres=1920,yres=1080 -device qemu-xhci -device usb-kbd -device usb-tablet \
+        -device virtio-vga,xres="${HALLOWEEN_VM_RES%x*}",yres="${HALLOWEEN_VM_RES#*x}" -device qemu-xhci -device usb-kbd -device usb-tablet \
         -display none -serial file:"$VM/serial.log" \
         -qmp unix:"$VM/qmp.sock",server=on,wait=off -pidfile "$VM/qemu.pid" -daemonize
     wait_ssh
@@ -126,9 +129,10 @@ EOF
 
 desktop() {
     case ${1:-} in
+        plasma) dm=sddm session=plasma process=plasmashell ;;
         gnome) dm=gdm session=gnome process=gnome-shell ;;
         xfce) dm=lightdm session=xfce process=xfdesktop ;;
-        *) die "usage: vm.sh desktop gnome|xfce" ;;
+        *) die "usage: vm.sh desktop plasma|gnome|xfce" ;;
     esac
     log "logging in to $session automatically with $dm"
     vssh "printf '[User]\nSession=$session\nSystemAccount=false\n' | sudo tee /var/lib/AccountsService/users/geeko >/dev/null
@@ -137,7 +141,10 @@ desktop() {
           sudo mkdir -p /etc/lightdm/lightdm.conf.d
           printf '[Seat:*]\nautologin-user=geeko\nautologin-session=xfce\nuser-session=xfce\n' \
               | sudo tee /etc/lightdm/lightdm.conf.d/90-halloween-vm.conf >/dev/null
-          sudo systemctl disable gdm.service lightdm.service 2>/dev/null
+          sudo mkdir -p /etc/sddm.conf.d
+          plasma=\$(basename \$(ls /usr/share/wayland-sessions/plasma*.desktop | head -1) .desktop)
+          printf '[Autologin]\nUser=geeko\nSession=%s\n' \$plasma | sudo tee /etc/sddm.conf.d/90-halloween-vm.conf >/dev/null
+          sudo systemctl disable sddm.service gdm.service lightdm.service 2>/dev/null
           sudo systemctl enable --force $dm.service 2>/dev/null
           sudo systemctl reboot" || true
     sleep 30
@@ -157,7 +164,7 @@ install_tarball() {
 }
 
 run() {  # in the session, with its environment
-    vssh "pid=\$(pgrep -u geeko -x gnome-shell || pgrep -u geeko -x xfce4-session) || { echo 'no desktop session' >&2; exit 1; }
+    vssh "pid=\$(pgrep -u geeko -x plasmashell || pgrep -u geeko -x gnome-shell || pgrep -u geeko -x xfce4-session) || { echo 'no desktop session' >&2; exit 1; }
           while IFS= read -r -d '' v; do
               case \$v in XDG_CURRENT_DESKTOP=*|WAYLAND_DISPLAY=*|DISPLAY=*|XAUTHORITY=*|DBUS_SESSION_BUS_ADDRESS=*|XDG_SESSION_TYPE=*|XDG_RUNTIME_DIR=*) export \"\$v\" ;; esac
           done < /proc/\$(echo \$pid | cut -d' ' -f1)/environ
@@ -169,7 +176,8 @@ shift || true
 case $cmd in
     create) create ;;
     boot) boot ;;
-    stop) vssh 'sudo systemctl poweroff' 2>/dev/null || qmp quit ;;
+    stop) vssh 'sudo systemctl poweroff' 2>/dev/null || qmp quit
+          while [ -e "$VM/qemu.pid" ] && kill -0 "$(cat "$VM/qemu.pid")" 2>/dev/null; do sleep 2; done ;;
     ssh) vssh "$@" ;;
     run) run "$@" ;;
     install) install_tarball "$@" ;;

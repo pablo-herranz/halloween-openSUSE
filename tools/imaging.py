@@ -23,10 +23,37 @@ def crop_ratio(img, ratio, fx=0.5, fy=0.5):
     return img.crop((0, y, w, y + nh))
 
 
-def crop_to(wallpapers, variant, ratio):
-    """Crop a wallpaper master to `ratio` around its focus point in art/crops.toml."""
-    focus = CROPS.get(variant, {})
-    return crop_ratio(wallpapers[variant], ratio, focus.get("focus_x", 0.5), focus.get("focus_y", 0.5))
+def keep_window(size, ratio, keep, focus, zoomed=False):
+    """The (x0, y0, x1, y1) crop of an image of `size` to aspect `ratio`: it
+    contains the box `keep` (0..1) if it can and is otherwise as central as
+    possible; if `keep` doesn't fit, it is centred on `focus` (0..1). A
+    `zoomed` picture, which desktops zoom to fill any screen, is centred on
+    `keep` instead, so zooming cuts the scene around it first."""
+    w, h = size
+    wide = w / h > ratio
+    if wide:
+        length, total, lo, hi, at = round(h * ratio), w, keep[0] * w, keep[2] * w, focus[0] * w
+    else:
+        length, total, lo, hi, at = round(w / ratio), h, keep[1] * h, keep[3] * h, focus[1] * h
+    if zoomed:
+        start = (lo + hi - length) / 2
+    elif length >= hi - lo:
+        start = min(max((total - length) / 2, hi - length), lo)
+    else:
+        start = at - length / 2
+    start = round(min(max(start, 0), total - length))
+    return (start, 0, start + length, h) if wide else (0, start, w, start + length)
+
+
+def crop_keep(img, ratio, keep, focus, zoomed=False):
+    """Crop `img` to aspect `ratio` with keep_window()."""
+    return img.crop(keep_window(img.size, ratio, keep, focus, zoomed))
+
+
+def crop_to(wallpapers, variant, ratio, zoomed=False):
+    """Crop a wallpaper master to `ratio`, keeping its [variant] box in art/crops.toml."""
+    c = CROPS[variant]
+    return crop_keep(wallpapers[variant], ratio, c["keep"], c["focus"], zoomed)
 
 
 def save_jpeg(img, path, limit=None):

@@ -4,11 +4,13 @@
 a flickering lantern as throbber, on a gradient from the palette."""
 
 import math
+import shutil
+import tomllib
 
 from PIL import Image
 
 import placeholders as ph
-from common import SHARED, SYSTEM, fill_tokens, write
+from common import CACHE, ROOT, SHARED, SYSTEM, fetch, fill_tokens, write
 from imaging import fit, save_png
 
 DESKTOP = "shared"
@@ -24,6 +26,9 @@ def build(ctx):
     write(out / f"{ID}.plymouth",
           fill_tokens((src / f"{ID}.plymouth.in").read_text(), {**hexes, "IMAGEDIR": INSTALL_DIR}))
     save_png(fit(ctx.hero, 300), out / "watermark.png")
+    pins = tomllib.loads((ROOT / "tools/upstream.toml").read_text())["plymouth"]
+    for name, sha256 in pins["files"].items():
+        shutil.copyfile(fetch(f"{pins['base']}/{name}", sha256, CACHE / "plymouth" / name), out / name)
     lit, unlit = ctx.lanterns
     size, frames = 64, 40
     small_lit, small_unlit = fit(lit, 48), fit(unlit, 48)
