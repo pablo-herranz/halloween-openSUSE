@@ -1,0 +1,42 @@
+# SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
+# SPDX-License-Identifier: CC0-1.0
+name: Art request or proposal
+description: Suggest an icon, wallpaper, ornament or other artwork
+labels: [art]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! Agreeing on the idea here first saves work later. The art
+        guidelines are in CONTRIBUTING.md.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of art?
+      options:
+        - Icon
+        - Wallpaper
+        - Plasma style ornament
+        - Splash or boot splash
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What should it show, and where does it appear? For icons, list the icon names if you know them (for example folder-development).
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Sketches, mock-ups or references
+      description: Images are welcome. Don't include other projects' logos.
+  - type: checkboxes
+    id: making
+    attributes:
+      label: Making it
+      options:
+        - label: I'd like to make it myself
+        - label: I plan to use AI tools, and will record the provenance in art/prompts/

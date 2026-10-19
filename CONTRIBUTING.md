@@ -126,6 +126,20 @@ and `ALIASES` there. `make icon-preview` renders the whole set at 16 to 64 px
 into `build/icon-preview.png`; check the small sizes before opening a pull
 request.
 
+## Releasing (maintainers)
+
+Versions are calendar-based (`YYYY.MM.patch`).
+
+1. In a pull request, set `VERSION` in `tools/common.py` and move the
+   `[Unreleased]` notes in `CHANGELOG.md` under the new version.
+2. After it is merged, tag `main` and push the tag:
+   `git tag v2026.10.0 && git push origin v2026.10.0`.
+3. The release workflow checks that the tag matches `VERSION`, runs
+   `make release-check` (which fails while placeholders are in use), builds
+   the archives with `make dist` and publishes a GitHub release with them.
+
+`make dist` builds the same archives locally, into `dist/`.
+
 ## AI-assisted contributions
 
 AI tools are welcome for code and art, as long as you say so:
