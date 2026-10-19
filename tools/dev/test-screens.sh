@@ -90,9 +90,10 @@ sddm() {
 }
 
 widgets() {
-    # An analog clock for the pumpkin face, removed again afterwards
+    # An analog clock for the pumpkin face, in the empty sky on the left (the
+    # chameleon is on the right), removed again afterwards
     local id
-    id=$(plasma_script 'var w = desktops()[0].addWidget("org.kde.plasma.analogclock", 1180, 140, 360, 360); print(w.id)')
+    id=$(plasma_script 'var w = desktops()[0].addWidget("org.kde.plasma.analogclock", 160, 140, 360, 360); print(w.id)')
     sleep 4
     shot clock
     plasma_script "desktops().forEach(d => d.widgets().forEach(w => { if (w.id == $id) w.remove() }))" >/dev/null
@@ -144,7 +145,7 @@ user_pref("browser.tabs.warnOnClose", false);
 EOF
     echo '{"chrome://browser/content/browser.xhtml":{"main-window":{"sizemode":"maximized"}}}' > "$profile/xulstore.json"
     WAYLAND_DISPLAY=$WL command firefox --no-remote --profile "$profile" --start-debugger-server "$port" \
-        https://en.wikipedia.org/wiki/Jack-o%27-lantern https://www.opensuse.org/ https://news.opensuse.org/ \
+        "https://en.wikipedia.org/wiki/Pumpkin?vectornightmode=1" https://en.wikipedia.org/wiki/Jack-o%27-lantern \
         https://en.opensuse.org/Portal:Tumbleweed https://en.wikipedia.org/wiki/Halloween about:addons >/dev/null 2>&1 &
     timeout 60 python3 - "$port" "$xpi" <<'EOF'
 import json, socket, sys, time

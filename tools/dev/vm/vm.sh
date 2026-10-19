@@ -22,6 +22,7 @@
 #                                   log in to that desktop automatically (reboots)
 #        vm.sh shot NAME            screenshot to $HALLOWEEN_VM/shots/NAME.png
 #        vm.sh key KEY...           press keys (QEMU qcodes: esc, ret, meta_l, s, …)
+#        vm.sh point X Y            move the pointer to pixels X Y of the display
 #        vm.sh click X Y            click at pixels X Y of the display
 set -euo pipefail
 
@@ -186,6 +187,7 @@ case $cmd in
     desktop) desktop "$@" ;;
     shot) mkdir -p "$VM/shots" && qmp shot "$VM/shots/${1:?usage: vm.sh shot NAME}.png" && echo "$VM/shots/$1.png" ;;
     key) qmp key "$@" ;;
+    point) qmp point "$@" ;;
     click) qmp click "$@" ;;
     *) sed -n '/^# usage:/,/^set -euo/p' "$0" | sed '$d; s/^# \{0,1\}//' >&2; exit 2 ;;
 esac
