@@ -1,5 +1,5 @@
 /* SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
- * SPDX-License-Identifier: LGPL-2.1-or-later
+ * SPDX-License-Identifier: LGPL-2.1-only
  *
  * openSUSE Halloween: appended to adw-gtk3-dark's gtk.css by
  * tools/targets/gtk.py. adw-gtk3's widget rules use these named colours, and a

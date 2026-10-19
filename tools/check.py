@@ -770,11 +770,20 @@ def check_reuse():
     if not Path(reuse).exists():
         print("skip  reuse lint (reuse not installed)")
         return
-    r = subprocess.run([reuse, "--root", str(ROOT), "lint"], capture_output=True, text=True)
-    if r.returncode:
-        fail("reuse lint:\n" + r.stdout[-2000:])
+    if (ROOT / ".git").exists():
+        cmd, what = [reuse, "--root", str(ROOT), "lint"], "reuse lint"
     else:
-        ok("reuse lint")
+        # From a release archive there is no git to ignore build/, which holds
+        # the third-party files fetched for the build: lint the sources file by file
+        files = [str(p) for p in sorted(ROOT.rglob("*"))
+                 if p.is_file() and p.relative_to(ROOT).parts[0] not in ("build", "dist")
+                 and ".venv" not in p.parts and "__pycache__" not in p.parts]
+        cmd, what = [reuse, "--root", str(ROOT), "lint-file", *files], f"reuse lint-file ({len(files)} source files)"
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode:
+        fail(f"{what}:\n" + (r.stdout + r.stderr)[-2000:])
+    else:
+        ok(what)
 
 
 def main():

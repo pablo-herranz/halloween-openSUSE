@@ -1,4 +1,5 @@
-Pillow>=12.3.0
+Pillow>=11.3.0
 reuse[charset-normalizer]>=6.2.0
 scour>=0.38.2
-jsonschema>=4.26.0
+jsonschema>=4.24.0
+license-expression>=30.0

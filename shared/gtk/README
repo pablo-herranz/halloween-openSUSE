@@ -6,7 +6,7 @@ https://github.com/plusky/halloween-openSUSE from its palette.
 
 gtk-3.0/          adw-gtk3-dark 6.5 by lassekongo83
                   (https://github.com/lassekongo83/adw-gtk3, LGPL-2.1-only),
-                  recoloured; the recolouring is LGPL-2.1-or-later
+                  recoloured; the recolouring is LGPL-2.1-only too
 gnome-shell/      GNOME Shell stylesheet, for the User Themes extension
 xfwm4/            xfwm4's default window-manager theme by Olivier Fourdan
                   (GPL-2.0-or-later), recoloured
