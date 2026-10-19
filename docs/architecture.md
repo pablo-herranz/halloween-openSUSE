@@ -45,9 +45,11 @@ masters, the placeholder list) and runs every target in
 | `plasma` | plasma | colour scheme, Plasma style (via `tools/plasma_style.py`), global theme |
 | `sddm` | plasma | `build/root/sddm/breeze-openSUSE-halloween/` |
 
-`build.py --desktop plasma` builds the shared targets plus Plasma's.
-`build/user/` installs to `~/.local/share`, `build/root/` to `/usr/share`,
-and the install scripts are copied to `build/install/`.
+`build.py --desktop plasma` builds the shared targets plus Plasma's. A
+target's `DESKTOP` can also be a tuple, for a piece several desktops share.
+`build/user/` holds what goes to `share/` (themes, icons, wallpapers),
+`build/root/` the login screen and boot splash, `build/firefox/` the Firefox
+theme and `build/defaults/` the optional defaults.
 `build/MANIFEST.sha256` lists every installable file; the same masters always
 give the same manifest.
 
@@ -72,11 +74,29 @@ is the one check `main`'s ruleset requires.
 
 ## Install
 
-`install/install-user.sh` copies `build/user/` and applies the theme with
-Plasma's own tools; `install/install-root.sh` installs the login screen and
-boot splash (with `--plymouth` making the boot splash the default and
-rebuilding the initrds). Both save the previous settings, which the
-`uninstall-*.sh` scripts restore. `install/verify.sh` reports what is active.
+`tools/install.py` (`make install`) copies the build into the system paths, as
+an RPM's `%install` will: its `FILES` table maps each folder in `build/` to an
+install path under `PREFIX` (`/usr`), `LIBDIR` or `SYSCONFDIR`, honouring
+`DESTDIR`. Every entry inside a mapped folder is ours, so `make uninstall`
+removes exactly those. `--defaults` (`make install-defaults`) installs the
+`DEFAULTS` table instead: declarative files, such as an SDDM `conf.d`
+drop-in, that make the theme the default the way a separate defaults package
+would. Nothing that is installed changes settings. `check.py` stages an
+install and uninstall into a temporary folder on every check.
+
+The SDDM theme links openSUSE's `breeze-openSUSE` QML with relative symlinks,
+so updates of that package keep flowing in.
+
+The Firefox theme goes to `LIBDIR/firefox/browser/extensions/`: openSUSE
+builds Firefox with `--with-unsigned-addon-scopes=app`, so an unsigned add-on
+only loads from Firefox's own folder, not from the shared
+`/usr/share/mozilla/extensions/`. Its package is therefore
+architecture-specific; a Mozilla-signed `.xpi` could use the shared folder.
+
+The development helpers in `tools/dev/` do change settings: they apply the
+theme to a Plasma session, save and restore the previous settings, and switch
+the login screen and boot splash, for trying changes on a test machine.
+`verify.sh` reports what is active.
 
 ## Adding a desktop
 
@@ -89,7 +109,8 @@ To add one:
    the helpers in `tools/imaging.py`.
 3. Write the output under `build/user/` or `build/root/` in the paths the
    desktop expects.
-4. Add install and verify scripts for it in `install/`.
+4. Map its output folders to install paths in `tools/install.py`; put its
+   defaults in `build/defaults/` and the `DEFAULTS` table.
 5. Extend `tools/check.py` with checks for the new files.
 6. Document it in the README's "What's included" table.
 

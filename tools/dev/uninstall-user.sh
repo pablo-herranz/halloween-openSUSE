@@ -2,6 +2,9 @@
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
+# Development helper for test machines: it changes the desktop's settings.
+# Packages install the theme with tools/install.py (make install) instead.
+#
 # Switch the session back to the settings saved by install-user.sh (or the
 # openSUSE defaults), then remove the per-user halloween-openSUSE files.
 set -euo pipefail

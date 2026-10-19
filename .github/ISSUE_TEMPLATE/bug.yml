@@ -33,7 +33,7 @@ body:
     attributes:
       label: How to reproduce
       placeholder: |
-        1. Run build/install/install-user.sh
+        1. Run sudo make install, then choose the theme in System Settings
         2. Open …
   - type: input
     id: versions
@@ -41,7 +41,8 @@ body:
       label: openSUSE and Plasma versions
       placeholder: Tumbleweed 20261018, Plasma 6.8.2
   - type: textarea
-    id: verify
+    id: install
     attributes:
-      label: Output of build/install/verify.sh
+      label: How you installed it
+      description: For example `sudo make install` from a checkout at a given commit, or the package version.
       render: text

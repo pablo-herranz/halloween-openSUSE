@@ -1,9 +1,11 @@
 # Security policy
 
-A theme is mostly artwork, but this one also ships scripts that run as root:
-`install/install-root.sh` writes to `/usr/share` and `/etc/sddm.conf.d` and
-rebuilds the initrds, and `install/uninstall-root.sh` undoes that. Plasma
-global themes and SDDM themes can also contain QML.
+A theme is mostly artwork, but `sudo make install` runs `tools/install.py` as
+root, which writes to `/usr/share`, `/usr/lib64/firefox` and (with
+`install-defaults`) `/etc`. The development helpers in `tools/dev/` also run
+as root on test machines and rebuild the initrds. Plasma global themes and
+SDDM themes can also contain QML, and the Firefox theme is installed where
+Firefox doesn't check signatures.
 
 ## Supported versions
 

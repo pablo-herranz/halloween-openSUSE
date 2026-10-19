@@ -2,6 +2,9 @@
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
+# Development helper for test machines: it changes the desktop's settings.
+# Packages install the theme with tools/install.py (make install) instead.
+#
 # Install the per-user parts of halloween-openSUSE into ~/.local/share and
 # switch the running Plasma session to them. Panels and widgets are kept.
 # Safe to re-run; the first run saves the current settings for
