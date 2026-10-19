@@ -12,9 +12,10 @@ ROOT = Path(__file__).resolve().parent.parent
 SHARED = ROOT / "shared"    # sources of the desktop-neutral pieces
 BUILD = ROOT / "build"
 CACHE = BUILD / "cache"
-USER = BUILD / "user"       # installs to ~/.local/share, no root needed
-SYSTEM = BUILD / "root"     # installs to /usr/share: login screen, boot splash
+USER = BUILD / "user"       # themes, icons, wallpapers: share/ in the system
+SYSTEM = BUILD / "root"     # login screen and boot splash
 FIREFOX = BUILD / "firefox"
+DEFAULTS = BUILD / "defaults"   # the optional defaults; tools/install.py --defaults
 VERSION = "2026.10.0"
 FIREFOX_ID = "openSUSE-halloween@pluskal.org"
 

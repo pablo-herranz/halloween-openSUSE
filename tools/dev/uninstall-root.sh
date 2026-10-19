@@ -2,6 +2,9 @@
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
+# Development helper for test machines: it changes the desktop's settings.
+# Packages install the theme with tools/install.py (make install) instead.
+#
 # Undo install-root.sh: restore the previous login screen and Plymouth theme,
 # rebuild the initrds, then remove the system halloween-openSUSE files.
 set -euo pipefail

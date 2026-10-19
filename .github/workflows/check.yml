@@ -72,7 +72,7 @@ jobs:
             build/user
             build/root
             build/firefox
-            build/install
+            build/defaults
             build/MANIFEST.sha256
             build/icon-preview.png
           retention-days: 14

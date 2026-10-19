@@ -11,13 +11,14 @@ make check                        # build into build/ and validate it (creates t
 make lint                         # ruff, ShellCheck, actionlint, zizmor, typos, editorconfig, reuse
 make icon-preview                 # build/icon-preview.png: every icon at 16 to 64 px
 make release-check                # make check, and fail while any placeholder is in use
+make install DESTDIR=/tmp/stage   # install the build like a package would (also install-defaults, uninstall)
 ```
 
 One file or one desktop at a time:
 
 ```bash
 tools/.venv/bin/ruff check tools/check.py
-tools/.venv/bin/shellcheck -x -P install install/verify.sh
+tools/.venv/bin/shellcheck -x -P tools/dev tools/dev/verify.sh
 tools/.venv/bin/reuse lint
 tools/.venv/bin/python tools/build.py --desktop plasma   # the shared pieces plus Plasma's
 ```
@@ -43,6 +44,9 @@ installs it.
   `tools/vectors.py`.
 - Generated art: record how it was made in `art/prompts/`, in the format of
   `art/prompts/08-more-icons.md`.
+- Install paths: only in the table in `tools/install.py`. Installing copies
+  files and changes no settings, so the theme can be packaged as an RPM;
+  `tools/dev/` holds the helpers that do change settings, for test machines.
 - `build/` is output. `art/source/` holds the masters, in Git LFS.
 
 Every new file starts with an SPDX header or gets a path in `REUSE.toml`:
@@ -67,8 +71,8 @@ and colour scheme LGPL-2.0-or-later, docs and small config CC0-1.0.
 
 ## Ask first
 
-- The `make` targets that take `TARGET=user@host`: they install on a real
-  machine over SSH.
+- The `make` targets that take `TARGET=user@host`: they change a real
+  machine's settings over SSH.
 - `sudo`, installing packages, or changing the user's desktop settings.
 - Opening a pull request that isn't a draft, unless the user asked for the
   change to land: the owner's pull requests merge on their own once CI passes.
@@ -79,6 +83,8 @@ and colour scheme LGPL-2.0-or-later, docs and small config CC0-1.0.
 - Edit files in `build/`, or hand-edit the masters in `art/source/`.
 - Reproduce trademarks: the openSUSE logo, Firefox's logo, other projects'
   brand icons. Image prompts never say "openSUSE", "Geeko" or "logo".
+- Add a script that changes settings to what gets installed: defaults are
+  declarative files installed by `make install-defaults`.
 - Credit AI tools in commits: no `Assisted-by:` or `Co-Authored-By:` trailers
   naming an AI.
 

@@ -2,6 +2,9 @@
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
+# Development helper for test machines: it changes the desktop's settings.
+# Packages install the theme with tools/install.py (make install) instead.
+#
 # Install the system parts of halloween-openSUSE. Needs root.
 #   - Plasma style, colour scheme, icons, wallpaper and look-and-feel in
 #     /usr/local/share, so the login screen and other users can use them
@@ -54,31 +57,12 @@ install_shared() {
 }
 
 install_sddm() {
-    local base=$SDDM_THEMES/$SDDM_BASE theme=$SDDM_THEMES/$SDDM_ID
-    [ -f "$base/Main.qml" ] || die "$base not found (is sddm-theme-openSUSE installed?)"
-    log "building SDDM theme $SDDM_ID on top of $SDDM_BASE"
-    rm -rf "$theme"
-    mkdir -p "$theme"
-    # Link the QML so updates of breeze-openSUSE keep flowing in
-    for f in "$base"/*; do
-        case $(basename "$f") in
-            metadata.desktop|theme.conf|theme.conf.user|preview.png) ;;
-            *) ln -s "$f" "$theme/$(basename "$f")" ;;
-        esac
-    done
-    cp "$SRC/root/sddm/$SDDM_ID/metadata.desktop" "$SRC/root/sddm/$SDDM_ID/background.jpg" \
-        "$SRC/root/sddm/$SDDM_ID/preview.png" "$theme/"
-    cp "$base/theme.conf" "$theme/theme.conf"
-    local group=General key value
-    while IFS= read -r line; do
-        case $line in
-            ''|'#'*) ;;
-            '['*']') group=${line#[}; group=${group%]} ;;
-            *=*) key=${line%%=*} value=${line#*=}
-                 kwriteconfig6 --file "$theme/theme.conf" --group "$group" --key "$key" "$value" ;;
-        esac
-    done < "$SRC/root/sddm/$SDDM_ID/theme.conf.overrides"
-    chmod -R u=rwX,go=rX "$theme"
+    local base=$SDDM_THEMES/$SDDM_BASE
+    [ -f "$base/Main.qml" ] || die "$base not found (is plasma6-sddm-theme-openSUSE installed?)"
+    log "installing SDDM theme $SDDM_ID (links to $SDDM_BASE's QML)"
+    rm -rf "${SDDM_THEMES:?}/$SDDM_ID"
+    cp -R "$SRC/root/sddm/$SDDM_ID" "$SDDM_THEMES/"
+    chmod -R u=rwX,go=rX "$SDDM_THEMES/$SDDM_ID"
 }
 
 activate_sddm() {

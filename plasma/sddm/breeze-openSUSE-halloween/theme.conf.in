@@ -1,0 +1,9 @@
+[General]
+showlogo=hidden
+showClock=true
+logo=/usr/share/sddm/themes/breeze/default-logo.svg
+type=image
+color=@sddm_fallback@
+fontSize=10
+background=@THEMEDIR@/background.jpg
+needsFullUserModel=false

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Turn screenshots from install/test-screens.sh into package previews.
+"""Turn screenshots from tools/dev/test-screens.sh into package previews.
 
 Reads art/screenshots/*.png (1920x1080) and writes art/previews/, which
 tools/build.py prefers over its generated mock-ups, and the web-sized images

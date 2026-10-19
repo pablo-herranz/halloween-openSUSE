@@ -1,7 +1,0 @@
-# Applied on top of breeze-openSUSE's theme.conf by install/install-root.sh
-[General]
-type=image
-background=@THEMEDIR@/background.jpg
-color=@sddm_fallback@
-showlogo=hidden
-showClock=true

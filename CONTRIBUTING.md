@@ -42,8 +42,8 @@ few pinned Breeze SVGs from invent.kde.org on its first run and caches them in
 | `plasma/` | KDE Plasma: colour scheme, Plasma style, global theme with splash, SDDM login theme |
 | `gnome/`, `xfce/` | Notes for the planned editions |
 | `art/` | The palette, crop focus points, prompt records, and the art masters (`source/`, Git LFS) |
-| `tools/` | The build (`build.py`, `targets/`), checks (`check.py`) and helpers |
-| `install/` | Install, uninstall, verify and screenshot scripts, copied to `build/install/` |
+| `tools/` | The build (`build.py`, `targets/`), checks (`check.py`), the installer (`install.py`) and helpers |
+| `tools/dev/` | Development helpers for a test machine: apply, verify and screenshot the theme |
 | `docs/` | Architecture notes and the README screenshots |
 
 Never edit anything in `build/`: it is generated. See
@@ -67,13 +67,15 @@ Keep pull requests focused: one icon set, one fix, one feature.
 
 ### Trying it on a machine
 
-On the openSUSE machine itself, use the scripts in `build/install/` as the
-README describes. While developing on another computer, the `make` targets
-that take `TARGET=user@host` build here, copy `build/` to the test machine over
-SSH and run the same scripts there:
+`make install` only copies files, as a package does (see the README). For a
+quick round trip while developing, the helpers in `tools/dev/` also apply the
+theme to a Plasma session, save the previous settings and restore them on
+uninstall. They change settings, so use them only on a test machine. The
+`make` targets that take `TARGET=user@host` build here, copy `build/` and the
+helpers to the test machine over SSH and run them there:
 
 ```bash
-make install-user TARGET=user@testbox
+make install-user TARGET=user@testbox   # and install-root, plymouth
 make verify TARGET=user@testbox
 make screens TARGET=user@testbox && make fetch-screenshots TARGET=user@testbox
 make previews   # turn the screenshots into package previews and README images

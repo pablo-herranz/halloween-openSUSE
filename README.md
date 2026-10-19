@@ -43,36 +43,52 @@ are planned, and the wallpapers, icons, boot splash and Firefox theme in
 
 ## Requirements
 
-- openSUSE Tumbleweed with KDE Plasma 6.8 or newer and the openSUSE branding
-  (the `breeze-openSUSE` SDDM theme and `plymouth`)
-- systemd-boot with `sdbootutil`, for the boot splash
+- openSUSE Tumbleweed; KDE Plasma 6.8 or newer for the Plasma pieces
+- For the login screen, openSUSE's `breeze-openSUSE` SDDM theme
+  (`plasma6-sddm-theme-openSUSE`), which it builds on
 - To build: Python 3.11 or newer, `make` and [Git LFS](https://git-lfs.com/)
 
 ## Install
 
-On the openSUSE machine, from a checkout of this repository:
+The theme installs like a package: `make install` only copies its files into
+the system folders and changes no settings. You then choose the pieces you
+want. RPM packages for openSUSE are planned and will do the same.
 
 ```bash
 git lfs install && git lfs pull
-make build
-build/install/install-user.sh                   # wallpaper, Plasma style, colours, icons, splash
-sudo build/install/install-root.sh              # login screen; installs the boot splash
-sudo build/install/install-root.sh --plymouth   # after trying it: make it the boot splash
-build/install/verify.sh                         # report what is active
+make check                   # build into build/ and validate it
+sudo make install            # copy the theme to /usr/share and /usr/lib64
+sudo make install-defaults   # optional: make it the default login screen
 ```
 
-- The user install keeps your panels and widgets, and saves your previous
-  settings on its first run.
-- `install-root.sh --files` installs without switching anything, so you can
-  try the login screen first.
-- The boot splash only becomes active with `--plymouth`, which also rebuilds
-  the initrds; until then a kernel update can't pick it up by surprise.
+Then pick it:
+
+- **Plasma:** System Settings → *Colors & Themes* → *Global Theme* →
+  *openSUSE Halloween*. It brings the Plasma style, colours, icons, splash
+  screen and wallpaper; leave *Use desktop layout from theme* unticked to
+  keep your panels.
+- **Login screen:** System Settings → *Colors & Themes* → *Login Screen
+  (SDDM)* → *openSUSE Halloween*, or `make install-defaults`, which adds
+  `/etc/sddm.conf.d/zz-openSUSE-halloween.conf`.
+- **Boot splash:** note the current theme (`plymouth-set-default-theme`), then
+  switch and rebuild the initrds:
+
+  ```bash
+  sudo plymouth-set-default-theme openSUSE-halloween
+  sudo sdbootutil mkinitrd        # systemd-boot; with GRUB: sudo dracut -f --regenerate-all
+  ```
+
+- **Firefox:** `make install` puts the theme into openSUSE Firefox's own
+  add-on folder. Restart Firefox and pick it in `about:addons` → *Themes*.
+  See [Firefox](#firefox) for other Firefox builds.
 
 ### Uninstall
 
+Switch the global theme, login screen and boot splash back first (their files
+go away), then:
+
 ```bash
-build/install/uninstall-user.sh        # restores your previous Plasma settings
-sudo build/install/uninstall-root.sh   # restores the login screen and boot splash
+sudo make uninstall   # removes every installed file, the defaults included
 ```
 
 ### If the boot splash causes trouble
@@ -80,25 +96,19 @@ sudo build/install/uninstall-root.sh   # restores the login screen and boot spla
 - Press <kbd>Esc</kbd> during boot to see the text log.
 - Hold <kbd>Space</kbd> at power-on to open the systemd-boot menu and pick an
   older snapshot, or press <kbd>e</kbd> and add `plymouth.enable=0`.
-- From a text console (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>F3</kbd>), run
-  `sudo build/install/uninstall-root.sh`.
+- From a text console (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>F3</kbd>), switch
+  back with `plymouth-set-default-theme` and rebuild the initrds as above.
 
 ### Firefox
 
-`make build` makes `build/firefox/openSUSE-halloween.xpi`. It only recolours
-Firefox; Firefox's own logo stays as it is. The `.xpi` isn't signed by
-Mozilla, and regular Firefox releases only install signed add-ons:
+The theme only recolours Firefox; Firefox's own logo stays as it is. The
+`.xpi` (`build/firefox/openSUSE-halloween.xpi`) isn't signed by Mozilla, and
+regular Firefox releases only install signed add-ons:
 
-- **openSUSE's Firefox, for everyone on the machine:** openSUSE builds Firefox
-  to load add-ons from its own folder. The file name must be the add-on ID:
-
-  ```bash
-  sudo install -Dm644 build/firefox/openSUSE-halloween.xpi "/usr/lib64/firefox/browser/extensions/openSUSE-halloween@pluskal.org.xpi"
-  ```
-
-  Restart Firefox, then pick the theme in `about:addons` → *Themes*. Firefox
-  doesn't check signatures in that folder, so only put files there that you
-  built or trust. To remove it, pick another theme and delete the file.
+- **openSUSE's Firefox:** it is built to load unsigned add-ons only from its
+  own folder, which is where `make install` puts the theme
+  (`/usr/lib64/firefox/browser/extensions/openSUSE-halloween@pluskal.org.xpi`).
+  Only put files there that you built or trust.
 - **Firefox Developer Edition, Nightly or ESR:** set
   `xpinstall.signatures.required` to `false` in `about:config`, then choose
   ⚙ → *Install Add-on From File…* in `about:addons`.

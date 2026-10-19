@@ -1,5 +1,8 @@
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Development helper for test machines: it changes the desktop's settings.
+# Packages install the theme with tools/install.py (make install) instead.
 # Shared settings and helpers for the install scripts. Sourced, not run.
 # shellcheck shell=bash
 # The settings below are used by the scripts that source this file.

@@ -25,7 +25,11 @@ The first release, 2026.10.0, is being prepared.
   and the power and session actions; symbolic icons follow the colour scheme
 - Plymouth boot splash `openSUSE-halloween`
 - Firefox theme
-- Install, uninstall, verify and screenshot scripts
+- `make install`, which installs the theme like a package: it copies the files
+  into the system paths and changes no settings; `make install-defaults` adds
+  optional defaults (the login screen) and `make uninstall` removes both
+- Development helpers in `tools/dev/` that apply, verify and screenshot the
+  theme on a test machine
 - Build tools that make every size and format from the art masters, with
   checks for contrast, sizes, Plasma compatibility and REUSE compliance
 - Contributor documentation, AGENTS.md and continuous integration

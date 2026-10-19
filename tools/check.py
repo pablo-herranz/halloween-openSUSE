@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Validate build/ before it is deployed.
+"""Validate build/ before it is installed.
 
-Checks metadata syntax, leftover tokens, Plasma metadata against KDE's
-KPlugin schema, colour contrast, image sizes and file budgets, the Plasma
-style's SVG element IDs, the icon theme and its SVGs, the Firefox theme and
-REUSE compliance. `--release` also fails while placeholders are
-still in use.
+Checks, for the desktops that were built: metadata syntax, leftover tokens,
+Plasma metadata against KDE's KPlugin schema, colour contrast, image sizes and
+file budgets, the Plasma style's SVG element IDs, the SDDM theme's links, the
+icon theme and its SVGs, the Firefox theme, a staged install and uninstall, and
+REUSE compliance. `--release` also fails while placeholders are still in use.
 """
 
 import argparse
@@ -17,6 +17,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import tomllib
 import xml.etree.ElementTree as ET
 import zipfile
@@ -25,6 +26,7 @@ from pathlib import Path
 from jsonschema import Draft7Validator
 from PIL import Image
 
+import install
 from common import BUILD, CACHE, FIREFOX, FIREFOX_ID, ROOT, SYSTEM, USER, VERSION, contrast, fetch, rgb
 
 STYLE = USER / "plasma/desktoptheme/openSUSE-halloween"
@@ -144,21 +146,41 @@ def check_images():
                 fail(f"{f.relative_to(BUILD)} is {Image.open(f).size}, not {w}x{h}")
             if w >= 3840 and f.stat().st_size > 3_000_000:
                 fail(f"{f.relative_to(BUILD)} is {f.stat().st_size / 1e6:.1f} MB (> 3 MB)")
+    plymouth = SYSTEM / "plymouth/openSUSE-halloween"
+    if dir_size(plymouth) > 600_000:
+        fail(f"{plymouth.relative_to(BUILD)} is {dir_size(plymouth) / 1e3:.0f} kB (> 600 kB)")
+    for f in ("throbber-0001.png", "throbber-0040.png", "watermark.png"):
+        if not (plymouth / f).exists():
+            fail(f"plymouth {f} missing")
+    ok(f"images: wallpapers, plymouth {dir_size(plymouth) / 1e3:.0f} kB")
+
+
+def check_look_and_feel():
     expected = {"previews/preview.png": (600, 337), "previews/fullscreenpreview.jpg": (1920, 1080),
                 "previews/lockscreen.png": (600, 337), "previews/splash.png": (300, 169)}
     for rel, size in expected.items():
         f = LNF / rel
         if not f.exists() or Image.open(f).size != size:
             fail(f"look-and-feel {rel} missing or not {size}")
-    for d, limit in ((LNF / "splash", 1_000_000), (SYSTEM / "plymouth/openSUSE-halloween", 600_000)):
-        size = dir_size(d)
-        if size > limit:
-            fail(f"{d.relative_to(BUILD)} is {size / 1e3:.0f} kB (> {limit / 1e3:.0f} kB)")
-    for f in ("throbber-0001.png", "throbber-0040.png", "watermark.png"):
-        if not (SYSTEM / "plymouth/openSUSE-halloween" / f).exists():
-            fail(f"plymouth {f} missing")
-    ok(f"images: wallpapers, previews, splash {dir_size(LNF / 'splash') / 1e3:.0f} kB, "
-       f"plymouth {dir_size(SYSTEM / 'plymouth/openSUSE-halloween') / 1e3:.0f} kB")
+    if dir_size(LNF / "splash") > 1_000_000:
+        fail(f"look-and-feel splash is {dir_size(LNF / 'splash') / 1e3:.0f} kB (> 1000 kB)")
+    ok(f"look-and-feel: previews, splash {dir_size(LNF / 'splash') / 1e3:.0f} kB")
+
+
+def check_sddm():
+    """The login theme links breeze-openSUSE's QML and points at its own background."""
+    from targets import sddm
+    theme = SYSTEM / "sddm" / sddm.ID
+    for name in sddm.BASE_FILES:
+        link = theme / name
+        if not link.is_symlink() or str(link.readlink()) != f"../{sddm.BASE}/{name}":
+            fail(f"sddm {name} is not a link to ../{sddm.BASE}/{name}")
+    cp = configparser.ConfigParser(interpolation=None)
+    cp.read_string((theme / "theme.conf").read_text())
+    background = cp.get("General", "background", fallback="")
+    if background != f"{sddm.INSTALL_DIR}/background.jpg" or not (theme / "background.jpg").exists():
+        fail(f"sddm theme.conf background {background!r} is not the theme's own background.jpg")
+    ok(f"sddm: {len(sddm.BASE_FILES)} links to {sddm.BASE}, own background")
 
 
 def svg_ids(path):
@@ -308,6 +330,34 @@ def check_firefox():
        f"{xpi.name} {xpi.stat().st_size / 1e3:.0f} kB")
 
 
+def check_install():
+    """Stage `make install` and `make install-defaults` and undo them again: the
+    files land only under usr/ and etc/, and uninstalling leaves nothing behind."""
+    with tempfile.TemporaryDirectory() as tmp:
+        for extra in ([], ["--defaults"]):
+            install.main(["--destdir", tmp, "--quiet", *extra])
+        staged = sorted(p.relative_to(tmp) for p in Path(tmp).rglob("*") if not p.is_dir() or p.is_symlink())
+        stray = [p for p in staged if p.parts[0] not in ("usr", "etc")]
+        if stray:
+            fail(f"install puts files outside usr/ and etc/: {stray[:3]}")
+        need = ["usr/share/icons/openSUSE-halloween/index.theme",
+                "usr/share/wallpapers/openSUSEhalloween/metadata.json",
+                "usr/share/plymouth/themes/openSUSE-halloween/openSUSE-halloween.plymouth",
+                f"usr/lib64/firefox/browser/extensions/{FIREFOX_ID}.xpi"]
+        if (SYSTEM / "sddm").exists():
+            need += ["usr/share/sddm/themes/breeze-openSUSE-halloween/Main.qml",
+                     "etc/sddm.conf.d/zz-openSUSE-halloween.conf"]
+        missing = [n for n in need if not (Path(tmp) / n).is_symlink() and not (Path(tmp) / n).exists()]
+        if missing:
+            fail(f"install lacks {missing}")
+        for extra in ([], ["--defaults"]):
+            install.main(["--destdir", tmp, "--quiet", "--uninstall", *extra])
+        left = [p.relative_to(tmp) for p in Path(tmp).rglob("*") if not p.is_dir() or p.is_symlink()]
+        if left:
+            fail(f"uninstall leaves {left[:3]}")
+    ok(f"install: {len(staged)} files under usr/ and etc/, all removed again by uninstall")
+
+
 def check_reuse():
     reuse = shutil.which("reuse") or str(ROOT / "tools/.venv/bin/reuse")
     if not Path(reuse).exists():
@@ -326,13 +376,18 @@ def main():
     args = ap.parse_args()
     if not USER.exists():
         sys.exit("build/ is empty: run tools/build.py first")
+    desktops = json.loads((BUILD / "build-info.json").read_text()).get("desktops", [])
     check_syntax()
     check_metadata()
-    check_contrast()
     check_images()
-    check_plasma_style()
     check_icons()
     check_firefox()
+    if "plasma" in desktops:
+        check_contrast()
+        check_plasma_style()
+        check_look_and_feel()
+        check_sddm()
+    check_install()
     check_reuse()
     placeholders = (BUILD / "placeholders.txt").read_text().split("\n") if (BUILD / "placeholders.txt").exists() else []
     placeholders = [p for p in placeholders if p]

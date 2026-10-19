@@ -2,6 +2,9 @@
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
+# Development helper for test machines: it changes the desktop's settings.
+# Packages install the theme with tools/install.py (make install) instead.
+#
 # Report which halloween-openSUSE pieces are active. Run as the desktop user;
 # the login-screen and initrd checks use `sudo -n` when it is available.
 # Worth re-running after every `zypper dup`.
