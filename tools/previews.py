@@ -41,6 +41,8 @@ WEB = {
     "gnome.jpg": ("gnome.png", 960),
     "gnome-apps.jpg": ("gnome-apps.png", 960),
     "xfce.jpg": ("xfce.png", 960),
+    "sway.jpg": ("sway.png", 960),
+    "swaync.jpg": ("swaync.png", 960),
 }
 
 

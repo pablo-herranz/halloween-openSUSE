@@ -8,7 +8,7 @@ import shutil
 
 from common import SHARED, USER, fill_tokens, upstream_archive, write
 
-DESKTOP = ("gnome", "xfce")
+DESKTOP = ("gnome", "xfce", "sway")
 ID = "openSUSE-halloween"
 THEME = USER / "themes" / ID
 FOCUS = "alpha(@accent_color,0.5)"

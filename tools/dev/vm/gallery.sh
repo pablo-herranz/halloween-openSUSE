@@ -81,5 +81,27 @@ log "Xfce: the pieces picked in its settings, the Settings Manager and a notific
 sleep 4
 "$V" shot xfce >/dev/null && mv "$VM/shots/xfce.png" "$OUT/"
 
+log "Sway: the themed bar, and the notification centre"
+"$V" ssh "mkdir -p /home/geeko/.config/sway /home/geeko/.config/waybar /home/geeko/.config/swaync
+          printf 'include /usr/share/openSUSE-halloween/sway/theme\noutput * bg /usr/share/backgrounds/openSUSEhalloween/night.jpg fill\n' > /home/geeko/.config/sway/config
+          cp /usr/share/openSUSE-halloween/waybar/style.css /home/geeko/.config/waybar/style.css
+          cp /usr/share/openSUSE-halloween/swaync/style.css /home/geeko/.config/swaync/style.css"
+"$V" desktop sway
+"$V" run "nohup swaync >/tmp/swaync.log 2>&1 &
+          sleep 2
+          notify-send -i preferences-desktop-locale 'Happy Halloween' 'The openSUSE Halloween theme is installed.'"
+sleep 3
+# the main shot shows the bar and the floating notification
+"$V" ssh "export XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-1; grim /tmp/sway.png" >/dev/null 2>&1 || true
+# …then the control centre, empty with its carved-gear icon
+"$V" run "swaync-client -C -sw
+          sleep 1
+          swaync-client -cp -sw
+          swaync-client -op -sw"
+sleep 2
+"$V" ssh "export XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-1; grim /tmp/swaync.png" >/dev/null 2>&1 || true
+scp -q -F "$VM/ssh_config" 'vm:/tmp/sway.png' "$OUT/sway.png" 2>/dev/null || true
+scp -q -F "$VM/ssh_config" 'vm:/tmp/swaync.png' "$OUT/swaync.png" 2>/dev/null || true
+
 "$V" desktop gnome >/dev/null   # leave the VM where vm.sh create leaves it
 ls -1 "$OUT"

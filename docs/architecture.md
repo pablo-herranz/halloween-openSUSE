@@ -51,6 +51,7 @@ masters, the placeholder list) and runs every target in
 | `gtk` | gnome, xfce | `build/user/themes/openSUSE-halloween/gtk-3.0/` (adw-gtk3-dark, recoloured) |
 | `gnome` | gnome | Shell stylesheet, `gnome-background-properties/`, defaults in `build/defaults/` |
 | `xfce` | xfce | `build/user/themes/openSUSE-halloween{,-hdpi,-xhdpi}/xfwm4/`, notification theme |
+| `sway` | sway | `build/user/openSUSE-halloween/{sway,waybar,swaync}/` |
 
 `build.py --desktop plasma` builds the shared targets plus Plasma's. A
 target's `DESKTOP` can also be a tuple, for a piece several desktops share.

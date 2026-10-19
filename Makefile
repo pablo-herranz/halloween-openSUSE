@@ -96,7 +96,8 @@ previews: $(VENV)/.ok
 	$(PY) tools/previews.py
 
 # Retake every README screenshot in the test VM on TARGET (tools/dev/vm/:
-# vm.sh create must have run there once), then remake the README images
+# vm.sh create must have run there once, and that machine must run qemu),
+# then remake the README images
 VM_DIR ?= vm-halloween
 gallery: deploy
 	tools/dist.sh >/dev/null

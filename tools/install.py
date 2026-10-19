@@ -27,6 +27,7 @@ FILES = [
     ("user/backgrounds", "{datadir}/backgrounds"),
     ("user/icons", "{datadir}/icons"),
     ("user/themes", "{datadir}/themes"),
+    ("user/openSUSE-halloween", "{datadir}/openSUSE-halloween"),
     ("user/gnome-background-properties", "{datadir}/gnome-background-properties"),
     ("user/color-schemes", "{datadir}/color-schemes"),
     ("user/plasma/desktoptheme", "{datadir}/plasma/desktoptheme"),

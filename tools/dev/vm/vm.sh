@@ -18,7 +18,7 @@
 #        vm.sh run CMD              CMD inside the logged-in desktop session
 #        vm.sh install TARBALL      install a release tarball (make dist) the way a
 #                                   package does, with its defaults
-#        vm.sh desktop plasma|gnome|xfce
+#        vm.sh desktop plasma|gnome|xfce|sway
 #                                   log in to that desktop automatically (reboots)
 #        vm.sh shot NAME            screenshot to $HALLOWEEN_VM/shots/NAME.png
 #        vm.sh key KEY...           press keys (QEMU qcodes: esc, ret, meta_l, s, …)
@@ -36,7 +36,7 @@ IMAGE=openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2
 # The desktops, plus what the minimal image lacks for a usable session
 PATTERNS="kde_plasma gnome_basis xfce_basis x11"
 PACKAGES="sddm plasma6-sddm-theme-openSUSE plymouth-theme-spinner gdm lightdm lightdm-gtk-greeter gnome-shell-extension-user-theme xdg-desktop-portal-gnome"
-PACKAGES+=" nautilus gnome-console xfce4-notifyd xfce4-terminal make rsync"
+PACKAGES+=" nautilus gnome-console xfce4-notifyd xfce4-terminal make rsync sway waybar swaync"
 # What gallery.sh screenshots with
 PACKAGES+=" spectacle dolphin MozillaFirefox libnotify-tools"
 
@@ -136,7 +136,8 @@ desktop() {
         plasma) dm=sddm session=plasma process=plasmashell ;;
         gnome) dm=gdm session=gnome process=gnome-shell ;;
         xfce) dm=lightdm session=xfce process=xfdesktop ;;
-        *) die "usage: vm.sh desktop plasma|gnome|xfce" ;;
+        sway) dm=sddm session=sway process=sway ;;
+        *) die "usage: vm.sh desktop plasma|gnome|xfce|sway" ;;
     esac
     log "logging in to $session automatically with $dm"
     vssh "printf '[User]\nSession=$session\nSystemAccount=false\n' | sudo tee /var/lib/AccountsService/users/geeko >/dev/null
@@ -146,8 +147,12 @@ desktop() {
           printf '[Seat:*]\nautologin-user=geeko\nautologin-session=xfce\nuser-session=xfce\n' \
               | sudo tee /etc/lightdm/lightdm.conf.d/90-halloween-vm.conf >/dev/null
           sudo mkdir -p /etc/sddm.conf.d
-          plasma=\$(basename \$(ls /usr/share/wayland-sessions/plasma*.desktop | head -1) .desktop)
-          printf '[Autologin]\nUser=geeko\nSession=%s\n' \$plasma | sudo tee /etc/sddm.conf.d/90-halloween-vm.conf >/dev/null
+          if [ \"$session\" = sway ]; then sname=sway; else plasma=\$(basename \$(ls /usr/share/wayland-sessions/plasma*.desktop | head -1) .desktop); sname=\$plasma; fi
+          printf '[Autologin]\nUser=geeko\nSession=%s\n' \$sname | sudo tee /etc/sddm.conf.d/90-halloween-vm.conf >/dev/null
+          if [ \"$session\" = sway ]; then
+            sudo -u geeko mkdir -p /home/geeko/.config/sway
+            printf 'include /usr/share/openSUSE-halloween/sway/theme\n' | sudo -u geeko tee /home/geeko/.config/sway/config >/dev/null
+          fi
           sudo systemctl disable sddm.service gdm.service lightdm.service 2>/dev/null
           sudo systemctl enable --force $dm.service 2>/dev/null
           sudo systemctl reboot" || true

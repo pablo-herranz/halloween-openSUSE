@@ -55,7 +55,8 @@ def text_files():
     for f in BUILD.rglob("*"):
         if not f.is_file() or f.relative_to(BUILD).parts[0] == "cache":
             continue
-        if f.suffix in (".json", ".qml", ".js", ".svg", ".sh", ".css", ".xml", *INI_SUFFIXES) or f.name in INI_NAMES:
+        if (f.suffix in (".json", ".qml", ".js", ".svg", ".sh", ".css", ".xml", *INI_SUFFIXES)
+                or f.name in INI_NAMES or f.name == "theme"):
             yield f
 
 

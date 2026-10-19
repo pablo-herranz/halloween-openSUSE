@@ -24,6 +24,8 @@ friendly chameleon in a witch hat.
 | <img src="docs/screenshots/splash.jpg" alt="Splash screen: the chameleon hugging a jack-o'-lantern above five small lanterns lighting up one by one"> | <img src="docs/screenshots/clock.jpg" alt="An analog clock widget with a carved pumpkin face on the desktop"> |
 | Splash screen | Pumpkin clock |
 | <img src="docs/screenshots/gnome.jpg" alt="GNOME with the night wallpaper: Files shows orange folders with emblems, and the quick settings menu has plum panels with ember-orange toggles"> | <img src="docs/screenshots/xfce.jpg" alt="Xfce with the night wallpaper: the Settings Manager in dark plum, each setting a glyph carved into a pumpkin, a plum window title bar, a dark panel and a Halloween notification"> |
+| <img src="docs/screenshots/sway.jpg" alt="Sway with the night wallpaper: a dark top bar with workspaces, clock and system modules in pumpkin accent, the notification bell highlighted in plum"> | <img src="docs/screenshots/swaync.jpg" alt="SwayNotificationCenter control centre in dark plum with the carved-gear icon over the empty No Notifications list"> |
+| Sway | swaync notification centre |
 | GNOME | Xfce |
 | <img src="docs/screenshots/lockscreen.jpg" alt="The Plasma lock screen: a large clock over the night wallpaper with the chameleon and lanterns"> | <img src="docs/screenshots/gnome-apps.jpg" alt="GNOME's app grid over the night wallpaper: calculator, clocks, maps, mail, music and the other apps in the theme's flat autumn style"> |
 | Lock screen (Plasma) | GNOME apps |
@@ -45,6 +47,7 @@ friendly chameleon in a witch hat.
 | Login screen, built on openSUSE's `breeze-openSUSE` | `breeze-openSUSE-halloween` | SDDM |
 | Boot splash | `openSUSE-halloween` | Plymouth |
 | Firefox theme: plum toolbars, pumpkin accents, the moonlit forest behind the tabs | `openSUSE-halloween@pluskal.org` | Firefox |
+| Sway colours and gaps, a Waybar stylesheet and a swaync notification theme | `openSUSE-halloween` | Sway, Waybar, swaync |
 
 openSUSE's green and blue are replaced by an all-autumn palette
 ([`art/palette.toml`](art/palette.toml)); openSUSE green appears only on the
