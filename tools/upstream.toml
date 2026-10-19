@@ -1,5 +1,7 @@
-# Upstream Breeze Plasma style files that tools/plasma_style.py builds on.
-# Pinned to libplasma v6.8.0 by SHA-256; bump the tag and hashes together.
+# Upstream files the build downloads, pinned by SHA-256.
+
+# The Breeze Plasma style files tools/plasma_style.py builds on, from
+# libplasma v6.8.0; bump the tag and hashes together.
 
 base = "https://invent.kde.org/plasma/libplasma/-/raw/v6.8.0/src/desktoptheme/breeze"
 
@@ -17,3 +19,9 @@ base = "https://invent.kde.org/plasma/libplasma/-/raw/v6.8.0/src/desktoptheme/br
 "solid/widgets/panel-background.svg" = "4afc5322f22494450a36a00451c1f077b80f21f3d0b7bd13be313387a5d1a414"
 "solid/widgets/tooltip.svg" = "e221404656676c6bf9cea3e569235463de28644e645f770a06f5b34a0d63c15e"
 "widgets/clock.svg" = "f7e513e10b1101449e369cd43b6113285f2399fed924bed1aa32cb6b10156639"
+
+# KDE's JSON schema for KPlugin metadata (metadata.json), from
+# sysadmin/ci-utilities; tools/check.py validates against it.
+[kpluginmetadata]
+url = "https://invent.kde.org/sysadmin/ci-utilities/-/raw/68adf5e6e8c83db9327f7b1d2980e67fc12d548c/resources/jsonschemas/kpluginmetadata.schema.json"
+sha256 = "3c89da0d5f743c6c76529b6b672de4857feb91856fc72f142e3008b69926c437"

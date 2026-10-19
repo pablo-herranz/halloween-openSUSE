@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 # Every pull request and every push to main: lint, then build and validate
-# everything. The job names are the required checks of main's ruleset.
+# everything. The CI job at the end is the check main's ruleset requires.
 name: Check
 
 on:
@@ -18,8 +18,8 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  shellcheck:
-    name: ShellCheck
+  lint:
+    name: Lint
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -29,39 +29,12 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: tools/requirements-dev.txt
-      - run: pip install -r tools/requirements-dev.txt
-      - run: shellcheck -x -P install install/*.sh tools/*.sh
-
-  ruff:
-    name: Ruff
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.12"
-          cache: pip
-          cache-dependency-path: tools/requirements-dev.txt
-      - run: pip install -r tools/requirements-dev.txt
-      - run: ruff check --output-format=github tools
-
-  reuse:
-    name: REUSE
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.12"
-          cache: pip
-          cache-dependency-path: tools/requirements.txt
-      - run: pip install -r tools/requirements.txt
-      - run: reuse lint
+          cache-dependency-path: tools/requirements*.txt
+      # ruff, ShellCheck, actionlint, zizmor, typos, editorconfig-checker and
+      # reuse lint. With a token, zizmor also runs its online audits.
+      - run: make lint ZIZMOR_FLAGS=--format=github
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   build:
     name: Build and check
@@ -103,3 +76,20 @@ jobs:
             build/MANIFEST.sha256
             build/icon-preview.png
           retention-days: 14
+
+  # The one check main's ruleset requires: it passes only when every job above
+  # passed, so adding a job never needs a ruleset change.
+  ci:
+    name: CI
+    if: always()
+    needs: [lint, build]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require every job to pass
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "results: $RESULTS"
+          for result in $RESULTS; do
+            [ "$result" = success ] || exit 1
+          done

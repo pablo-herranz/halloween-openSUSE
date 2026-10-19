@@ -115,7 +115,7 @@ the build works and how to propose artwork. AI coding agents should read
 
 ```bash
 make check   # build everything into build/ and validate it
-make lint    # ruff and ShellCheck
+make lint    # ruff, ShellCheck, workflow, spelling and licence checks
 ```
 
 How the pieces fit together is in [docs/architecture.md](docs/architecture.md).

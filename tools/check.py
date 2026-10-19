@@ -3,9 +3,10 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Validate build/ before it is deployed.
 
-Checks metadata syntax, leftover tokens, colour contrast, image sizes and
-file budgets, the Plasma style's SVG element IDs, icon SVG sanity, the Firefox
-theme and REUSE compliance. `--release` also fails while placeholders are
+Checks metadata syntax, leftover tokens, Plasma metadata against KDE's
+KPlugin schema, colour contrast, image sizes and file budgets, the Plasma
+style's SVG element IDs, the icon theme and its SVGs, the Firefox theme and
+REUSE compliance. `--release` also fails while placeholders are
 still in use.
 """
 
@@ -16,13 +17,15 @@ import re
 import shutil
 import subprocess
 import sys
+import tomllib
 import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
+from jsonschema import Draft7Validator
 from PIL import Image
 
-from common import BUILD, CACHE, FIREFOX, FIREFOX_ID, ROOT, SYSTEM, USER, VERSION, contrast, rgb
+from common import BUILD, CACHE, FIREFOX, FIREFOX_ID, ROOT, SYSTEM, USER, VERSION, contrast, fetch, rgb
 
 STYLE = USER / "plasma/desktoptheme/openSUSE-halloween"
 LNF = USER / "plasma/look-and-feel/org.openSUSE.halloween.desktop/contents"
@@ -68,6 +71,30 @@ def check_syntax():
             fail(f"{f.relative_to(BUILD)}: unfilled @token@")
         n += 1
     ok(f"syntax and tokens in {n} text files")
+
+
+def check_metadata():
+    """Plasma's metadata.json files against KDE's KPlugin schema, plus the keys
+    Plasma shows to users."""
+    pin = tomllib.loads((ROOT / "tools/upstream.toml").read_text())["kpluginmetadata"]
+    schema = fetch(pin["url"], pin["sha256"], CACHE / "kde/kpluginmetadata.schema.json")
+    validator = Draft7Validator(json.loads(schema.read_text()))
+    files = sorted(USER.rglob("metadata.json"))
+    for f in files:
+        rel = f.relative_to(BUILD)
+        try:
+            data = json.loads(f.read_text())
+        except ValueError:
+            continue  # check_syntax reports it
+        for e in validator.iter_errors(data):
+            fail(f"{rel}: {e.json_path}: {e.message}")
+        plugin = data.get("KPlugin", {})
+        for key in ("Id", "Name", "Description", "Authors", "License", "Version"):
+            if not plugin.get(key):
+                fail(f"{rel}: KPlugin has no {key}")
+        if plugin.get("Version") and plugin["Version"] != VERSION:
+            fail(f"{rel}: version {plugin['Version']} is not {VERSION}")
+    ok(f"metadata: {len(files)} metadata.json files match KDE's KPlugin schema")
 
 
 def kde_colors(path):
@@ -163,25 +190,56 @@ def check_plasma_style():
     ok(f"plasma style: {n} SVGs keep every Breeze element ID")
 
 
+def icon_dirs(icons):
+    """The directories index.theme lists, as {path: section}."""
+    cp = configparser.ConfigParser(strict=False, interpolation=None)
+    cp.optionxform = str
+    cp.read_string((icons / "index.theme").read_text())
+    theme = cp["Icon Theme"]
+    listed = [d.strip() for key in ("Directories", "ScaledDirectories")
+              for d in theme.get(key, "").split(",") if d.strip()]
+    dirs = {}
+    for d in listed:
+        if d not in cp or not {"Size", "Type"} <= set(cp[d]):
+            fail(f"icons index.theme: [{d}] is missing or has no Size and Type")
+        elif not (icons / d).is_dir():
+            fail(f"icons index.theme lists {d}, which has no icons")
+        else:
+            dirs[d] = cp[d]
+    return dirs
+
+
 def check_icons():
     icons = USER / "icons/openSUSE-halloween"
+    dirs = icon_dirs(icons)
+    for f in icons.rglob("*"):
+        if f.is_symlink() and not f.exists():
+            fail(f"icon {f.relative_to(icons)}: broken symlink")
     n = 0
     for f in sorted(icons.rglob("*.svg")):
         rel = f.relative_to(icons)
+        if not re.fullmatch(r"[a-z0-9][a-z0-9._+-]*\.svg", f.name):
+            fail(f"icon {rel}: name has characters other than a-z, 0-9 and ._+-")
+        section = dirs.get(str(rel.parent))
+        if section is None:
+            fail(f"icon {rel}: its directory isn't listed in index.theme")
         text = f.read_text()
         try:
             root = ET.fromstring(text)
         except ET.ParseError as e:
             fail(f"icon {rel}: {e}")
             continue
-        if not root.get("viewBox"):
-            fail(f"icon {rel}: no viewBox")
+        box = (root.get("viewBox") or "").split()
+        if len(box) != 4 or box[0:2] != ["0", "0"] or box[2] != box[3] or not box[2].isdigit():
+            fail(f"icon {rel}: viewBox {root.get('viewBox')!r} is not 0 0 N N")
+        elif section is not None and section["Type"] == "Fixed" and box[2] != section["Size"]:
+            fail(f"icon {rel}: {box[2]} px in a {section['Size']} px directory")
         if f.stat().st_size > 60_000:
             fail(f"icon {rel}: {f.stat().st_size / 1e3:.0f} kB (> 60 kB)")
         if re.search(r"<(\w+:)?(text|script|image)\b", text) or re.search(r'href="(https?:|file:)', text):
             fail(f"icon {rel}: contains text, script, raster images or external links")
         n += 1
-    ok(f"icons: {n} SVGs")
+    ok(f"icons: {n} SVGs in the {len(dirs)} directories index.theme lists")
 
 
 def check_firefox():
@@ -269,6 +327,7 @@ def main():
     if not USER.exists():
         sys.exit("build/ is empty: run tools/build.py first")
     check_syntax()
+    check_metadata()
     check_contrast()
     check_images()
     check_plasma_style()

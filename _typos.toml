@@ -1,0 +1,4 @@
+# Spell-checking for `make lint`: everything but the licence texts and the
+# art masters' SVG path data
+[files]
+extend-exclude = ["LICENSES/", "art/source/", "*.svg"]

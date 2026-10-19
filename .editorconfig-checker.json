@@ -1,0 +1,6 @@
+{
+  "Exclude": ["^LICENSES/", "^art/source/"],
+  "Disable": {
+    "IndentSize": true
+  }
+}

@@ -27,7 +27,7 @@ git clone https://github.com/<you>/halloween-openSUSE.git
 cd halloween-openSUSE
 git lfs install && git lfs pull   # the art masters in art/source/ are in Git LFS
 make check                        # creates tools/.venv, builds into build/, validates it
-make lint                         # ruff and ShellCheck, as CI runs them
+make lint                         # ruff, ShellCheck, workflow, spelling and licence checks, as CI runs them
 ```
 
 You need Python 3.11 or newer, `make` and Git LFS. `make check` downloads a
@@ -52,10 +52,10 @@ Never edit anything in `build/`: it is generated. See
 ## Workflow
 
 `main` is protected: every change goes through a pull request, and a pull
-request can only be merged when CI passes (ShellCheck, Ruff, REUSE and Build
-and check). The maintainer's own pull requests and Dependabot's merge by
-themselves once CI passes; everyone else's are reviewed and merged by the
-maintainer.
+request can only be merged when its `CI` check passes, which means both jobs
+passed: Lint (`make lint`) and Build and check (`make check`). The
+maintainer's own pull requests and Dependabot's merge by themselves once CI
+passes; everyone else's are reviewed and merged by the maintainer.
 
 1. Fork the repository and create a branch for one change.
 2. Make the change, then run `make check` and `make lint`.
@@ -138,9 +138,17 @@ Versions are calendar-based (`YYYY.MM.patch`).
    `git tag v2026.10.0 && git push origin v2026.10.0`.
 3. The release workflow checks that the tag matches `VERSION`, runs
    `make release-check` (which fails while placeholders are in use), builds
-   the archives with `make dist` and publishes a GitHub release with them.
+   the archives with `make dist`, attests their build provenance and
+   publishes a GitHub release with them.
 
-`make dist` builds the same archives locally, into `dist/`.
+Releases are immutable, and release tags can't be moved or deleted: a broken
+release needs a new version. `make dist` builds the same archives locally,
+into `dist/`. To check that a downloaded archive was built by the release
+workflow:
+
+```bash
+gh attestation verify halloween-openSUSE-2026.10.0.tar.gz --repo plusky/halloween-openSUSE
+```
 
 ## AI-assisted contributions
 
