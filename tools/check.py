@@ -14,6 +14,7 @@ import argparse
 import base64
 import configparser
 import io
+import itertools
 import json
 import os
 import re
@@ -357,6 +358,67 @@ ONE_COLOUR_SEEN = {
     "org.xfce.panel.showdesktop": "the Xfce panel's show desktop button (xfce4-panel)",
 }
 
+# GTK reads one-colour icons with a small parser of its own (tools/upstream.toml,
+# [references] gtk-symbolic-parser: gtk/gdktextureutils.c, start_element_cb)
+# and falls back to its full SVG renderer when it can't. It sees tags as GMarkup
+# does, prefixes and all; it skips the tags below, so a transform on a <g> would
+# be lost and the shapes inside a <defs> drawn, and it rejects any attribute on
+# a shape, or any value, that it doesn't know.
+GTK_SKIPPED = {"g", "defs", "style", "metadata"}
+GTK_SKIPPED_PREFIXES = ("sodipodi:", "inkscape:", "rdf:", "cc:", "dc:")
+GTK_SHAPE_ATTRS = {"class", "opacity", "visibility", "fill-rule", "fill-opacity", "stroke-width", "stroke-opacity",
+                   "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-dasharray",
+                   "stroke-dashoffset", "fill", "stroke", "style", "id", "color", "overflow", "d", "x", "y",
+                   "width", "height", "rx", "ry", "cx", "cy", "r"}
+GTK_NUMBERS = {"opacity", "fill-opacity", "stroke-opacity", "stroke-width", "stroke-miterlimit", "stroke-dashoffset",
+               "x", "y", "width", "height", "rx", "ry", "cx", "cy", "r"}
+GTK_CHOICES = {"stroke-linecap": {"butt", "round", "square"}, "stroke-linejoin": {"miter", "round", "bevel"}}
+
+
+def number(text, unit=""):
+    """The value of a number as GTK reads it (g_ascii_strtod, nothing after it), or None."""
+    try:
+        return float(text.removesuffix(unit)) if text.strip() == text else None
+    except ValueError:
+        return None
+
+
+def gtk_fast_symbolic(text, size):
+    """Why GTK's own parser would turn this one-colour icon down, or None."""
+    inside = []
+    for close, tag, attrs, empty in re.findall(
+            r"<(/?)([A-Za-z_][\w.:-]*)((?:\s+[\w.:-]+\s*=\s*(?:\"[^\"]*\"|'[^']*'))*)\s*(/?)>", text):
+        if close:
+            inside.pop()
+            continue
+        if not empty:
+            inside.append(tag)
+        a = {k: v or w for k, v, w in re.findall(r"([\w.:-]+)\s*=\s*(?:\"([^\"]*)\"|'([^']*)')", attrs)}
+        if "transform" in a:
+            return f"a transform on <{tag}>"
+        if tag == "svg":
+            w, h = (number(a.get(k, ""), "px") for k in ("width", "height"))
+            if (w, h) != (size, size):
+                return f"width and height should be {size}, not {a.get('width')} and {a.get('height')}"
+            box = a.get("viewBox", "").split(" ")
+            if "viewBox" in a and len(box) == 4 and [number(n) for n in box] != [0, 0, w, h]:
+                return f"viewBox {a['viewBox']!r} is not 0 0 {size} {size}"
+        elif tag in GTK_SKIPPED or tag.startswith(GTK_SKIPPED_PREFIXES):
+            continue
+        elif tag not in ("path", "rect", "circle"):
+            return f"<{tag}>, which GTK's parser doesn't draw"
+        elif "defs" in inside:
+            return f"a <{tag}> inside <defs>, which GTK draws and other renderers don't"
+        elif extra := {k for k in a if not k.startswith("gpa:")} - GTK_SHAPE_ATTRS:
+            return f"<{tag}> has {', '.join(sorted(extra))}"
+        else:
+            for k, v in a.items():
+                if (k in GTK_NUMBERS and number(v) is None or k in GTK_CHOICES and v not in GTK_CHOICES[k]
+                        or k == "stroke-dasharray" and v != "none"
+                        and None in [number(n) for n in re.split(r"[, ]", v) if n]):
+                    return f"<{tag}> {k}={v!r}, which GTK can't read"
+    return None
+
 
 def check_icons():
     from targets.icons import ADWAITA_ID
@@ -407,6 +469,9 @@ def check_icons():
             if el.get("fill") == "currentColor" and "ColorScheme-Text" not in (el.get("class") or "").split():
                 fail(f"icon {rel}: fill=currentColor on a <{el.tag.split('}')[-1]}> without class ColorScheme-Text")
                 break
+        if f.name.endswith("-symbolic.svg") or "ColorScheme-Text" in text:
+            if problem := gtk_fast_symbolic(text, 16):
+                fail(f"icon {rel}: one colour, but GTK can't read it directly: {problem}")
         n += 1
     # The Icon Theme Specification's Example key: the icon that stands for the theme
     for theme in (icons, adwaita):
@@ -420,6 +485,37 @@ def check_icons():
         elif "ColorScheme-Text" not in found[0].read_text():
             fail(f"icon {name} should be one colour: {where}")
     ok(f"icons: {n} SVGs in the {len(dirs)} directories index.theme lists")
+
+
+def check_hinting():
+    """The one-colour glyphs are snapped to the 16 px grid edge by edge
+    (vectors.grid_warp). Moving every edge to its nearest pixel can double one
+    key of the keyboard and halve the next, so six keys read as four marks:
+    the gap between any two neighbouring level edges may change by at most
+    vectors.HINT_MAX_STRETCH."""
+    import vectors
+    bad, n = [], 0
+    for master in sorted({*vectors.SYMBOLIC, *vectors.GNOME_SETTINGS, *vectors.SETTINGS}):
+        shapes = vectors.load(master)
+        if not shapes:
+            continue
+        n += 1
+        outlines = vectors.glyph_outlines(shapes)
+        every = [c for o in outlines for c in o]
+        for axis, warp in enumerate(vectors.grid_warps(outlines)):
+            edges = sorted({p for p, _ in vectors.level_edges(every, axis)})
+            for a, b in itertools.pairwise(edges):
+                change = (warp(b) - warp(a)) - (b - a)
+                if abs(change) > vectors.HINT_MAX_STRETCH + 1e-9:
+                    bad.append((abs(change), f"{master}: the gap at {'xy'[axis]} {a:.2f}-{b:.2f} px goes from "
+                                             f"{b - a:.2f} to {b - a + change:.2f} px"))
+    for _, text in sorted(bad, reverse=True)[:5]:
+        fail(f"hinting: {text}")
+    if bad:
+        fail(f"hinting: {len(bad)} gaps between edges change by more than {vectors.HINT_MAX_STRETCH} px")
+        return
+    ok(f"hinting: {n} glyphs on the 16 px grid, no gap between edges changed by more than "
+       f"{vectors.HINT_MAX_STRETCH} px")
 
 
 def header_svg_image(text):
@@ -833,6 +929,7 @@ def main():
     check_plymouth_colours()
     check_plymouth_layout()
     check_icons()
+    check_hinting()
     check_kde_lookup()
     check_firefox()
     if "plasma" in desktops:

@@ -15,6 +15,7 @@ shapes, drops the backdrop, and recomposes them:
 
 Missing masters return None, so build.py falls back to placeholders.
 """
+import bisect
 import re
 
 from common import ROOT, contrast, rgb
@@ -348,13 +349,17 @@ def tidy(text, precision=5, groups=True):
     return scour.scourString(text, opts) + "\n"
 
 
-def fit(shapes_markup, box, target, attrs=""):
-    """Group markup so `box` (x0, y0, x1, y1) is centred in `target` (x0, y0, size)."""
+def placement(box, target):
+    """(scale, dx, dy) that centre `box` (x0, y0, x1, y1) in `target` (x0, y0, size)."""
     bx0, by0, bx1, by1 = box
     tx, ty, size = target
     s = size / max(bx1 - bx0, by1 - by0)
-    ox = tx + (size - (bx1 - bx0) * s) / 2 - bx0 * s
-    oy = ty + (size - (by1 - by0) * s) / 2 - by0 * s
+    return s, tx + (size - (bx1 - bx0) * s) / 2 - bx0 * s, ty + (size - (by1 - by0) * s) / 2 - by0 * s
+
+
+def fit(shapes_markup, box, target, attrs=""):
+    """Group markup so `box` (x0, y0, x1, y1) is centred in `target` (x0, y0, size)."""
+    s, ox, oy = placement(box, target)
     return f'<g{attrs} transform="translate({ox:.3f} {oy:.3f}) scale({s:.6f})">{shapes_markup}</g>'
 
 
@@ -538,26 +543,142 @@ def app_icons(palette):
     return made
 
 
-def symbolic_icon(shapes, palette):
-    """A one-colour icon in KDE's symbolic format: the dark parts of a glyph in
-    the colour scheme's text colour, the light details inside them cut out as
-    holes (each dark shape plus the light shapes drawn on top of it, even-odd)."""
+# At 16 px a glyph's level edges fall between pixels and blur. Like a font's
+# autohinter, symbolic_icon() finds the edges that run level along each axis,
+# rounds them to pixel boundaries, and stretches the coordinates between them
+# piecewise linearly, so every point keeps its order, no edge moves more than
+# half a pixel, and the gap between two neighbouring edges, a key or a stroke,
+# changes by at most HINT_MAX_STRETCH (check.py, check_hinting). The hinted
+# copies go to 16x16/, which GTK and Plasma take at exactly 16 px; scalable/
+# keeps the exact outline for every other size ([references] gtk-icon-lookup).
+HINT_FLAT = 0.25        # px: how far a segment may stray from level and still be an edge
+HINT_MIN_EDGE = 0.5     # px: the shortest segment that counts as an edge
+HINT_MERGE = 0.25       # px: edges closer than this are one
+HINT_MIN_WEIGHT = 0.75  # px: the least total length of edges worth a pixel boundary
+HINT_MAX_STRETCH = 0.4  # px: how much the gap between two neighbouring edges may change
+
+
+NUMBER = r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)"
+
+
+def outline(d, s, ox, oy):
+    """[(command, [x, y, …])] of path data, every point scaled by `s` and then
+    moved by (ox, oy). The masters' paths are absolute M, L and C commands and z."""
+    parts = re.findall(r"([MLCZz])([^MLCZz]*)", d)
+    if set(re.findall(r"[A-Za-z]", d)) - set("MLCZz") or not all(
+            re.fullmatch(rf"(?:[\s,]*{NUMBER})*[\s,]*", a) for _, a in parts):
+        raise SystemExit(f"path data other than absolute M, L, C and z with plain numbers: {d[:60]}…")
+    return [(c.upper(), [float(n) * s + (oy if k % 2 else ox) for k, n in enumerate(re.findall(NUMBER, a))])
+            for c, a in parts]
+
+
+def segments(commands):
+    """Each line or curve of an outline, as its points."""
+    here = start = None
+    for c, a in commands:
+        points = list(zip(a[0::2], a[1::2], strict=True))
+        if c == "M":
+            here = start = points[0]
+            points = points[1:]
+        if c == "C":
+            for k in range(0, len(points), 3):
+                yield [here, *points[k:k + 3]]
+                here = points[k + 2]
+        elif c == "Z":
+            yield [here, start]
+            here = start
+        else:
+            for p in points:
+                yield [here, p]
+                here = p
+
+
+def level_edges(commands, axis):
+    """[(position, length)] of the segments that run level along `axis`
+    (1: horizontal edges, at a y)."""
+    found = []
+    for points in segments(commands):
+        along = [p[axis] for p in points]
+        length = abs(points[-1][1 - axis] - points[0][1 - axis])
+        if max(along) - min(along) < HINT_FLAT and length >= HINT_MIN_EDGE:
+            found.append((sum(along) / len(along), length))
+    return found
+
+
+def grid_warp(edges, size):
+    """A function moving the strongest edges onto whole pixels, two never onto
+    the same one, and every other coordinate in proportion between them. An
+    edge stays where it is when snapping it would change its distance to a
+    neighbouring snapped edge by more than HINT_MAX_STRETCH. Beyond the
+    outermost snapped edges, the outline moves with them."""
+    clusters = []
+    for pos, length in sorted(edges):
+        if clusters and pos - clusters[-1][0] < HINT_MERGE:
+            p, w = clusters[-1]
+            clusters[-1] = ((p * w + pos * length) / (w + length), w + length)
+        else:
+            clusters.append((pos, length))
+    snapped = {}
+    for pos, weight in sorted(clusters, key=lambda c: -c[1]):
+        px = round(pos)
+        near = [max((p for p in snapped if p < pos), default=None), min((p for p in snapped if p > pos), default=None)]
+        # on the same side of each neighbour as before, and about as far from it
+        if weight >= HINT_MIN_WEIGHT and 0 < px < size and all(
+                n is None or ((px - snapped[n]) * (pos - n) > 0
+                              and abs(abs(px - snapped[n]) - abs(pos - n)) <= HINT_MAX_STRETCH) for n in near):
+            snapped[pos] = px
+    xs, ys = zip(*(sorted(snapped.items()) or [(0, 0)]), strict=True)
+
+    def warp(x):
+        if x <= xs[0]:
+            return x + ys[0] - xs[0]
+        if x >= xs[-1]:
+            return x + ys[-1] - xs[-1]
+        i = bisect.bisect_right(xs, x)
+        return ys[i - 1] + (x - xs[i - 1]) * (ys[i] - ys[i - 1]) / (xs[i] - xs[i - 1])
+    return warp
+
+
+def glyph_outlines(shapes):
+    """The dark parts of a glyph, each with the light shapes drawn on top of it
+    as holes, as outlines in a 14 px box from (1, 1) of a 16 px icon, so the
+    outermost edges can sit on whole pixels."""
     dark = [(i, s) for i, s in enumerate(shapes) if luminance(s.colour) < 0.5]
     light = [(i, s) for i, s in enumerate(shapes) if luminance(s.colour) >= 0.5]
+    place = placement(union(s.bbox() for _, s in dark), (1, 1, SYMBOLIC_SIZE - 2))
+    return [[c for p in [s, *(h for j, h in light if j > i and inside(h.bbox(), s.bbox()))]
+             for c in outline(p.d, *place)] for i, s in dark]
+
+
+def grid_warps(outlines):
+    """(x, y) functions that move the outlines' level edges onto whole pixels."""
+    every = [c for o in outlines for c in o]
+    return tuple(grid_warp(level_edges(every, axis), SYMBOLIC_SIZE) for axis in (0, 1))
+
+
+def symbolic_icon(shapes, palette, hint=False):
+    """A one-colour icon in KDE's symbolic format: the dark parts of a glyph in
+    the colour scheme's text colour, the light details inside them cut out as
+    holes (even-odd). Hinted for 16 px with `hint`."""
+    size = SYMBOLIC_SIZE
+    outlines = glyph_outlines(shapes)
+    wx, wy = grid_warps(outlines) if hint else (float, float)
     paths = []
-    for i, s in dark:
-        holes = [h for j, h in light if j > i and inside(h.bbox(), s.bbox())]
-        d = " ".join([s.d] + [h.d for h in holes])
+    for commands in outlines:
+        d = " ".join(c + "".join(f" {wx(x):.3f} {wy(y):.3f}" for x, y in zip(a[0::2], a[1::2], strict=True))
+                     for c, a in commands)
         paths.append(f'<path class="ColorScheme-Text" d="{d}" fill="currentColor" fill-rule="evenodd"/>')
-    box = union(s.bbox() for _, s in dark)
     style = ('<style type="text/css" id="current-color-scheme">'
              f'.ColorScheme-Text {{ color:{palette["cream"]}; }}</style>')
-    size = SYMBOLIC_SIZE
-    # scour moves a fill all paths share up to their group, and Qt resolves
-    # currentColor there, so the group needs the class as well
-    # whole pixels: a 14 px box from (1, 1) keeps straight edges on the grid at 16 px
-    body = fit("".join(paths), box, (1, 1, size - 2), ' class="ColorScheme-Text"')
-    return tidy(svg(style + body, (0, 0, size, size)), groups=False)
+    # GTK reads a one-colour icon with a parser of its own only when it has a
+    # size and no transform (check.py, gtk_fast_symbolic)
+    return tidy(svg(style + "".join(paths), (0, 0, size, size), size), groups=False)
+
+
+def symbolic_files(shapes, palette, folder, names):
+    """A glyph's one-colour icons: hinted in 16x16/, exact in scalable/."""
+    texts = {"16x16": symbolic_icon(shapes, palette, hint=True), "scalable": symbolic_icon(shapes, palette)}
+    return {f"{size}/{folder}/{n}.svg": text for n in names for size, text in texts.items()}
 
 
 def symbolic_icons(palette):
@@ -565,13 +686,11 @@ def symbolic_icons(palette):
     for master, (folder, names) in SYMBOLIC.items():
         shapes = load(master)
         if shapes:
-            text = symbolic_icon(shapes, palette)
-            made.update({f"scalable/{folder}/{n}.svg": text for n in names})
+            made.update(symbolic_files(shapes, palette, folder, names))
     for master, panels in GNOME_SETTINGS.items():
         shapes = load(master)
         if shapes:
-            text = symbolic_icon(shapes, palette)
-            made.update({f"scalable/apps/org.gnome.Settings-{p}-symbolic.svg": text for p in panels})
+            made.update(symbolic_files(shapes, palette, "apps", [f"org.gnome.Settings-{p}-symbolic" for p in panels]))
     return made
 
 
@@ -648,12 +767,12 @@ def settings_icons(palette):
         big = icon(pumpkin_markup + carved, frame, 0.06)
         carved = emblem_markup(shapes, glyph_box(SETTINGS_EMBLEM_SIZE_SMALL), palette["complementary"], face)
         small = {px: icon(pumpkin_markup + carved, small_frame, 0.0, px) for px in (16, 22)}
-        one_colour = symbolic_icon(shapes, palette)
         for n in names:
             made[f"scalable/apps/{n}.svg"] = big
             made.update({f"{px}x{px}/apps/{n}.svg": text for px, text in small.items()})
-            if f"{n}-symbolic" in breeze:
-                made[f"scalable/apps/{n}-symbolic.svg"] = one_colour
+        twins = [f"{n}-symbolic" for n in names if f"{n}-symbolic" in breeze]
+        if twins:
+            made.update(symbolic_files(shapes, palette, "apps", twins))
     return made
 
 

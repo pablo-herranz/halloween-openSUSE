@@ -204,7 +204,10 @@ you left (and why) in the pull request.
   stay one colour; apps, places, devices and file types may be in colour.
 - One-colour icons take the colour scheme's text colour: the class
   `ColorScheme-Text` and `fill="currentColor"` on the same element, or Qt
-  draws them black (`make check`), and straight edges on the 16 px grid.
+  draws them black. They have a size and no transform, or GTK draws them with
+  its slower full renderer. The build snaps their level edges to the 16 px
+  grid in `16x16/` and keeps the exact outline in `scalable/`, and a key or a
+  stroke may not change by more than 0.4 px (`make check` checks all three).
 - Colours come from the palette (`normalise()` in `tools/vectors.py`).
 
 ### Colours and states
