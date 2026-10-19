@@ -74,8 +74,8 @@ make screens TARGET=user@testbox && make fetch-screenshots TARGET=user@testbox
 theme unpacked in `build/firefox/openSUSE-halloween/`. It only recolours
 Firefox; Firefox's own icon and logo stay as they are.
 
-The `.xpi` isn't signed by Mozilla yet, and regular Firefox releases
-(openSUSE's included) only install signed add-ons:
+The `.xpi` isn't signed by Mozilla yet. Regular Firefox releases, openSUSE's
+included, only install signed add-ons from `about:addons` or a web page:
 
 - **Firefox, signed:** upload the `.xpi` to
   [addons.mozilla.org](https://addons.mozilla.org/developers/), either
@@ -88,9 +88,22 @@ The `.xpi` isn't signed by Mozilla yet, and regular Firefox releases
 - **Any Firefox, until it restarts:** in
   `about:debugging#/runtime/this-firefox` choose *Load Temporary Add-on…* and
   pick the `.xpi`.
+- **openSUSE's Firefox, for everyone on the machine:** openSUSE builds
+  Firefox to load unsigned add-ons from its own folder. The file name must be
+  the add-on ID:
 
-`install/test-screens.sh firefox` does the last one in a throwaway profile
-and takes a screenshot; it leaves your own Firefox profiles alone.
+  ```bash
+  sudo install -Dm644 build/firefox/openSUSE-halloween.xpi "/usr/lib64/firefox/browser/extensions/openSUSE-halloween@pluskal.org.xpi"
+  ```
+
+  Restart Firefox, then pick the theme in `about:addons` → *Themes*. Firefox
+  doesn't check signatures in that folder, so only put files there that you
+  built or trust. Firefox updates leave the file in place; to remove it,
+  pick another theme and delete the file.
+
+`install/test-screens.sh firefox` loads the theme as a temporary add-on in a
+throwaway profile and takes a screenshot; it leaves your own Firefox profiles
+alone.
 
 ### If the boot splash causes trouble
 
