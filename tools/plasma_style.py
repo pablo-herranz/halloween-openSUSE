@@ -155,7 +155,7 @@ def build(out, palette, colors_text):
 
 
 def main():
-    from build import render_colors
+    from targets.plasma import render_colors
     from common import load_palette
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("out", nargs="?", default=str(ROOT / "build/user/plasma/desktoptheme/openSUSE-halloween"))

@@ -22,9 +22,8 @@ from pathlib import Path
 
 from PIL import Image
 
-from common import BUILD, CACHE, FIREFOX_ID, ROOT, VERSION, contrast, rgb
+from common import BUILD, CACHE, FIREFOX, FIREFOX_ID, ROOT, SYSTEM, USER, VERSION, contrast, rgb
 
-USER, SYSTEM, FIREFOX = BUILD / "user", BUILD / "root", BUILD / "firefox"
 STYLE = USER / "plasma/desktoptheme/openSUSE-halloween"
 LNF = USER / "plasma/look-and-feel/org.openSUSE.halloween.desktop/contents"
 INI_NAMES = ("defaults", "plasmarc", "colors", "index.theme")
