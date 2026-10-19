@@ -55,7 +55,9 @@ Never edit anything in `build/`: it is generated. See
 request can only be merged when its `CI` check passes, which means both jobs
 passed: Lint (`make lint`) and Build and check (`make check`). The
 maintainer's own pull requests and Dependabot's merge by themselves once CI
-passes; everyone else's are reviewed and merged by the maintainer.
+passes; everyone else's are reviewed and merged by the maintainer. Pull
+requests are rebased onto `main` (no merge or squash commits), so keep each
+commit meaningful and self-contained.
 
 1. Fork the repository and create a branch for one change.
 2. Make the change, then run `make check` and `make lint`.

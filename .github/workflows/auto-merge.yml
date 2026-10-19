@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 # Pull requests the repository owner or Dependabot opens from a branch of
-# this repository are set to merge (with a merge commit) once main's required
+# this repository are set to merge (rebased onto main) once main's required
 # checks pass. Dependabot only proposes releases at least 7 days old (see
 # dependabot.yml). Everyone else's pull requests wait for a maintainer.
 # Drafts are left alone until they are marked ready. To keep one from
@@ -32,7 +32,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - run: gh pr merge --auto --merge "$PR_URL"
+      - run: gh pr merge --auto --rebase "$PR_URL"
         env:
           GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.html_url }}
