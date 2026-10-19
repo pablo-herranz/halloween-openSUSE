@@ -220,6 +220,9 @@ SYMBOLIC = {
     "glyph-gear": ("categories", ("applications-system-symbolic", "preferences-system-symbolic")),
     "glyph-broom": ("categories", ("applications-utilities-symbolic",)),
     "glyph-signpost": ("actions", ("compass",)),
+    # Thunar's side pane asks for go-home for Home; Dolphin's Home button too
+    "emblem-cottage": ("actions", ("go-home",)),
+    "emblem-monitor": ("apps", ("org.xfce.panel.showdesktop",)),
     "glyph-sleep": ("actions", ("system-suspend", "system-suspend-symbolic")),
     "glyph-hibernate": ("actions", ("system-suspend-hibernate", "system-suspend-hibernate-symbolic", "system-hibernate",
                                     "system-hibernate-symbolic")),

@@ -38,7 +38,9 @@ The first release, 2026.10.0, is being prepared.
   counterparts (calculator, clocks, contacts, maps, mail, music, videos,
   notes, logs and more), YaST, printers, phones, input devices, headphones,
   displays and computers, each with one seasonal touch; settings dialogs show
-  their glyph carved into a pumpkin, so they tell apart at 16 px
+  their glyph carved into a pumpkin, so they tell apart at 16 px; Thunar's
+  Home and Xfce's show-desktop button use the theme's one-colour glyphs, and
+  the optional defaults turn IBus's blue layout indicator cream
 - Firefox theme, with a header that stays sharp on HiDPI screens
 - `make install`, which installs the theme like a package: it copies the files
   into the system paths and changes no settings; `make install-defaults` adds
