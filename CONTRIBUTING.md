@@ -136,6 +136,12 @@ licence:
   chameleon is an original character) or other projects' logos, such as
   Firefox's. Prompts never say "openSUSE", "Geeko" or "logo".
 
+Everything has to work on the screens listed under "Supported screens" in
+the README, from 1366x768 to 5K, 3:2, ultrawide and portrait, at 100% to 200%
+scaling. Crop pictures made from the wallpaper with `crop_to()`, which keeps
+the chameleon box in `art/crops.toml` in view, and check unusual shapes and
+scales in the test VM (`HALLOWEEN_VM_RES=2256x1504 tools/dev/vm/vm.sh boot`).
+
 ### Adding icons
 
 Icons are composed by [`tools/vectors.py`](tools/vectors.py) from the SVG

@@ -19,9 +19,13 @@ shared/, plasma/ ──┘                                             │
   and Plasma style ornaments. If a master is missing, the build draws a
   placeholder instead and lists it in `build/placeholders.txt`; `make
   release-check` fails while any placeholder is in use.
-- **`art/crops.toml`** gives the focus points used when a wallpaper is cropped
-  to another aspect ratio, and the parts of the night wallpaper used for the
-  splash backdrop and the Firefox header.
+- **`art/crops.toml`** gives the box every crop of a wallpaper must keep in
+  view (the chameleon, its hat and the lanterns), and the parts of the night
+  wallpaper used for the splash backdrop and the Firefox header.
+  `crop_to()` in `tools/imaging.py` crops to any aspect ratio around that
+  box: as centrally as possible for Plasma's per-shape pictures, and centred
+  on the box for the `zoomed` pictures that GNOME, Xfce and the login screens
+  stretch over any screen.
 - **`art/prompts/`** records how each master was made.
 - **`shared/` and `plasma/`** hold the hand-written parts: metadata, templates
   with `@palette_name@` tokens, QML, `index.theme`, and the Firefox manifest
@@ -72,6 +76,13 @@ leftover tokens, the Plasma `metadata.json` files against KDE's KPlugin
 schema (pinned in `tools/upstream.toml`), colour contrast, image sizes and
 file size limits, the Plasma style's element IDs, the icon theme's
 `index.theme` and SVGs, the Firefox theme, and `reuse lint`.
+
+Two checks guard the supported screens (README, "Supported screens"):
+`check_resolutions` works out, for common screen sizes and shapes, how much of
+the chameleon each desktop shows (with Plasma's own rule for picking a
+wallpaper size), and `check_plymouth_layout` lays the boot splash out from 720p
+to 4K and portrait and fails if the passphrase prompt, lantern or title would
+cover the chameleon.
 
 `make lint` checks the sources: ruff, ShellCheck, actionlint and zizmor for
 the workflows, typos, editorconfig-checker and `reuse lint`.

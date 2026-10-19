@@ -1,14 +1,17 @@
-# Focus points (0..1 of width and height) used when a wallpaper master is
-# cropped to another aspect ratio, e.g. 16:9 masters to 16:10 screens.
-# Keep the chameleon inside the crop by moving focus_x towards it.
+# What every crop of a wallpaper master to another aspect ratio must show:
+# `keep` is the box (x0, y0, x1, y1, as 0..1 of width and height) around the
+# chameleon, its hat and the lanterns, with a little margin. A crop that can
+# hold the box contains it and otherwise stays as close to the middle of the
+# master as it can; a crop too small for it (portrait, 32:9) is centred on
+# `focus` instead, between the chameleon's head and the lanterns.
 
 [dusk]
-focus_x = 0.55
-focus_y = 0.5
+keep = [0.615, 0.10, 0.965, 0.82]
+focus = [0.80, 0.40]
 
 [night]
-focus_x = 0.55
-focus_y = 0.5
+keep = [0.615, 0.10, 0.965, 0.82]
+focus = [0.80, 0.40]
 
 # The splash backdrop: the calm left part of the night master (x0, y0, x1, y1),
 # so the splash's own chameleon isn't doubled by the one in the wallpaper.

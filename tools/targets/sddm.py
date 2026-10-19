@@ -15,6 +15,9 @@ DESKTOP = "plasma"
 ID = "breeze-openSUSE-halloween"
 BASE = "breeze-openSUSE"
 INSTALL_DIR = f"/usr/share/sddm/themes/{ID}"
+# SDDM zooms its background to fill each screen: 16:10 at 4K, cropped like the
+# zoomed wallpaper pictures, stays sharp on 4K and keeps the chameleon
+BACKGROUND = (3840, 2400)
 # Everything in breeze-openSUSE except its metadata, preview and theme.conf
 BASE_FILES = ["Background.qml", "KeyboardButton.qml", "Login.qml", "Main.qml", "Messages.sh",
               "SessionButton.qml", "default-logo.svg", "faces"]
@@ -30,7 +33,7 @@ def build(ctx):
         os.symlink(f"../{BASE}/{name}", out / name)
     defaults = ROOT / "plasma/sddm/defaults/zz-openSUSE-halloween.conf"
     write(DEFAULTS / "sddm.conf.d" / defaults.name, defaults.read_text())
-    bg = crop_to(ctx.wallpapers, "night", 16 / 10).resize((2560, 1600), Image.LANCZOS)
+    bg = crop_to(ctx.wallpapers, "night", BACKGROUND[0] / BACKGROUND[1], zoomed=True).resize(BACKGROUND, Image.LANCZOS)
     bg = vignette(ImageEnhance.Brightness(bg).enhance(0.9))
     save_jpeg(bg, out / "background.jpg")
     shots = ROOT / "art/previews/sddm.png"

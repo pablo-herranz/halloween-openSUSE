@@ -59,6 +59,24 @@ See [gnome/](gnome/) and [xfce/](xfce/) for what each edition covers.
   (`plasma6-sddm-theme-openSUSE`), which it builds on
 - To build: Python 3.11 or newer, `make` and [Git LFS](https://git-lfs.com/)
 
+### Supported screens
+
+These setups are supported, and `make check` fails if a change breaks them:
+
+| Setup | What you get |
+|---|---|
+| 16:9 and 16:10, from 1366x768 to 5K | The whole scene, on every desktop and login screen |
+| 3:2 laptops (2256x1504, 3000x2000, …) | The whole chameleon everywhere |
+| 21:9 ultrawide, 4:3, 5:4 | Plasma: the whole chameleon, from a picture made for the shape. GNOME, Xfce and the login screens zoom one 16:10 picture: at least 80% of it |
+| 32:9 and portrait (9:16) | Plasma: a picture made for the shape (on 32:9 the tail is cut). Elsewhere, pick the matching picture yourself (see below) |
+| 100%, 150% and 200% scaling (HiDPI) | Sharp throughout: icons, styles and Shell theme are vector or CSS, wallpapers go up to 5K, login and splash backgrounds are 4K, the Firefox header is drawn at 2x, and the Xfce window manager theme comes at 1x, 1.5x and 2x |
+| Boot splash, 720p to 4K and portrait | The passphrase prompt, the lantern and update messages never cover the chameleon |
+
+The pictures for every shape are in
+`/usr/share/wallpapers/openSUSEhalloween/contents/images{,_dark}/`, named by
+size; GNOME and Xfce can use any of them instead of the default one in
+`/usr/share/backgrounds/openSUSEhalloween/`.
+
 ## Install
 
 The theme installs like a package: `make install` only copies its files into
@@ -93,8 +111,9 @@ Then pick it:
 - **Xfce:** in Settings → *Appearance* pick `openSUSE-halloween` (style) and
   `openSUSE-halloween-adwaita` (icons); in *Window Manager* pick
   `openSUSE-halloween` (or `-hdpi` / `-xhdpi` with display scaling); in
-  *Notifications* pick `openSUSE-halloween`; and choose the wallpaper in
-  *Desktop* from `/usr/share/wallpapers/openSUSEhalloween/contents/images_dark/`.
+  *Notifications* pick `openSUSE-halloween`; and in *Desktop* choose
+  `/usr/share/backgrounds/openSUSEhalloween/night.jpg`, or the picture for
+  your screen's shape from `/usr/share/wallpapers/openSUSEhalloween/contents/images_dark/`.
   Xfce's defaults come from openSUSE's branding packages, so there are none
   to install. For the login screen (LightDM), an administrator can set
   `theme-name=openSUSE-halloween`, `icon-theme-name=openSUSE-halloween-adwaita`

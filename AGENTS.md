@@ -65,6 +65,10 @@ and colour scheme LGPL-2.0-or-later, docs and small config CC0-1.0.
 - Run `make check` and `make lint` before committing.
 - Keep the build reproducible: the same masters give the same
   `build/MANIFEST.sha256`.
+- Keep the screens in the README's "Supported screens" working: crop
+  wallpaper-based images with `crop_to()` (`tools/imaging.py`), which keeps
+  the chameleon box from `art/crops.toml`, and keep `check_resolutions` and
+  `check_plymouth_layout` in `tools/check.py` passing rather than relaxing them.
 - After changing art or icons, run `make icon-preview` and look at
   `build/icon-preview.png`.
 - Add before/after screenshots to pull requests that change how something

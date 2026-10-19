@@ -8,7 +8,7 @@ Firefox theme:
 | GTK 3 theme: adw-gtk3-dark with the palette's colours | `/usr/share/themes/openSUSE-halloween/gtk-3.0/` | `tools/targets/gtk.py` from [`shared/gtk/`](../shared/gtk/) |
 | GNOME Shell stylesheet for the User Themes extension | `/usr/share/themes/openSUSE-halloween/gnome-shell/` | `tools/targets/gnome.py` from [`gnome-shell/`](gnome-shell/) |
 | Icons over Adwaita | `/usr/share/icons/openSUSE-halloween-adwaita/` | `tools/targets/icons.py` |
-| Wallpaper entry for Settings, dusk (light) and night (dark) | `/usr/share/gnome-background-properties/openSUSEhalloween.xml` | `tools/targets/gnome.py` |
+| Wallpaper entry for Settings, dusk (light) and night (dark), pointing at the 16:10 pictures in `/usr/share/backgrounds/openSUSEhalloween/` | `/usr/share/gnome-background-properties/openSUSEhalloween.xml` | `tools/targets/gnome.py`, `wallpapers.py` |
 
 `make install-defaults` adds the optional defaults from [`defaults/`](defaults/):
 
