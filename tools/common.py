@@ -18,7 +18,7 @@ USER = BUILD / "user"       # themes, icons, wallpapers: share/ in the system
 SYSTEM = BUILD / "root"     # login screen and boot splash
 FIREFOX = BUILD / "firefox"
 DEFAULTS = BUILD / "defaults"   # the optional defaults; tools/install.py --defaults
-VERSION = "2026.10.1"
+VERSION = "2026.10.2"
 FIREFOX_ID = "openSUSE-halloween@pluskal.org"
 
 
