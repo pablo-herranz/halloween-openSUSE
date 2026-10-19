@@ -7,7 +7,7 @@ REMOTE := .cache/halloween-openSUSE
 VENV := tools/.venv
 PY := $(VENV)/bin/python
 
-.PHONY: all build check release-check deploy install-user install-root plymouth verify screens fetch-screenshots previews clean
+.PHONY: all build check release-check deploy install-user install-root plymouth verify screens fetch-screenshots previews icon-preview clean
 
 all: check
 
@@ -48,6 +48,9 @@ fetch-screenshots:
 
 previews: $(VENV)/.ok
 	$(PY) tools/previews.py
+
+icon-preview: build
+	$(PY) tools/icon_preview.py
 
 clean:
 	rm -rf build/user build/root build/install build/*.txt build/*.json build/MANIFEST.sha256

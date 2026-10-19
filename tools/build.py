@@ -19,6 +19,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 import placeholders as ph
 import plasma_style
+import vectors
 from common import BUILD, ROOT, fill_tokens, load_palette, rgb, write
 
 USER = BUILD / "user"
@@ -182,6 +183,8 @@ def build_icons(p):
     src = ROOT / "icons/openSUSE-halloween"
     out = USER / "icons/openSUSE-halloween"
     shutil.copytree(src, out)
+    for rel, svg in vectors.icons(p).items():
+        write(out / rel, svg)
     for rel, svg in ph.icon_svgs(p).items():
         if not (out / rel).exists():
             write(out / rel, svg)
@@ -251,6 +254,7 @@ def main():
     colors = render_colors(p)
     write(USER / "color-schemes/openSUSEHalloween.colors", colors)
     plasma_style.build(USER / "plasma/desktoptheme/openSUSE-halloween", p, colors)
+    placeholders_used.extend(f"ornament {n}" for n in plasma_style.ORNAMENTS if vectors.ornament(n, p) is None)
 
     wallpapers = build_wallpaper(p)
     hero = master("hero", lambda: ph.hero(p)).convert("RGBA")

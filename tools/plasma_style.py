@@ -20,6 +20,7 @@ import tomllib
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+import vectors
 from common import CACHE, ROOT, fetch, write
 
 SVG_NS = "http://www.w3.org/2000/svg"
@@ -29,8 +30,9 @@ VARIANTS = ("", "translucent/", "opaque/", "solid/")
 # Ornament placement: (ornament file, target height in px, opacity, hint elements)
 OVERLAYS = {
     "dialogs/background.svg": ("popup-sprig.svg", 56, 0.55, ["hint-overlay-pos-right"]),
-    "widgets/panel-background.svg": ("panel-garland.svg", 8, 0.7, ["hint-overlay-tile-horizontal"]),
+    "widgets/panel-background.svg": ("panel-garland.svg", 12, 0.7, ["hint-overlay-tile-horizontal"]),
 }
+ORNAMENTS = [o[0] for o in OVERLAYS.values()] + ["clock-face.svg"]
 TOOLTIP_SHADOW = ("widgets/tooltip.svg", "ember", 1.8)
 
 
@@ -40,9 +42,11 @@ def upstream(name):
                  CACHE / "libplasma-breeze" / name).read_text()
 
 
-def ornament(name, prefix):
-    """Return (inner SVG markup with prefixed ids, width, height) of an ornament."""
-    root = ET.parse(SRC / "ornaments" / name).getroot()
+def ornament(name, prefix, palette):
+    """Return (inner SVG markup with prefixed ids, width, height) of an ornament:
+    made from its Recraft master when there is one, else the drawn placeholder."""
+    text = vectors.ornament(name, palette) or (SRC / "ornaments" / name).read_text()
+    root = ET.fromstring(text)
     _, _, w, h = (float(v) for v in root.get("viewBox").split())
     ET.register_namespace("", SVG_NS)
     parts = []
@@ -78,8 +82,8 @@ def append(svg, markup):
     return svg[:i] + markup + "\n" + svg[i:]
 
 
-def add_overlay(svg, name, height, opacity, hints):
-    frag, w, h = ornament(name, "halloween-" + Path(name).stem + "-")
+def add_overlay(svg, name, height, opacity, hints, palette):
+    frag, w, h = ornament(name, "halloween-" + Path(name).stem + "-", palette)
     scale = height / h
     width = w * scale
     svg, x0 = widen_canvas(svg, width + 12, height + 4)
@@ -110,12 +114,12 @@ def set_class(svg, element_id, new_class):
     return out
 
 
-def pumpkin_clock(svg):
+def pumpkin_clock(svg, palette):
     svg = svg.replace('id="ClockFace"', 'id="ClockFaceBreeze"', 1)
     svg = set_class(svg, "HourHand", "ColorScheme-Background")
     svg = set_class(svg, "MinuteHand", "ColorScheme-Background")
     svg = set_class(svg, "SecondHand", "ColorScheme-Text")
-    frag, w, h = ornament("clock-face.svg", "halloween-face-")
+    frag, w, h = ornament("clock-face.svg", "halloween-face-", palette)
     if (w, h) != (200, 200):
         raise RuntimeError("clock-face.svg must be 200x200 to match Breeze's clock")
     return append(svg, f'  <g id="ClockFace">{frag}</g>\n')
@@ -131,11 +135,11 @@ def build(out, palette, colors_text):
     for variant in VARIANTS:
         for name, (orn, height, opacity, hints) in OVERLAYS.items():
             path = variant + name
-            write(out / path, add_overlay(upstream(path), orn, height, opacity, hints))
+            write(out / path, add_overlay(upstream(path), orn, height, opacity, hints, palette))
         name, color, factor = TOOLTIP_SHADOW
         path = variant + name
         write(out / path, tint_shadow(upstream(path), palette[color], factor))
-    write(out / "widgets/clock.svg", pumpkin_clock(upstream("widgets/clock.svg")))
+    write(out / "widgets/clock.svg", pumpkin_clock(upstream("widgets/clock.svg"), palette))
     return out
 
 

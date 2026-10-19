@@ -5,9 +5,8 @@ colours, falling leaves, carved pumpkins, and a friendly chameleon inspired by
 openSUSE's Geeko. It currently covers KDE Plasma 6 on openSUSE Tumbleweed;
 the layout leaves room for other desktops.
 
-> **Status:** work in progress. The pipeline is complete, but the artwork is
-> still drawn placeholders; the generated art replaces them before the first
-> release.
+> **Status:** work in progress. All artwork is in place; testing on a real
+> machine and screenshots come before the first release.
 
 ## What's included
 
