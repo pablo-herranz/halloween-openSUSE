@@ -96,6 +96,12 @@ tools/dev/vm/vm.sh desktop xfce           # or gnome; reboots and logs in
 tools/dev/vm/vm.sh shot xfce              # ~/vm-halloween/shots/xfce.png
 ```
 
+The README's screenshots all come from that VM. After a change that shows,
+retake them all in one go: `make gallery TARGET=user@host` builds a release
+tarball, installs it in the VM on that host, takes every screenshot on Plasma,
+GNOME and Xfce at 1920x1080, copies them to `art/screenshots/` and remakes
+the README images in `docs/screenshots/`. Commit both with the change.
+
 ## Commit messages
 
 Write the subject in the imperative mood ("Add folder icons for videos"),

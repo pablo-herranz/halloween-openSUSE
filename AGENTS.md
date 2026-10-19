@@ -72,7 +72,8 @@ and colour scheme LGPL-2.0-or-later, docs and small config CC0-1.0.
 - After changing art or icons, run `make icon-preview` and look at
   `build/icon-preview.png`.
 - Add before/after screenshots to pull requests that change how something
-  looks.
+  looks, and retake the README gallery with `make gallery` (it runs the test
+  VM in `tools/dev/vm/`, so it is one of the `TARGET=` targets: ask first).
 
 ## Ask first
 

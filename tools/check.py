@@ -591,6 +591,18 @@ def check_install():
     ok(f"install: {len(staged)} files under usr/ and etc/, all removed again by uninstall")
 
 
+def check_readme_images():
+    """Every image the README shows exists, and every README image is shown."""
+    readme = (ROOT / "README.md").read_text()
+    shown = set(re.findall(r"docs/screenshots/([\w.-]+\.jpg)", readme))
+    files = {f.name for f in (ROOT / "docs/screenshots").glob("*.jpg")}
+    for name in sorted(shown - files):
+        fail(f"README shows docs/screenshots/{name}, which doesn't exist")
+    for name in sorted(files - shown):
+        fail(f"docs/screenshots/{name} isn't shown in the README")
+    ok(f"README: {len(shown)} screenshots, all there")
+
+
 def check_reuse():
     reuse = shutil.which("reuse") or str(ROOT / "tools/.venv/bin/reuse")
     if not Path(reuse).exists():
@@ -629,6 +641,7 @@ def main():
         check_xfwm4()
     check_resolutions()
     check_install()
+    check_readme_images()
     check_reuse()
     placeholders = (BUILD / "placeholders.txt").read_text().split("\n") if (BUILD / "placeholders.txt").exists() else []
     placeholders = [p for p in placeholders if p]

@@ -35,6 +35,8 @@ IMAGE=openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2
 PATTERNS="kde_plasma gnome_basis xfce_basis x11"
 PACKAGES="sddm plasma6-sddm-theme-openSUSE plymouth-theme-spinner gdm lightdm lightdm-gtk-greeter gnome-shell-extension-user-theme xdg-desktop-portal-gnome"
 PACKAGES+=" nautilus gnome-console xfce4-notifyd xfce4-terminal make rsync"
+# What gallery.sh screenshots with
+PACKAGES+=" spectacle dolphin MozillaFirefox libnotify-tools"
 
 log() { printf '\033[1;33m==>\033[0m %s\n' "$*"; }
 die() { printf 'error: %s\n' "$*" >&2; exit 1; }

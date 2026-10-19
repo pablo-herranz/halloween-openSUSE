@@ -25,6 +25,8 @@ friendly chameleon in a witch hat.
 | Splash screen | Pumpkin clock |
 | <img src="docs/screenshots/gnome.jpg" alt="GNOME with the night wallpaper: Files shows orange folders with emblems, and the quick settings menu has plum panels with ember-orange toggles"> | <img src="docs/screenshots/xfce.jpg" alt="Xfce with the night wallpaper: Thunar in dark plum with orange folders, plum window title bar, a dark panel with a pumpkin task button and a Halloween notification"> |
 | GNOME | Xfce |
+| <img src="docs/screenshots/lockscreen.jpg" alt="The Plasma lock screen: a large clock over the night wallpaper with the chameleon and lanterns"> | <img src="docs/screenshots/gdm.jpg" alt="The GNOME login screen in its dark style, with an orange focus ring on the user name field"> |
+| Lock screen (Plasma) | Login screen (GDM) |
 
 ## What's included
 

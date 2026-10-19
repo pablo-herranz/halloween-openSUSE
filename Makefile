@@ -11,7 +11,7 @@ SYSCONFDIR ?= /etc
 INSTALL := python3 tools/install.py --destdir "$(DESTDIR)" --prefix "$(PREFIX)" --libdir "$(LIBDIR)" --sysconfdir "$(SYSCONFDIR)"
 
 # The remote targets (deploy, install-user, install-root, plymouth, verify,
-# screens, fetch-screenshots) are only a development helper: build on this
+# screens, fetch-screenshots, gallery) are only a development helper: build on this
 # machine, then apply the theme on a test machine over SSH with the scripts in
 # tools/dev/, which change its settings. Name it with TARGET=user@host.
 TARGET ?=
@@ -19,7 +19,7 @@ REMOTE := .cache/halloween-openSUSE
 VENV := tools/.venv
 PY := $(VENV)/bin/python
 
-.PHONY: all need-target build check lint dist release-check install install-defaults uninstall deploy install-user install-root plymouth verify screens fetch-screenshots previews icon-preview clean
+.PHONY: all need-target build check lint dist release-check install install-defaults uninstall deploy gallery install-user install-root plymouth verify screens fetch-screenshots previews icon-preview clean
 
 all: check
 
@@ -93,6 +93,17 @@ fetch-screenshots: need-target
 	rsync -a $(TARGET):$(REMOTE)/screenshots/ art/screenshots/
 
 previews: $(VENV)/.ok
+	$(PY) tools/previews.py
+
+# Retake every README screenshot in the test VM on TARGET (tools/dev/vm/:
+# vm.sh create must have run there once), then remake the README images
+VM_DIR ?= vm-halloween
+gallery: deploy
+	tools/dist.sh >/dev/null
+	scp -q dist/halloween-openSUSE-*.tar.gz $(TARGET):$(REMOTE)/
+	ssh $(TARGET) "HALLOWEEN_VM=\$$HOME/$(VM_DIR) $(REMOTE)/install/vm/gallery.sh \
+		$(REMOTE)/$$(basename dist/halloween-openSUSE-*.tar.gz)"
+	rsync -a $(TARGET):$(VM_DIR)/shots/gallery/ art/screenshots/
 	$(PY) tools/previews.py
 
 icon-preview: build

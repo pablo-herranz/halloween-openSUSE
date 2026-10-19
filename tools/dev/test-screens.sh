@@ -29,7 +29,12 @@ wayland_socket() {
 }
 WL=${WAYLAND_SESSION_SOCKET:-$(wayland_socket)}
 [ -n "$WL" ] || die "no Wayland socket in $XDG_RUNTIME_DIR: is a Plasma session running?"
-BASE_URL="file://$DATA/wallpapers/$WALLPAPER_ID"
+# The user install's wallpaper, or the system's (make install)
+if [ -d "$DATA/wallpapers/$WALLPAPER_ID" ]; then
+    BASE_URL="file://$DATA/wallpapers/$WALLPAPER_ID"
+else
+    BASE_URL="file:///usr/share/wallpapers/$WALLPAPER_ID"
+fi
 mkdir -p "$OUT"
 
 # Apps started from SSH need the session's desktop variables, or Qt skips
