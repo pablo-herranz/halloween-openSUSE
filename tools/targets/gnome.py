@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """GNOME: the Shell stylesheet (in the shared theme folder, for the User Themes
 extension), the wallpaper entry for Settings, and the optional defaults: a
-gsettings override and GDM's dconf database."""
+GSettings override, which also covers the login screen (GDM)."""
 
 from xml.sax.saxutils import escape
 
@@ -44,6 +44,3 @@ def build(ctx):
     override = "30_openSUSE-halloween.gschema.override"
     write(DEFAULTS / "glib-2.0/schemas" / override,
           fill_tokens((src / "defaults" / f"{override}.in").read_text(), tokens))
-    write(DEFAULTS / "dconf/profile/gdm", (src / "defaults/gdm-profile").read_text())
-    write(DEFAULTS / "dconf/db/gdm.d/30-openSUSE-halloween",
-          fill_tokens((src / "defaults/30-openSUSE-halloween.in").read_text(), tokens))

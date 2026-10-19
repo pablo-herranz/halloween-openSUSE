@@ -1,10 +1,16 @@
 # Installed by the optional defaults (make install-defaults): the Halloween
-# theme as the GNOME default for users who haven't chosen their own. Named to
-# sort after openSUSE's 20_openSUSE-branding override, so it wins.
+# theme's colours, wallpaper and Shell theme as GNOME's defaults, for users who
+# haven't chosen their own. Named to sort after openSUSE's 20_openSUSE-branding
+# override, so it wins. It leaves the GTK and icon theme to the user (GNOME
+# Tweaks): they must match gtk3-branding, or gnome-settings-daemon switches
+# them back; and it doesn't touch the list of enabled Shell extensions.
 
 [org.gnome.desktop.interface]
-gtk-theme='openSUSE-halloween'
-icon-theme='openSUSE-halloween-adwaita'
+accent-color='orange'
+color-scheme='prefer-dark'
+
+# The login screen (GDM's greeter runs as the GNOME-Greeter desktop)
+[org.gnome.desktop.interface:GNOME-Greeter]
 accent-color='orange'
 color-scheme='prefer-dark'
 
@@ -14,14 +20,7 @@ picture-uri-dark='file://@DARK@'
 picture-options='zoom'
 primary-color='@night@'
 
-[org.gnome.desktop.screensaver]
-picture-uri='file://@DARK@'
-picture-options='zoom'
-primary-color='@night@'
-
-[org.gnome.shell]
-enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
-
+# Used once the User Themes extension is enabled
 [org.gnome.shell.extensions.user-theme]
 name='openSUSE-halloween'
 

@@ -31,7 +31,7 @@ def build(ctx):
     write(out / "theme.conf", fill_tokens((src / "theme.conf.in").read_text(), tokens))
     for name in BASE_FILES:
         os.symlink(f"../{BASE}/{name}", out / name)
-    defaults = ROOT / "plasma/sddm/defaults/zz-openSUSE-halloween.conf"
+    defaults = ROOT / "plasma/sddm/defaults/30-breeze-openSUSE-halloween.conf"
     write(DEFAULTS / "sddm.conf.d" / defaults.name, defaults.read_text())
     bg = crop_to(ctx.wallpapers, "night", BACKGROUND[0] / BACKGROUND[1], zoomed=True).resize(BACKGROUND, Image.LANCZOS)
     # the power actions sit low on the screen, in a band that is light in the

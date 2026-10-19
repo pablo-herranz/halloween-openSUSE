@@ -34,6 +34,7 @@ UseEndAnimation=false
 UseEndAnimation=false
 
 [updates]
+UseEndAnimation=false
 SuppressMessages=true
 ProgressBarShowPercentComplete=true
 UseProgressBar=true
@@ -41,6 +42,7 @@ Title=Installing Updates...
 SubTitle=Do not turn off your computer
 
 [system-upgrade]
+UseEndAnimation=false
 SuppressMessages=true
 ProgressBarShowPercentComplete=true
 UseProgressBar=true
@@ -48,8 +50,12 @@ Title=Upgrading System...
 SubTitle=Do not turn off your computer
 
 [firmware-upgrade]
+UseEndAnimation=false
 SuppressMessages=true
 ProgressBarShowPercentComplete=true
 UseProgressBar=true
 Title=Upgrading Firmware...
 SubTitle=Do not turn off your computer
+
+[system-reset]
+UseEndAnimation=false

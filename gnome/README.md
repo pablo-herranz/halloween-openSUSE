@@ -12,15 +12,18 @@ Firefox theme:
 
 `make install-defaults` adds the optional defaults from [`defaults/`](defaults/):
 
-- `30_openSUSE-halloween.gschema.override`: GTK and icon theme, dark style,
-  orange accent, wallpaper and lock screen, the Shell theme with the User
-  Themes extension enabled, and IBus's keyboard layout indicator in cream
-  (on every desktop where IBus runs; blue otherwise). It sorts after openSUSE's
+- `30_openSUSE-halloween.gschema.override`: dark style and orange accent,
+  for the session and, in a `GNOME-Greeter` group, the login screen (GDM);
+  the wallpaper; the Shell theme's name for the User Themes extension; and
+  IBus's keyboard layout indicator in cream (on every desktop where IBus
+  runs; blue otherwise). It leaves the GTK and icon theme to the user (GNOME
+  Tweaks), as openSUSE's glib2 branding asks them to match `gtk3-branding`,
+  and it doesn't touch the list of enabled Shell extensions. It sorts after
+  openSUSE's
   `20_openSUSE-branding` override, and only applies to settings a user hasn't
   changed. Packages run `glib-compile-schemas` through a file trigger.
-- a `gdm` dconf profile and `gdm.d/30-openSUSE-halloween`: the login screen
-  with the orange accent and dark style (`dconf update` afterwards). GDM's
-  background can't be changed without patching GNOME Shell.
+
+GDM's background can't be changed without patching GNOME Shell.
 
 libadwaita (GTK 4) apps keep GNOME's own colours and take the orange accent;
 recolouring them would mean overwriting each user's `~/.config/gtk-4.0/gtk.css`,

@@ -4,13 +4,15 @@
 """Render the built icon theme for review: each distinct icon once (with how
 many names share it) at 64/48/32/22/16 px on the theme's dark view colour,
 on cream and on the ember selection, to build/icon-preview.png. See
-CONTRIBUTING.md, "Design review"."""
+CONTRIBUTING.md, "Design review". Renders with rsvg-convert (librsvg, the
+renderer GTK uses): librsvg2-tools on openSUSE, librsvg on Homebrew."""
 import hashlib
 import io
+import shutil
+import subprocess
 import sys
 from collections import defaultdict
 
-import resvg_py
 from PIL import Image, ImageDraw
 
 from common import BUILD, load_palette, rgb
@@ -20,11 +22,14 @@ BACKGROUNDS = ("view", "cream", "ember")
 
 
 def render(path, size):
-    png = resvg_py.svg_to_bytes(svg_path=str(path), width=size, height=size)
-    return Image.open(io.BytesIO(bytes(png))).convert("RGBA")
+    png = subprocess.run(["rsvg-convert", "-w", str(size), "-h", str(size), str(path)],
+                         check=True, capture_output=True).stdout
+    return Image.open(io.BytesIO(png)).convert("RGBA")
 
 
 def main():
+    if not shutil.which("rsvg-convert"):
+        sys.exit("icon_preview.py needs rsvg-convert: librsvg2-tools on openSUSE, librsvg on Homebrew")
     p = load_palette()
     theme = BUILD / "user/icons/openSUSE-halloween"
     names = defaultdict(list)

@@ -2,7 +2,7 @@
 
 All notable changes are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions are
-calendar-based: `YYYY.MM.patch`.
+calendar-based: `YEAR.MONTH.PATCH`, the month without a leading zero.
 
 ## [Unreleased]
 
@@ -27,7 +27,7 @@ The first release, 2026.10.0, is being prepared.
   below the chameleon; it brings its own copy of Plymouth's prompt images
 - GNOME edition: a GTK 3 theme built on adw-gtk3, a GNOME Shell stylesheet,
   the wallpaper in Settings (dusk light, night dark), and optional defaults
-  (GSettings override with the orange accent; GDM accent through dconf)
+  (a GSettings override with the orange accent, also for GDM)
 - Xfce edition: the GTK 3 theme with panel styling, xfwm4's default theme in
   the palette at three scales, and a notification theme
 - Icon theme `openSUSE-halloween-adwaita`: the same icons over Adwaita, for
@@ -44,7 +44,10 @@ The first release, 2026.10.0, is being prepared.
 - Firefox theme, with a header that stays sharp on HiDPI screens
 - `make install`, which installs the theme like a package: it copies the files
   into the system paths and changes no settings; `make install-defaults` adds
-  optional defaults (the login screen) and `make uninstall` removes both
+  optional defaults as vendor files under `/usr` (the login screen; GNOME's
+  accent, dark style, wallpaper and Shell theme, also on GDM's login screen)
+  and `make uninstall` removes both; the release archive carries the sources,
+  art masters included, next to the build
 - Development helpers in `tools/dev/` that apply, verify and screenshot the
   theme on a test machine, and a headless GNOME and Xfce test VM
   (`tools/dev/vm/`)

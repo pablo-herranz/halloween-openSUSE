@@ -30,9 +30,13 @@ make check                        # creates tools/.venv, builds into build/, val
 make lint                         # ruff, ShellCheck, workflow, spelling and licence checks, as CI runs them
 ```
 
-You need Python 3.11 or newer, `make` and Git LFS. `make check` downloads a
-few pinned Breeze SVGs from invent.kde.org on its first run and caches them in
-`build/cache/`.
+You need Python 3.11 or newer, `make` and Git LFS, and `rsvg-convert` for
+`make icon-preview` (`librsvg2-tools` on openSUSE, `librsvg` on Homebrew).
+`make check` downloads the pinned upstream files in `tools/upstream.toml`
+(Breeze SVGs, adw-gtk3, xfwm4, Plymouth's prompt images) on its first run
+and keeps them in `build/cache/`; a file already there with the pinned
+SHA-256 is used as it is, so a package build can put them there from its
+sources and build offline.
 
 ## Layout
 
@@ -40,7 +44,7 @@ few pinned Breeze SVGs from invent.kde.org on its first run and caches them in
 |---|---|
 | `shared/` | Desktop-neutral pieces: wallpapers, icon theme, Plymouth boot splash, Firefox theme, the GTK 3 colours |
 | `plasma/` | KDE Plasma: colour scheme, Plasma style, global theme with splash, SDDM login theme |
-| `gnome/` | GNOME: Shell stylesheet, defaults (GSettings override, GDM) |
+| `gnome/` | GNOME: Shell stylesheet, defaults (GSettings override) |
 | `xfce/` | Xfce: window manager colours, notification theme |
 | `art/` | The palette, crop focus points, prompt records, and the art masters (`source/`, Git LFS) |
 | `tools/` | The build (`build.py`, `targets/`), checks (`check.py`), the installer (`install.py`) and helpers |
@@ -233,7 +237,14 @@ watch it pass.
 
 ## Releasing (maintainers)
 
-Versions are calendar-based (`YYYY.MM.patch`).
+Versions are calendar-based, `YEAR.MONTH.PATCH`, with the month written
+without a leading zero (`2026.10.0`, `2027.3.1`): the version also goes into
+the Firefox theme, and Firefox rejects version numbers with leading zeros.
+`make check` checks the form. A package built from a git snapshot names it
+after the release it relates to: `2026.10.0+git20261020.1a2b3c4` for a commit
+after 2026.10.0, `2026.11.0~git20261020.1a2b3c4` for one on the way to
+2026.11.0. RPM and zypper sort `+` after the release and `~` before it
+(`zypper vcmp` shows it), so users always get the release itself.
 
 1. In a pull request, set `VERSION` in `tools/common.py` and move the
    `[Unreleased]` notes in `CHANGELOG.md` under the new version.
@@ -241,8 +252,9 @@ Versions are calendar-based (`YYYY.MM.patch`).
    `git tag v2026.10.0 && git push origin v2026.10.0`.
 3. The release workflow checks that the tag matches `VERSION`, runs
    `make release-check` (which fails while placeholders are in use), builds
-   the archives with `make dist`, attests their build provenance and
-   publishes a GitHub release with them.
+   the archives with `make dist` (the sources with the masters, and the
+   build), attests their build provenance and publishes a GitHub release
+   with them.
 
 Releases are immutable, and release tags can't be moved or deleted: a broken
 release needs a new version. `make dist` builds the same archives locally,

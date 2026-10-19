@@ -14,7 +14,7 @@
         "Description": "Breeze with autumn colours, a leaf trim and a pumpkin clock",
         "EnabledByDefault": true,
         "Id": "openSUSE-halloween",
-        "License": "LGPL",
+        "License": "LGPL-2.0-or-later",
         "Name": "openSUSE Halloween",
         "Version": "2026.10.0",
         "Website": "https://github.com/plusky/halloween-openSUSE"

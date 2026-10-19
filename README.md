@@ -100,15 +100,17 @@ Then pick it:
   keep your panels.
 - **Login screen:** System Settings → *Colors & Themes* → *Login Screen
   (SDDM)* → *openSUSE Halloween*, or `make install-defaults`, which adds
-  `/etc/sddm.conf.d/zz-openSUSE-halloween.conf`.
+  the vendor default `/usr/lib/sddm/sddm.conf.d/30-breeze-openSUSE-halloween.conf`
+  (a login screen picked in System Settings still wins).
 - **GNOME:** in Settings → *Appearance*, pick the dark style, the orange
   accent and the *openSUSE Halloween* background. In GNOME Tweaks →
   *Appearance*, pick `openSUSE-halloween` for *Legacy Applications* and *Shell*
   (with the User Themes extension enabled), and `openSUSE-halloween-adwaita`
-  for *Icons*. Or let `make install-defaults` do it for everyone who hasn't
-  chosen otherwise: it adds a GSettings override (run
-  `glib-compile-schemas /usr/share/glib-2.0/schemas` after it) and gives the
-  login screen (GDM) the orange accent through dconf (run `dconf update`).
+  for *Icons*. `make install-defaults` adds a GSettings override (run
+  `glib-compile-schemas /usr/share/glib-2.0/schemas` after it) with the dark
+  style, the orange accent, also on the login screen (GDM), the wallpaper and
+  the Shell theme's name, for everyone who hasn't chosen otherwise; the GTK
+  theme, the icons and the User Themes extension stay your choice in Tweaks.
   GDM's background can't be changed.
 - **Xfce:** in Settings → *Appearance* pick `openSUSE-halloween` (style) and
   `openSUSE-halloween-adwaita` (icons); in *Window Manager* pick
@@ -230,7 +232,10 @@ header or in [`REUSE.toml`](REUSE.toml), and the texts are in
 
 - Artwork, including the icons and the Firefox theme: CC-BY-SA-4.0
 - Plasma style and colour scheme: LGPL-2.0-or-later (derived from Breeze)
-- GTK 3 theme: LGPL-2.1-or-later (derived from adw-gtk3, LGPL-2.1)
+- GTK 3 theme: LGPL-2.1-only, as adw-gtk3, which it recolours (the
+  recolouring itself is LGPL-2.1-or-later)
+- SDDM login theme: CC-BY-SA-4.0 (its background) and CC0-1.0 (its
+  configuration); the QML it links is openSUSE's `breeze-openSUSE`
 - Splash, look-and-feel, Plymouth theme, GNOME Shell stylesheet, Xfce window
   manager and notification themes, tools and scripts: GPL-2.0-or-later
 - Documentation and small configuration files: CC0-1.0

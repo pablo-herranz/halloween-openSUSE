@@ -48,5 +48,5 @@ def build(ctx):
         lit_f = small_lit.copy()
         lit_f.putalpha(lit_f.getchannel("A").point(lambda a, f=f: int(a * f)))
         frame.alpha_composite(lit_f, (8, 8))
-        for prefix in ("throbber", "animation"):
-            save_png(frame, out / f"{prefix}-{i + 1:04d}.png")
+        # The throbber only: no mode plays an end animation (UseEndAnimation=false)
+        save_png(frame, out / f"throbber-{i + 1:04d}.png")

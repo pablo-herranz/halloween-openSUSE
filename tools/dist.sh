@@ -2,14 +2,17 @@
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
-# Pack build/ into release archives in dist/:
-#   halloween-openSUSE-VERSION.tar.gz        the built theme with tools/install.py
-#                                            and the Makefile: unpack, then
-#                                            `make install DESTDIR=…` (what an RPM
-#                                            spec's %install runs)
+# Pack the release archives into dist/:
+#   halloween-openSUSE-VERSION.tar.gz        the sources (every tracked file,
+#                                            art masters included) and the
+#                                            built theme in build/: `make
+#                                            install DESTDIR=…` installs the
+#                                            build as an RPM spec's %install
+#                                            would, `make check` rebuilds it
 #   halloween-openSUSE-VERSION-firefox.xpi   the Firefox theme
 #   SHA256SUMS
-# Run `make check` (or `make release-check`) first.
+# Run `make check` (or `make release-check`) first, with the Git LFS masters
+# pulled.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 export COPYFILE_DISABLE=1   # no macOS ._ metadata files in the archives
@@ -21,11 +24,16 @@ out=dist
 rm -rf "$out"
 mkdir -p "$out/$name"
 
-# The complete set: the build, the installer and the docs
-mkdir -p "$out/$name/build" "$out/$name/tools"
-cp -R build/user build/root build/firefox build/defaults build/MANIFEST.sha256 "$out/$name/build/"
-cp tools/install.py "$out/$name/tools/"
-cp -R Makefile README.md CHANGELOG.md REUSE.toml LICENSES "$out/$name/"
+# The sources: every tracked file as checked out, so the art masters must be
+# the Git LFS content, not its pointers
+if git ls-files -z | xargs -0 grep -l --null-data -m1 '^version https://git-lfs' 2>/dev/null | head -c1 | grep -q .; then
+    echo "Git LFS pointers instead of masters: run git lfs pull first" >&2
+    exit 1
+fi
+git ls-files -z | tar --no-xattrs --null -T - -cf - | tar -C "$out/$name" -xf -
+# and the build
+mkdir -p "$out/$name/build"
+cp -R build/user build/root build/firefox build/defaults build/MANIFEST.sha256 build/build-info.json "$out/$name/build/"
 tar --no-xattrs -C "$out" -czf "$out/$name.tar.gz" "$name"
 rm -rf "${out:?}/$name"
 cp build/firefox/openSUSE-halloween.xpi "$out/$name-firefox.xpi"

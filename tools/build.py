@@ -29,7 +29,7 @@ def write_manifest(ctx, desktops):
     lines = []
     for f in sorted(BUILD.rglob("*")):
         rel = f.relative_to(BUILD)
-        if rel.parts[0] not in ("user", "root", "defaults"):
+        if rel.parts[0] not in ("user", "root", "defaults", "firefox"):
             continue
         if f.is_symlink():
             # Links into other packages' files, such as the SDDM base theme
