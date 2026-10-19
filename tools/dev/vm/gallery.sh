@@ -41,7 +41,7 @@ sleep 10
 "$V" run "bash /tmp/gallery/install/test-screens.sh all"
 scp -q -F "$VM/ssh_config" 'vm:/tmp/gallery/screenshots/*.png' "$OUT/"
 
-log "GNOME: Files, the quick settings, and the login screen"
+log "GNOME: Files and the quick settings, and the app grid"
 "$V" desktop gnome
 "$V" key esc
 "$V" run "nohup nautilus --new-window ~ >/dev/null 2>&1 &"
@@ -50,11 +50,12 @@ sleep 15
 sleep 4
 "$V" shot gnome >/dev/null && mv "$VM/shots/gnome.png" "$OUT/"
 "$V" key esc
-"$V" run "gnome-session-quit --logout --no-prompt" || true
-sleep 20
-"$V" shot gdm >/dev/null && mv "$VM/shots/gdm.png" "$OUT/"
+"$V" key meta_l a
+sleep 4
+"$V" shot gnome-apps >/dev/null && mv "$VM/shots/gnome-apps.png" "$OUT/"
+"$V" key esc
 
-log "Xfce: the pieces picked in its settings, Thunar and a notification"
+log "Xfce: the pieces picked in its settings, the Settings Manager and a notification"
 "$V" desktop xfce
 "$V" run "xfconf-query -c xsettings -p /Net/ThemeName -s openSUSE-halloween
           xfconf-query -c xsettings -p /Net/IconThemeName -s openSUSE-halloween-adwaita
@@ -66,9 +67,10 @@ log "Xfce: the pieces picked in its settings, Thunar and a notification"
                   -s /usr/share/backgrounds/openSUSEhalloween/night.jpg
               xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor\$m/workspace\$w/image-style -n -t int -s 5
           done
-          nohup thunar ~ >/dev/null 2>&1 &
+          nohup xfce4-settings-manager >/dev/null 2>&1 &
           sleep 5
           notify-send -i folder-pictures 'Happy Halloween' 'The openSUSE Halloween theme is installed.'"
+"$V" point 1500 900   # over the wallpaper: no tooltip in the shot
 sleep 4
 "$V" shot xfce >/dev/null && mv "$VM/shots/xfce.png" "$OUT/"
 

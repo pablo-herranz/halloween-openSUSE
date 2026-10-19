@@ -28,8 +28,8 @@ TARGETS = {
 # README images: (screenshot, width). The hero is full width, the gallery
 # shows two per row.
 WEB = {
-    "desktop.jpg": ("desktop-light.png", 1600),
-    "desktop-night.jpg": ("desktop-dark.png", 960),
+    "desktop.jpg": ("desktop-dark.png", 1600),
+    "desktop-dusk.jpg": ("desktop-light.png", 960),
     "launcher.jpg": ("kickoff.png", 960),
     "dolphin.jpg": ("dolphin.png", 960),
     "file-types.jpg": ("dolphin-file-types.png", 960),
@@ -39,8 +39,8 @@ WEB = {
     "clock.jpg": ("clock.png", 960),
     "firefox.jpg": ("firefox.png", 960),
     "gnome.jpg": ("gnome.png", 960),
+    "gnome-apps.jpg": ("gnome-apps.png", 960),
     "xfce.jpg": ("xfce.png", 960),
-    "gdm.jpg": ("gdm.png", 960),
 }
 
 

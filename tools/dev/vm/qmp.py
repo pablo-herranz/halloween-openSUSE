@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Talk to the test VM's QEMU monitor (QMP), for vm.sh.
 
-usage: qmp.py SOCKET shot FILE.png | key KEY... | click X Y | quit
+usage: qmp.py SOCKET shot FILE.png | key KEY... | point X Y | click X Y | quit
 Keys are QEMU qcodes (esc, ret, meta_l, s, …); X Y are pixels of the VM's
 display ($HALLOWEEN_VM_RES, 1920x1080 by default), sent through its USB tablet.
 """
@@ -38,11 +38,11 @@ def main():
         cmd("screendump", filename=args[0], format="png")
     elif what == "key":
         cmd("send-key", keys=[{"type": "qcode", "data": k} for k in args])
-    elif what == "click":
+    elif what in ("point", "click"):
         x, y = (round(int(v) / size * 32767) for v, size in zip(args, (WIDTH, HEIGHT), strict=True))
         cmd("input-send-event", events=[{"type": "abs", "data": {"axis": "x", "value": x}},
                                         {"type": "abs", "data": {"axis": "y", "value": y}}])
-        for down in (True, False):
+        for down in (True, False) if what == "click" else ():
             cmd("input-send-event", events=[{"type": "btn", "data": {"down": down, "button": "left"}}])
     elif what == "quit":
         cmd("quit")

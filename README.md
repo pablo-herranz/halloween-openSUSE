@@ -5,28 +5,28 @@ and Xfce: warm candle-lit colours, falling leaves, carved pumpkins and a
 friendly chameleon in a witch hat.
 
 [![Check](https://github.com/plusky/halloween-openSUSE/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/plusky/halloween-openSUSE/actions/workflows/check.yml)
-[![Licence: multiple (REUSE)](https://img.shields.io/badge/licence-multiple_(REUSE)-blue)](#licence)
-[![KDE Plasma 6.8+](https://img.shields.io/badge/KDE_Plasma-6.8%2B-1d99f3)](https://kde.org/plasma-desktop/)
-[![GNOME 50+](https://img.shields.io/badge/GNOME-50%2B-4a86cf)](https://www.gnome.org/)
-[![Xfce 4.20+](https://img.shields.io/badge/Xfce-4.20%2B-2284f2)](https://www.xfce.org/)
-[![openSUSE Tumbleweed](https://img.shields.io/badge/openSUSE-Tumbleweed-73ba25)](https://get.opensuse.org/tumbleweed/)
+[![Licence: multiple (REUSE)](https://img.shields.io/badge/licence-multiple_(REUSE)-a77bca?labelColor=1c1622)](#licence)
+[![KDE Plasma 6.8+](https://img.shields.io/badge/KDE_Plasma-6.8%2B-e8751a?labelColor=1c1622)](https://kde.org/plasma-desktop/)
+[![GNOME 50+](https://img.shields.io/badge/GNOME-50%2B-e8751a?labelColor=1c1622)](https://www.gnome.org/)
+[![Xfce 4.20+](https://img.shields.io/badge/Xfce-4.20%2B-e8751a?labelColor=1c1622)](https://www.xfce.org/)
+[![openSUSE Tumbleweed](https://img.shields.io/badge/openSUSE-Tumbleweed-f0b429?labelColor=1c1622)](https://get.opensuse.org/tumbleweed/)
 
-<img src="docs/screenshots/desktop.jpg" width="100%" alt="KDE Plasma desktop with a storybook wallpaper: a green chameleon in a purple witch hat and striped scarf sits on a mossy branch beside three glowing jack-o'-lanterns, birch trees and a rising harvest moon at dusk. The panel at the bottom shows the chameleon launcher and pumpkin-orange app icons.">
+<img src="docs/screenshots/desktop.jpg" width="100%" alt="KDE Plasma desktop with a storybook wallpaper at night: a green chameleon in a purple witch hat and striped scarf sits on a mossy branch beside three glowing jack-o'-lanterns, under a full moon among birch trees. The panel at the bottom shows the chameleon launcher and pumpkin-orange app icons.">
 
 | | |
 |---|---|
 | <img src="docs/screenshots/launcher.jpg" alt="The application launcher in dark plum colours, with Halloween icons for apps, categories and power actions"> | <img src="docs/screenshots/dolphin.jpg" alt="Dolphin file manager with orange folders, each carrying an emblem such as a scroll, an acorn or a film reel"> |
 | App launcher | Dolphin with the folder icons |
-| <img src="docs/screenshots/desktop-night.jpg" alt="The same wallpaper at night, with stars and the lanterns glowing"> | <img src="docs/screenshots/login.jpg" alt="Login screen over a blurred night version of the wallpaper"> |
-| The wallpaper at night | Login screen (SDDM) |
+| <img src="docs/screenshots/desktop-dusk.jpg" alt="The same wallpaper at dusk, with a rising harvest moon"> | <img src="docs/screenshots/login.jpg" alt="Login screen over a blurred night version of the wallpaper"> |
+| The wallpaper at dusk | Login screen (SDDM) |
 | <img src="docs/screenshots/file-types.jpg" alt="Dolphin showing file icons: cream pages with pumpkin emblems for text, PDF, images, music, video, archives, web pages and scripts"> | <img src="docs/screenshots/firefox.jpg" alt="Firefox with plum toolbars and the moonlit forest behind the tabs"> |
 | File types | Firefox theme |
 | <img src="docs/screenshots/splash.jpg" alt="Splash screen: the chameleon hugging a jack-o'-lantern above five small lanterns lighting up one by one"> | <img src="docs/screenshots/clock.jpg" alt="An analog clock widget with a carved pumpkin face on the desktop"> |
 | Splash screen | Pumpkin clock |
-| <img src="docs/screenshots/gnome.jpg" alt="GNOME with the night wallpaper: Files shows orange folders with emblems, and the quick settings menu has plum panels with ember-orange toggles"> | <img src="docs/screenshots/xfce.jpg" alt="Xfce with the night wallpaper: Thunar in dark plum with orange folders, plum window title bar, a dark panel with a pumpkin task button and a Halloween notification"> |
+| <img src="docs/screenshots/gnome.jpg" alt="GNOME with the night wallpaper: Files shows orange folders with emblems, and the quick settings menu has plum panels with ember-orange toggles"> | <img src="docs/screenshots/xfce.jpg" alt="Xfce with the night wallpaper: the Settings Manager in dark plum, each setting a glyph carved into a pumpkin, a plum window title bar, a dark panel and a Halloween notification"> |
 | GNOME | Xfce |
-| <img src="docs/screenshots/lockscreen.jpg" alt="The Plasma lock screen: a large clock over the night wallpaper with the chameleon and lanterns"> | <img src="docs/screenshots/gdm.jpg" alt="The GNOME login screen in its dark style, with an orange focus ring on the user name field"> |
-| Lock screen (Plasma) | Login screen (GDM) |
+| <img src="docs/screenshots/lockscreen.jpg" alt="The Plasma lock screen: a large clock over the night wallpaper with the chameleon and lanterns"> | <img src="docs/screenshots/gnome-apps.jpg" alt="GNOME's app grid over the night wallpaper: calculator, clocks, maps, mail, music and the other apps in the theme's flat autumn style"> |
+| Lock screen (Plasma) | GNOME apps |
 
 ## What's included
 
@@ -36,7 +36,7 @@ friendly chameleon in a witch hat.
 | Plasma style: autumn colours, leaf sprig on popups, ember tooltip glow, pumpkin clock | `openSUSE-halloween` | Plasma |
 | Colour scheme | `openSUSEHalloween` | Plasma and KDE apps |
 | Global theme with a pumpkin splash screen | `org.openSUSE.halloween.desktop` | Plasma |
-| Icon theme over Breeze Dark: folders, file types, drives, trash, the common apps (files, terminal, settings, editor, image viewer, software, system monitor, archives, scanner, screenshots, also for GNOME's and Xfce's own apps), a web-browser icon (also for Firefox), app-menu and power icons | `openSUSE-halloween` | Plasma |
+| Icon theme over Breeze Dark: folders, file types, drives and devices, trash, the apps KDE, GNOME and Xfce ship by default (files, terminal, settings, editor, calculator, clocks, mail, maps, music, videos and more) and YaST, settings dialogs as glyphs carved into pumpkins, a web-browser icon (also for Firefox), app-menu and power icons | `openSUSE-halloween` | Plasma |
 | The same icons over Adwaita | `openSUSE-halloween-adwaita` | GNOME, Xfce |
 | GTK 3 theme: night colours with ember and pumpkin accents, built on [adw-gtk3](https://github.com/lassekongo83/adw-gtk3) | `openSUSE-halloween` | GNOME, Xfce, GTK 3 apps |
 | GNOME Shell theme: top bar, menus, quick settings, calendar | `openSUSE-halloween` | GNOME with the User Themes extension |
