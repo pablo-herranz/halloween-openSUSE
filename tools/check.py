@@ -308,8 +308,9 @@ def check_icons():
     n = 0
     for f in sorted(icons.rglob("*.svg")):
         rel = f.relative_to(icons)
-        if not re.fullmatch(r"[a-z0-9][a-z0-9._+-]*\.svg", f.name):
-            fail(f"icon {rel}: name has characters other than a-z, 0-9 and ._+-")
+        # Reverse-DNS app IDs keep their capitals (org.gnome.Nautilus)
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._+-]*\.svg", f.name):
+            fail(f"icon {rel}: name has characters other than letters, digits and ._+-")
         section = dirs.get(str(rel.parent))
         if section is None:
             fail(f"icon {rel}: its directory isn't listed in index.theme")
