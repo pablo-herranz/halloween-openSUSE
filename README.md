@@ -17,8 +17,10 @@ a witch hat.
 | App launcher | Dolphin with the folder icons |
 | <img src="docs/screenshots/desktop-night.jpg" alt="The same wallpaper at night, with stars and the lanterns glowing"> | <img src="docs/screenshots/login.jpg" alt="Login screen over a blurred night version of the wallpaper"> |
 | The wallpaper at night | Login screen (SDDM) |
-| <img src="docs/screenshots/splash.jpg" alt="Splash screen: the chameleon hugging a jack-o'-lantern above five small lanterns lighting up one by one"> | <img src="docs/screenshots/firefox.jpg" alt="Firefox with plum toolbars and the moonlit forest behind the tabs"> |
-| Splash screen | Firefox theme |
+| <img src="docs/screenshots/file-types.jpg" alt="Dolphin showing file icons: cream pages with pumpkin emblems for text, PDF, images, music, video, archives, web pages and scripts"> | <img src="docs/screenshots/firefox.jpg" alt="Firefox with plum toolbars and the moonlit forest behind the tabs"> |
+| File types | Firefox theme |
+| <img src="docs/screenshots/splash.jpg" alt="Splash screen: the chameleon hugging a jack-o'-lantern above five small lanterns lighting up one by one"> | <img src="docs/screenshots/clock.jpg" alt="An analog clock widget with a carved pumpkin face on the desktop"> |
+| Splash screen | Pumpkin clock |
 
 ## What's included
 
@@ -28,7 +30,7 @@ a witch hat.
 | Plasma style: autumn colours, leaf sprig on popups, ember tooltip glow, pumpkin clock | `openSUSE-halloween` | Plasma |
 | Colour scheme | `openSUSEHalloween` | Plasma and KDE apps |
 | Global theme with a pumpkin splash screen | `org.openSUSE.halloween.desktop` | Plasma |
-| Icon theme: folders, places, trash, KDE apps, app-menu and power icons over Breeze Dark | `openSUSE-halloween` | any freedesktop desktop |
+| Icon theme over Breeze Dark: folders, file types, drives, trash, KDE apps, a web-browser icon (also for Firefox), app-menu and power icons | `openSUSE-halloween` | any freedesktop desktop |
 | Login screen, built on openSUSE's `breeze-openSUSE` | `breeze-openSUSE-halloween` | SDDM |
 | Boot splash | `openSUSE-halloween` | Plymouth |
 | Firefox theme: plum toolbars, pumpkin accents, the moonlit forest behind the tabs | `openSUSE-halloween@pluskal.org` | Firefox |

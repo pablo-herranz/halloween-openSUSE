@@ -32,6 +32,7 @@ WEB = {
     "desktop-night.jpg": ("desktop-dark.png", 960),
     "launcher.jpg": ("kickoff.png", 960),
     "dolphin.jpg": ("dolphin.png", 960),
+    "file-types.jpg": ("dolphin-file-types.png", 960),
     "login.jpg": ("sddm.png", 960),
     "splash.jpg": ("splash.png", 960),
     "lockscreen.jpg": ("lockscreen.png", 960),

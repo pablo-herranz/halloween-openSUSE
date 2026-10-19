@@ -19,9 +19,10 @@ The first release, 2026.10.0, is being prepared.
   - global theme `org.openSUSE.halloween.desktop` with a splash screen whose
     lanterns light up as the session starts
   - SDDM login theme `breeze-openSUSE-halloween`
-- Icon theme `openSUSE-halloween` over Breeze Dark: folders and places, trash,
-  the launcher, KDE apps, the app menu's categories and the power and session
-  actions; symbolic icons follow the colour scheme
+- Icon theme `openSUSE-halloween` over Breeze Dark: folders and places, file
+  types, drives and removable media, trash, the launcher, KDE apps, an
+  original web-browser icon used for Firefox too, the app menu's categories
+  and the power and session actions; symbolic icons follow the colour scheme
 - Plymouth boot splash `openSUSE-halloween`
 - Firefox theme
 - Install, uninstall, verify and screenshot scripts

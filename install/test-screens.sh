@@ -96,11 +96,23 @@ widgets() {
 }
 
 dolphin() {
-    pgrep -u "$(id -u)" -x dolphin >/dev/null && die "close Dolphin first; this test closes the window it opens"
+    pgrep -u "$(id -u)" -x dolphin >/dev/null && die "close Dolphin first; this test closes the windows it opens"
     WAYLAND_DISPLAY=$WL command dolphin --new-window "$HOME" >/dev/null 2>&1 &
     sleep 9     # the first start with KDE's platform theme is slow
     shot dolphin
     pkill -u "$(id -u)" -x dolphin
+    sleep 1
+
+    # File type icons: a throwaway folder with one empty file of each kind
+    local demo
+    demo=$(mktemp -d -t halloween-file-types.XXXXXX)
+    touch "$demo"/{notes.txt,letter.pdf,photo.png,song.mp3,film.mp4,backup.zip,page.html,script.py,data.json}
+    printf '#!/bin/sh\n' > "$demo/program" && chmod +x "$demo/program"
+    WAYLAND_DISPLAY=$WL command dolphin --new-window "$demo" >/dev/null 2>&1 &
+    sleep 6
+    shot dolphin-file-types
+    pkill -u "$(id -u)" -x dolphin
+    rm -rf "$demo"
 }
 
 firefox() {

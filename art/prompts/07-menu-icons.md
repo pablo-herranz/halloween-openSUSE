@@ -4,9 +4,9 @@ Goal: every icon in the app launcher Halloween-themed, including Discover
 (the store). Icon names come from the Kickoff and kicker
 binaries on Plasma 6.8 and the menu's `.desktop` and `.directory` files.
 
-Not redrawn: brand logos of other projects (Firefox, Qt D-Bus Viewer, the
-ArtCraft suite, btop), like the distribution logo. A Halloween Firefox look
-belongs in a Firefox theme instead.
+Not redrawn: brand logos of other projects (Qt D-Bus Viewer, the ArtCraft
+suite, btop), like the distribution logo. Firefox gets the original
+web-browser icon from [08](08-more-icons.md), not a modified Firefox logo.
 
 ## Colour app icons
 

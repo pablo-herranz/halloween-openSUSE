@@ -1,6 +1,6 @@
 [Icon Theme]
 Name=openSUSE Halloween
-Comment=Autumn Halloween places, app, menu and launcher icons over Breeze Dark
+Comment=Autumn Halloween folders, file types, devices, apps, menu and launcher icons over Breeze Dark
 Inherits=breeze-dark,breeze,hicolor
 FollowsColorScheme=true
 DesktopDefault=48
@@ -8,7 +8,7 @@ ToolbarDefault=22
 PanelDefault=48
 DialogDefault=32
 # 16x16 comes first so its hand-simplified icons win at 16 px
-Directories=16x16/places,scalable/places,scalable/apps,scalable/categories,scalable/actions
+Directories=16x16/places,scalable/places,scalable/apps,scalable/categories,scalable/actions,scalable/mimetypes,scalable/devices
 
 [16x16/places]
 Size=16
@@ -41,4 +41,18 @@ Size=16
 MinSize=16
 MaxSize=512
 Context=Actions
+Type=Scalable
+
+[scalable/mimetypes]
+Size=64
+MinSize=16
+MaxSize=512
+Context=MimeTypes
+Type=Scalable
+
+[scalable/devices]
+Size=64
+MinSize=16
+MaxSize=512
+Context=Devices
 Type=Scalable
