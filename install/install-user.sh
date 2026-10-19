@@ -58,7 +58,11 @@ install_files() {
 apply_theme() {
     log "applying look-and-feel (colours, icons, Plasma style, splash; panels untouched)"
     apply plasma-apply-lookandfeel -a "$LNF_ID"
-    # Applied again explicitly: the look-and-feel skips pieces it thinks are current
+    # Applied again explicitly: the look-and-feel skips pieces it thinks are current.
+    # Plasma caches rendered style SVGs and keeps a cached render even when the
+    # style stops shipping a file, so drop the caches and switch away and back.
+    rm -f "${XDG_CACHE_HOME:-$HOME/.cache}/plasma_theme_$STYLE_ID.kcache" "${XDG_CACHE_HOME:-$HOME/.cache}/ksvg-elements"
+    apply plasma-apply-desktoptheme default >/dev/null 2>&1 || true
     apply plasma-apply-desktoptheme "$STYLE_ID" || true
     apply plasma-apply-colorscheme "$SCHEME_ID" || true
     kwriteconfig6 --file kdeglobals --group Icons --key Theme "$ICONS_ID"

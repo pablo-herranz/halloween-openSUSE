@@ -5,8 +5,8 @@
 
 Breeze's frame SVGs take their colours from the style's `colors` file, so most
 of the autumn look comes for free. On top of that this script:
-  - adds a leaf sprig `overlay` to popups (dialogs/background) and a vine
-    garland tiled along the panel's top edge (widgets/panel-background),
+  - adds a leaf sprig `overlay` to popups (dialogs/background) and,
+    optionally, a quiet tiled decoration to the panel (widgets/panel-background),
   - tints the tooltip shadow ember so tooltips glow warmly,
   - swaps the analog clock face for a carved pumpkin with dark hands.
 It does this for all four Breeze variants (plain, translucent, opaque, solid)
@@ -14,6 +14,7 @@ so Plasma never falls back to an unthemed Breeze frame.
 """
 
 import argparse
+import os
 import re
 import shutil
 import tomllib
@@ -30,8 +31,18 @@ VARIANTS = ("", "translucent/", "opaque/", "solid/")
 # Ornament placement: (ornament file, target height in px, opacity, hint elements)
 OVERLAYS = {
     "dialogs/background.svg": ("popup-sprig.svg", 40, 0.4, ["hint-overlay-pos-right"]),
-    "widgets/panel-background.svg": ("panel-garland.svg", 12, 0.7, ["hint-overlay-tile-horizontal"]),
 }
+# The panel's decoration sits under every panel item (launcher, tasks, tray,
+# clock), so only a quiet pattern tiled along its length works on any panel
+# length and screen; a single ornament would always land under the launcher
+# or the clock. HALLOWEEN_PANEL=trim|leaves|none picks one for trials.
+PANEL_DECORATIONS = {
+    "trim": ("panel-trim.svg", 3, 0.85, ["hint-overlay-tile-horizontal"]),
+    "leaves": ("panel-leaves.svg", 40, 1.0, ["hint-overlay-tile-horizontal"]),
+}
+PANEL = os.environ.get("HALLOWEEN_PANEL", "none")
+if PANEL in PANEL_DECORATIONS:
+    OVERLAYS["widgets/panel-background.svg"] = PANEL_DECORATIONS[PANEL]
 ORNAMENTS = [o[0] for o in OVERLAYS.values()] + ["clock-face.svg"]
 TOOLTIP_SHADOW = ("widgets/tooltip.svg", "ember", 1.8)
 

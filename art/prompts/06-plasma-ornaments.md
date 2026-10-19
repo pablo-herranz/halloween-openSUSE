@@ -17,21 +17,13 @@ Chose **2** (adds a gold leaf): `sprig.svg`, cropped to its content. Its
 backdrop comes in several pieces where the twig touches the edge; white
 pieces touching the canvas edge are dropped.
 
-## Panel garland (widgets/panel-background overlay, tiled)
+## Panel garland (dropped)
 
-Aspect ratio 2:1:
-
-> A thin horizontal autumn vine garland border that spans the full width,
-> entering at the left edge and leaving at the right edge at exactly
-> mid-height: a gently waving dark brown vine with small maple leaves in
-> pumpkin orange (#E8751A), ember red (#B84A17) and candle gold (#F0B429),
-> evenly spaced. Flat vector, few colours, no outlines, no gradients, no
-> texture, no shadow, plain white background. No text, no lettering, no
-> watermark, no signature.
-
-Chose **2** (clearer wave): `garland.svg`. The tile is the garland followed
-by its mirror image, so the ends always meet. It is drawn 12 px tall, so it
-reads as a fine festive trim; coordinates are cut to 3 significant digits.
+A tiled vine garland along the panel's top edge, from a 2:1
+`recraftv4_1_utility_vector` render ("a thin horizontal autumn vine garland
+border that spans the full width …"). On the real panel it read as
+a busy dotted line and the owner found it disruptive, so it was removed on
+2026-10-19: the panel keeps Breeze's plain frame in the autumn colours.
 
 ## Clock face (widgets/clock.svg `ClockFace`)
 

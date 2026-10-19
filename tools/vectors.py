@@ -381,10 +381,32 @@ def icons(palette):
 
 # --- Plasma style ornaments ------------------------------------------------------
 
+def panel_decoration(stem, palette):
+    """Tiled panel decorations: a thin pumpkin trim, or faint tone-on-tone
+    leaves made from the master folder's leaf. No leaf crosses the tile edge,
+    so the tile repeats seamlessly."""
+    if stem == "panel-trim":
+        return svg(f'<rect width="96" height="2" fill="{palette["pumpkin"]}"/>'
+                   f'<rect y="2" width="96" height="1" fill="{palette["ember"]}" opacity="0.6"/>', (0, 0, 96, 3))
+    folder = load("folder")
+    if folder is None:
+        return None
+    _, leaf, _ = split_folder(folder)
+    box = union(s.bbox() for s in leaf)
+    shape = "".join(s.markup(palette["plum"]) for s in leaf if luminance(s.colour) > 0.93)
+    leaves = ""
+    for x, y, size, turn, alpha in ((14, 8, 22, -20, 0.13), (86, 20, 15, 35, 0.10), (150, 5, 19, 12, 0.12)):
+        leaves += (f'<g opacity="{alpha}" transform="rotate({turn} {x + size / 2} {y + size / 2})">'
+                   + fit(shape, box, (x, y, size)) + "</g>")
+    return tidy(svg(leaves, (0, 0, 192, 40)))
+
+
 def ornament(name, palette):
     """SVG text for plasma/desktoptheme ornaments/<name>, or None without a master."""
     stem = name.removesuffix(".svg")
-    shapes = load({"popup-sprig": "sprig", "panel-garland": "garland", "clock-face": "clock"}[stem])
+    if stem.startswith("panel-"):
+        return panel_decoration(stem, palette)
+    shapes = load({"popup-sprig": "sprig", "clock-face": "clock"}[stem])
     if shapes is None:
         return None
     # Ornaments have no white of their own: any left is backdrop trapped
@@ -396,13 +418,6 @@ def ornament(name, palette):
         pad = (x1 - x0) * 0.02
         w, h = x1 - x0 + 2 * pad, y1 - y0 + 2 * pad
         return tidy(svg(f'<g transform="translate({pad - x0:g} {pad - y0:g})">{markup}</g>', (0, 0, w, h)))
-    if stem == "panel-garland":
-        # A seamless tile: the garland, then its mirror image, so both ends
-        # meet. It is drawn only 8-12 px tall, so 3 significant digits do.
-        w, h = x1 - x0, y1 - y0
-        tile = (f'<g transform="translate({-x0:g} {-y0:g})">{markup}</g>'
-                f'<g transform="translate({2 * w + x0:g} {-y0:g}) scale(-1 1)">{markup}</g>')
-        return tidy(svg(tile, (0, 0, 2 * w, h)), precision=3)
     # clock-face: the pumpkin body centred on (100, 100), which the hands turn
     # around; the invisible rect keeps the element exactly 200x200.
     body = [s for s in shapes if s.colour[0] > 150 and s.colour[0] > s.colour[2] + 60]
