@@ -58,11 +58,7 @@ install_files() {
 apply_theme() {
     log "applying look-and-feel (colours, icons, Plasma style, splash; panels untouched)"
     apply plasma-apply-lookandfeel -a "$LNF_ID"
-    # Applied again explicitly: the look-and-feel skips pieces it thinks are current.
-    # Plasma caches rendered style SVGs and keeps a cached render even when the
-    # style stops shipping a file, so drop the caches and switch away and back.
-    rm -f "${XDG_CACHE_HOME:-$HOME/.cache}/plasma_theme_$STYLE_ID.kcache" "${XDG_CACHE_HOME:-$HOME/.cache}/ksvg-elements"
-    apply plasma-apply-desktoptheme default >/dev/null 2>&1 || true
+    # Applied again explicitly: the look-and-feel skips pieces it thinks are current
     apply plasma-apply-desktoptheme "$STYLE_ID" || true
     apply plasma-apply-colorscheme "$SCHEME_ID" || true
     kwriteconfig6 --file kdeglobals --group Icons --key Theme "$ICONS_ID"
@@ -80,7 +76,18 @@ apply_theme() {
     kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key PreviewImage "$WALLPAPER_URL"
 }
 
+# Plasma keeps rendered style SVGs in memory and in ~/.cache, even for files a
+# newer version no longer ships. On an upgrade, drop the caches and restart the
+# shell; panels, widgets and open windows stay as they are.
+reload_shell() {
+    log "upgrade: clearing Plasma's style caches and restarting plasmashell"
+    rm -f "${XDG_CACHE_HOME:-$HOME/.cache}/plasma_theme_$STYLE_ID.kcache" "${XDG_CACHE_HOME:-$HOME/.cache}/ksvg-elements"
+    systemctl --user restart plasma-plasmashell.service || warn "restart plasmashell or log out and in to see every change"
+}
+
+[ -d "$DATA/plasma/desktoptheme/$STYLE_ID" ] && upgrade=1 || upgrade=0
 save_state
 install_files
 apply_theme
+[ "$upgrade" = 1 ] && reload_shell
 log "done. Undo with: $(dirname "$0")/uninstall-user.sh"

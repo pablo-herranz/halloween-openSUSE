@@ -163,6 +163,7 @@ def build_look_and_feel(p, wallpapers, hero, lit, unlit):
           + "".join(f'var {k} = "{p[k]}";\n' for k in ("night", "cream", "pumpkin", "candle")))
 
     previews = out / "contents/previews"
+    previews.mkdir(parents=True, exist_ok=True)
     shots = ROOT / "art/previews"
     made = {
         "preview.png": lambda: panel_mock(crop_to(wallpapers, "dusk", 16 / 9), p).resize((600, 337), Image.LANCZOS),

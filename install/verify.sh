@@ -37,6 +37,13 @@ for image in $(plasma_script 'print(desktops().map(d => { d.currentConfigGroup =
     i=$((i + 1))
 done
 check "lock screen wallpaper" "$(kread kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image)" "$URL"
+# Plasma looks in ~/.local/share first and /usr/local/share after, per file:
+# a stale system copy shows through wherever the user copy lacks a file
+for d in "plasma/desktoptheme/$STYLE_ID" "icons/$ICONS_ID" "plasma/look-and-feel/$LNF_ID" "wallpapers/$WALLPAPER_ID"; do
+    [ -d "/usr/local/share/$d" ] && [ -d "$DATA/$d" ] || continue
+    diff -rq "$DATA/$d" "/usr/local/share/$d" >/dev/null && v=same || v=different
+    check "system copy, $(basename "$d")" "$v" same
+done
 
 echo "Login screen (SDDM)"
 current=$(cat /usr/lib/sddm/sddm.conf.d/*.conf /etc/sddm.conf.d/*.conf /etc/sddm.conf 2>/dev/null \

@@ -4,3 +4,6 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# iCloud Drive conflict copies (the project folder is synced)
+* [0-9].*
