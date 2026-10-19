@@ -257,9 +257,15 @@ SYMBOLIC = {
 }
 SYMBOLIC_SIZE = 16
 
-# GNOME Settings' sidebar: master -> its panels' one-colour icons. Bluetooth
-# (the rune is a trademark), Wi-Fi, the mobile network and Sharing (it sits
-# next to Network) keep Adwaita's.
+# GNOME Settings' sidebar and the rows of its pages (tools/upstream.toml,
+# [references] gnome-settings-panels, */cc-*-panel.blp): master -> the icons named
+# org.gnome.Settings-<name>-symbolic. Adwaita's stay where no glyph fits or
+# ours would repeat one on the same screen: Bluetooth (the rune is a
+# trademark), Wi-Fi, the mobile network, Sharing (it sits next to Network);
+# System's Remote Desktop, Secure Shell and Software Updates; Privacy's
+# Camera, Thunderbolt and Device Security (the shield is Privacy's own);
+# Accessibility's Seeing, Hearing, Typing and Zoom (the note, keyboard and
+# magnifier are Sound's, Keyboard's and Search's in the sidebar).
 GNOME_SETTINGS = {
     "glyph-crystal": ("about",), "glyph-access": ("accessibility",), "glyph-brush": ("appearance",),
     "glyph-apps": ("applications",), "glyph-palette": ("color",), "emblem-monitor": ("display",),
@@ -267,7 +273,10 @@ GNOME_SETTINGS = {
     "glyph-web": ("network",), "glyph-bell": ("notifications",), "glyph-cloud": ("online-accounts",),
     "glyph-battery": ("power",), "glyph-printer": ("printers",), "glyph-shield": ("privacy",),
     "glyph-globe": ("region",), "glyph-magnifier": ("search",), "emblem-note": ("sound",), "glyph-gear": ("system",),
-    "glyph-hourglass": ("time",), "glyph-stylus": ("wacom",), "glyph-heart": ("wellbeing",),
+    "glyph-hourglass": ("time", "screen-time"), "glyph-stylus": ("wacom",), "glyph-heart": ("wellbeing",),
+    "glyph-ghosts": ("users",), "glyph-lock": ("screen-lock",), "glyph-signpost": ("location-access", "network-proxy"),
+    "glyph-broom": ("trash-file-history",), "glyph-speech": ("device-diagnostics",),
+    "glyph-cursor": ("accessibility-pointing",),
 }
 
 

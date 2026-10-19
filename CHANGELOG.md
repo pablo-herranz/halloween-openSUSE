@@ -6,6 +6,13 @@ calendar-based: `YEAR.MONTH.PATCH`, the month without a leading zero.
 
 ## [Unreleased]
 
+### Added
+
+- One-colour icons for rows on GNOME Settings' pages: Users, Screen Lock,
+  Location, File History & Trash, Diagnostics, Proxy, Pointing and Clicking
+  and Screen Time. Rows that no glyph fits, or where ours would repeat one
+  beside it, keep Adwaita's.
+
 ### Changed
 
 - One-colour icons come hinted for 16 px, in `16x16/`: their level edges are
