@@ -39,11 +39,14 @@ masters, the placeholder list) and runs every target in
 | Target | Desktop | Output |
 |---|---|---|
 | `wallpapers` | shared | `build/user/wallpapers/openSUSEhalloween/` |
-| `icons` | shared | `build/user/icons/openSUSE-halloween/` (via `tools/vectors.py`) |
+| `icons` | shared | `build/user/icons/openSUSE-halloween/` (via `tools/vectors.py`) and `openSUSE-halloween-adwaita/` |
 | `plymouth` | shared | `build/root/plymouth/openSUSE-halloween/` |
 | `firefox` | shared | `build/firefox/` (unpacked theme and `.xpi`) |
 | `plasma` | plasma | colour scheme, Plasma style (via `tools/plasma_style.py`), global theme |
 | `sddm` | plasma | `build/root/sddm/breeze-openSUSE-halloween/` |
+| `gtk` | gnome, xfce | `build/user/themes/openSUSE-halloween/gtk-3.0/` (adw-gtk3-dark, recoloured) |
+| `gnome` | gnome | Shell stylesheet, `gnome-background-properties/`, defaults in `build/defaults/` |
+| `xfce` | xfce | `build/user/themes/openSUSE-halloween{,-hdpi,-xhdpi}/xfwm4/`, notification theme |
 
 `build.py --desktop plasma` builds the shared targets plus Plasma's. A
 target's `DESKTOP` can also be a tuple, for a piece several desktops share.
@@ -52,6 +55,11 @@ target's `DESKTOP` can also be a tuple, for a piece several desktops share.
 theme and `build/defaults/` the optional defaults.
 `build/MANIFEST.sha256` lists every installable file; the same masters always
 give the same manifest.
+
+The GTK 3 theme and the xfwm4 theme aren't drawn from scratch either:
+`upstream_archive()` in `tools/common.py` fetches adw-gtk3's and xfwm4's
+release archives, pinned by SHA-256 in `tools/upstream.toml`, and the targets
+set their named colours from the palette.
 
 The Plasma style is not drawn from scratch: `tools/plasma_style.py` fetches
 Breeze's SVGs pinned by hash in `tools/upstream.toml` and adds the ornaments,
@@ -100,8 +108,8 @@ the login screen and boot splash, for trying changes on a test machine.
 
 ## Adding a desktop
 
-GNOME and Xfce are planned; see [gnome/](../gnome/) and [xfce/](../xfce/).
-To add one:
+Plasma, GNOME and Xfce are built; [gnome/](../gnome/) and [xfce/](../xfce/)
+describe the newer two. To add another:
 
 1. Put its hand-written sources in a top-level directory named after it.
 2. Add target modules in `tools/targets/` with `DESKTOP = "<desktop>"`, and

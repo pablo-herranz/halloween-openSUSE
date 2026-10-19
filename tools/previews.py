@@ -38,6 +38,9 @@ WEB = {
     "lockscreen.jpg": ("lockscreen.png", 960),
     "clock.jpg": ("clock.png", 960),
     "firefox.jpg": ("firefox.png", 960),
+    "gnome.jpg": ("gnome.png", 960),
+    "xfce.jpg": ("xfce.png", 960),
+    "gdm.jpg": ("gdm.png", 960),
 }
 
 

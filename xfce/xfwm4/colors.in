@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# The colours xfwm4's default theme draws its frames and buttons with (the
+# symbolic colours in its XPM images). tools/targets/xfce.py adds them to each
+# scale's themerc, filled in from art/palette.toml; these comment lines are
+# left out.
+active_color_2=@header@
+active_hilight_2=@button@
+active_mid_2=@header@
+active_shadow_2=@complementary@
+active_text_color=@cream@
+active_text_shadow_color=@complementary@
+inactive_color_2=@night@
+inactive_hilight_2=@header@
+inactive_mid_2=@night@
+inactive_shadow_2=@complementary@
+inactive_text_color=@inactive@
+inactive_text_shadow_color=@complementary@

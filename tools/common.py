@@ -4,6 +4,8 @@
 
 import hashlib
 import re
+import shutil
+import tarfile
 import tomllib
 import urllib.request
 from pathlib import Path
@@ -69,6 +71,22 @@ def fetch(url, sha256, dest):
             raise RuntimeError(f"{url}: SHA-256 {digest} does not match the pin {sha256}")
         dest.write_bytes(data)
     return dest
+
+
+def upstream_archive(name):
+    """Unpack the release archive pinned as [archives.NAME] in tools/upstream.toml
+    into build/cache/NAME/ once, and return that folder."""
+    pin = tomllib.loads((ROOT / "tools/upstream.toml").read_text())["archives"][name]
+    archive = fetch(pin["url"], pin["sha256"], CACHE / "archives" / pin["url"].rsplit("/", 1)[1])
+    out = CACHE / name
+    stamp = out / ".sha256"
+    if not stamp.exists() or stamp.read_text() != pin["sha256"]:
+        shutil.rmtree(out, ignore_errors=True)
+        out.mkdir(parents=True)
+        with tarfile.open(archive) as tar:
+            tar.extractall(out, filter="data")
+        stamp.write_text(pin["sha256"])
+    return out
 
 
 def write(path, content, mode=None):

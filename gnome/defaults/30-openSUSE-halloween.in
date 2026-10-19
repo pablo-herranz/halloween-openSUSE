@@ -1,0 +1,5 @@
+# Installed by the optional defaults: the login screen (GDM) with the orange
+# accent and the dark style. GDM's background can't be changed.
+[org/gnome/desktop/interface]
+accent-color='orange'
+color-scheme='prefer-dark'

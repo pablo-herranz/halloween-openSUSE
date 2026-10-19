@@ -38,7 +38,7 @@ ZIZMOR_FLAGS ?= --offline
 
 lint: $(VENV)/.dev
 	$(VENV)/bin/ruff check tools
-	$(VENV)/bin/shellcheck -x -P tools/dev tools/*.sh tools/dev/*.sh
+	$(VENV)/bin/shellcheck -x -P tools/dev tools/*.sh tools/dev/*.sh tools/dev/vm/*.sh
 	PATH="$(CURDIR)/$(VENV)/bin:$$PATH" $(VENV)/bin/actionlint
 	$(VENV)/bin/zizmor $(ZIZMOR_FLAGS) .github
 	$(VENV)/bin/typos

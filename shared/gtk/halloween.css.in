@@ -1,0 +1,55 @@
+/* SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ *
+ * openSUSE Halloween: appended to adw-gtk3-dark's gtk.css by
+ * tools/targets/gtk.py. adw-gtk3's widget rules use these named colours, and a
+ * later @define-color wins, so this recolours the whole theme. The palette
+ * tokens are filled in from art/palette.toml.
+ */
+
+/* Accent: ember behind white text, pumpkin as text on the night background */
+@define-color accent_bg_color @ember@;
+@define-color accent_fg_color @white@;
+@define-color accent_color @pumpkin@;
+
+@define-color window_bg_color @night@;
+@define-color window_fg_color @cream@;
+@define-color view_bg_color @view@;
+@define-color view_fg_color @cream@;
+@define-color headerbar_bg_color @header@;
+@define-color headerbar_fg_color @cream@;
+@define-color headerbar_backdrop_color @night@;
+@define-color sidebar_bg_color @header@;
+@define-color sidebar_fg_color @cream@;
+@define-color sidebar_backdrop_color @view_alt@;
+@define-color card_fg_color @cream@;
+@define-color dialog_bg_color @button@;
+@define-color dialog_fg_color @cream@;
+@define-color popover_bg_color @button@;
+@define-color popover_fg_color @cream@;
+@define-color thumbnail_bg_color @button@;
+@define-color thumbnail_fg_color @cream@;
+@define-color panel_bg_color @complementary@;
+@define-color panel_fg_color @cream@;
+
+/* Status colours as text */
+@define-color success_color @olive@;
+@define-color warning_color @candle@;
+@define-color error_color @cranberry@;
+@define-color destructive_color @cranberry@;
+
+/* Xfce panel (xfce4-panel 4.20): night with pumpkin highlights */
+.xfce4-panel.background {
+  background-color: @complementary@;
+  color: @cream@;
+}
+
+.xfce4-panel.background button:hover {
+  background-color: alpha(@pumpkin@, 0.22);
+}
+
+.xfce4-panel.background button:checked,
+.xfce4-panel.background button:active {
+  background-color: alpha(@pumpkin@, 0.38);
+  color: @white@;
+}

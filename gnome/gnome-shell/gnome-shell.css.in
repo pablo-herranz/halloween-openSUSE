@@ -1,0 +1,93 @@
+/* SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ *
+ * openSUSE Halloween for GNOME Shell. The User Themes extension loads this on
+ * top of the Shell's own light or dark stylesheet, so it only recolours: the
+ * top bar, menus, quick settings, the calendar and on-screen displays. The
+ * accent (orange) comes from the accent-color setting. Palette tokens are
+ * filled in from art/palette.toml by tools/targets/gnome.py.
+ */
+
+#panel {
+  background-color: @night@;
+}
+
+#panel .panel-button {
+  color: @cream@;
+}
+
+#panel .panel-button:hover,
+#panel .panel-button:focus {
+  background-color: alpha(@pumpkin@, 0.22);
+}
+
+#panel .panel-button:active,
+#panel .panel-button:checked {
+  background-color: alpha(@pumpkin@, 0.38);
+  color: @white@;
+}
+
+#panel .workspace-dot {
+  background-color: @cream@;
+}
+
+.popup-menu-boxpointer .popup-menu-content,
+.candidate-popup-boxpointer .candidate-popup-content {
+  background-color: @header@;
+  color: @cream@;
+}
+
+.popup-menu-item:hover,
+.popup-menu-item:focus {
+  background-color: alpha(@pumpkin@, 0.22);
+}
+
+.quick-settings {
+  background-color: @header@;
+  color: @cream@;
+}
+
+.quick-toggle,
+.quick-menu-toggle .quick-toggle {
+  background-color: @button@;
+  color: @cream@;
+}
+
+.quick-toggle:checked,
+.quick-menu-toggle .quick-toggle:checked,
+.quick-menu-toggle .quick-toggle-arrow:checked {
+  background-color: @ember@;
+  color: @white@;
+}
+
+.quick-toggle-menu {
+  background-color: @button@;
+  color: @cream@;
+}
+
+.datemenu-popover .calendar,
+.message-list .message {
+  background-color: @button@;
+  color: @cream@;
+}
+
+.calendar .calendar-today,
+.calendar .calendar-today:selected {
+  background-color: @ember@;
+  color: @white@;
+}
+
+.osd-window {
+  background-color: @header@;
+  color: @cream@;
+}
+
+.osd-window .level-bar {
+  background-color: @pumpkin@;
+}
+
+.switcher-popup .switcher-list,
+.workspace-switcher-container {
+  background-color: @header@;
+  color: @cream@;
+}

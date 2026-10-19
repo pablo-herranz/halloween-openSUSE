@@ -8,9 +8,9 @@ build(ctx), which writes its output into build/. tools/build.py runs them in the
 a desktop, add its modules and list them here; see docs/architecture.md.
 """
 
-from targets import firefox, icons, plasma, plymouth, sddm, wallpapers
+from targets import firefox, gnome, gtk, icons, plasma, plymouth, sddm, wallpapers, xfce
 
-TARGETS = [wallpapers, plasma, icons, sddm, plymouth, firefox]
+TARGETS = [wallpapers, plasma, icons, sddm, plymouth, firefox, gtk, gnome, xfce]
 
 
 def desktops_of(target):

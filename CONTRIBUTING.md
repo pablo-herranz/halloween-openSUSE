@@ -10,9 +10,9 @@ welcome. By taking part you agree to follow the
   open an issue with the bug form, with a screenshot if you can.
 - **Propose artwork** (an icon, a wallpaper, an ornament): open an issue with
   the art request form first, so the idea can be agreed before work starts.
-- **Add a desktop** (GNOME, Xfce): read [docs/architecture.md](docs/architecture.md)
-  and the notes in [gnome/](gnome/) or [xfce/](xfce/), then open an issue to
-  coordinate.
+- **Add a desktop** (MATE, Cinnamon, …) or improve the GNOME and Xfce
+  editions: read [docs/architecture.md](docs/architecture.md) and the notes in
+  [gnome/](gnome/) and [xfce/](xfce/), then open an issue to coordinate.
 - **Improve the build tools or install scripts.**
 
 Security problems go privately, as described in [SECURITY.md](SECURITY.md).
@@ -38,12 +38,13 @@ few pinned Breeze SVGs from invent.kde.org on its first run and caches them in
 
 | Path | What it holds |
 |---|---|
-| `shared/` | Desktop-neutral pieces: wallpapers, icon theme, Plymouth boot splash, Firefox theme |
+| `shared/` | Desktop-neutral pieces: wallpapers, icon theme, Plymouth boot splash, Firefox theme, the GTK 3 colours |
 | `plasma/` | KDE Plasma: colour scheme, Plasma style, global theme with splash, SDDM login theme |
-| `gnome/`, `xfce/` | Notes for the planned editions |
+| `gnome/` | GNOME: Shell stylesheet, defaults (GSettings override, GDM) |
+| `xfce/` | Xfce: window manager colours, notification theme |
 | `art/` | The palette, crop focus points, prompt records, and the art masters (`source/`, Git LFS) |
 | `tools/` | The build (`build.py`, `targets/`), checks (`check.py`), the installer (`install.py`) and helpers |
-| `tools/dev/` | Development helpers for a test machine: apply, verify and screenshot the theme |
+| `tools/dev/` | Development helpers for a test machine: apply, verify and screenshot the theme; `vm/` runs a GNOME and Xfce test VM |
 | `docs/` | Architecture notes and the README screenshots |
 
 Never edit anything in `build/`: it is generated. See
@@ -81,6 +82,18 @@ make install-user TARGET=user@testbox   # and install-root, plymouth
 make verify TARGET=user@testbox
 make screens TARGET=user@testbox && make fetch-screenshots TARGET=user@testbox
 make previews   # turn the screenshots into package previews and README images
+```
+
+For GNOME and Xfce, `tools/dev/vm/vm.sh` runs a throwaway Tumbleweed VM with
+both desktops on any Linux machine with KVM, headless, and takes screenshots
+through QEMU. Install a release tarball into it like a package would:
+
+```bash
+tools/dev/vm/vm.sh create                 # once: image, disk, both desktops
+make check && tools/dist.sh
+tools/dev/vm/vm.sh install dist/halloween-openSUSE-*.tar.gz
+tools/dev/vm/vm.sh desktop xfce           # or gnome; reboots and logs in
+tools/dev/vm/vm.sh shot xfce              # ~/vm-halloween/shots/xfce.png
 ```
 
 ## Commit messages

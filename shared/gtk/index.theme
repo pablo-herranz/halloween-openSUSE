@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=openSUSE Halloween
+Comment=An autumn Halloween night for GTK 3, GNOME Shell, xfwm4 and Xfce notifications
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=openSUSE-halloween
+IconTheme=openSUSE-halloween-adwaita
+MetacityTheme=openSUSE-halloween

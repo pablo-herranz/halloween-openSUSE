@@ -25,6 +25,8 @@ FIREFOX_ID = "openSUSE-halloween@pluskal.org"
 FILES = [
     ("user/wallpapers", "{datadir}/wallpapers"),
     ("user/icons", "{datadir}/icons"),
+    ("user/themes", "{datadir}/themes"),
+    ("user/gnome-background-properties", "{datadir}/gnome-background-properties"),
     ("user/color-schemes", "{datadir}/color-schemes"),
     ("user/plasma/desktoptheme", "{datadir}/plasma/desktoptheme"),
     ("user/plasma/look-and-feel", "{datadir}/plasma/look-and-feel"),
@@ -34,7 +36,12 @@ FILES = [
 ]
 DEFAULTS = [
     ("defaults/sddm.conf.d", "{sysconfdir}/sddm.conf.d"),
+    ("defaults/glib-2.0/schemas", "{datadir}/glib-2.0/schemas"),
+    ("defaults/dconf/profile", "{sysconfdir}/dconf/profile"),
+    ("defaults/dconf/db/gdm.d", "{sysconfdir}/dconf/db/gdm.d"),
 ]
+# Files that name other installed files by their /usr/share path
+REWRITE = (".xml", ".override")
 
 
 def entries(table, dirs):
@@ -52,8 +59,9 @@ def under(destdir, path):
     return Path(destdir + str(path)) if destdir else path
 
 
-def copy(src, dest):
-    """Copy a file, folder or symlink: folders 0755, files 0644, links as links."""
+def copy(src, dest, datadir):
+    """Copy a file, folder or symlink: folders 0755, files 0644, links as links.
+    Paths under /usr/share in REWRITE files follow --prefix."""
     if dest.is_symlink() or dest.is_file():
         dest.unlink()
     elif dest.is_dir() and (src.is_symlink() or not src.is_dir()):
@@ -65,7 +73,10 @@ def copy(src, dest):
         dest.mkdir(mode=0o755, exist_ok=True)
         dest.chmod(0o755)
         for child in sorted(src.iterdir()):
-            copy(child, dest / child.name)
+            copy(child, dest / child.name, datadir)
+    elif src.suffix in REWRITE and datadir != "/usr/share":
+        dest.write_text(src.read_text().replace("/usr/share/", f"{datadir}/"))
+        dest.chmod(0o644)
     else:
         shutil.copyfile(src, dest)
         dest.chmod(0o644)
@@ -97,7 +108,7 @@ def main(argv=None):
         if args.uninstall:
             remove(target)
         else:
-            copy(src, target)
+            copy(src, target, dirs["datadir"])
         if not args.quiet:
             print(f"{'removed' if args.uninstall else 'installed'} {dest}")
 

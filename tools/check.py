@@ -32,7 +32,8 @@ from common import BUILD, CACHE, FIREFOX, FIREFOX_ID, ROOT, SYSTEM, USER, VERSIO
 STYLE = USER / "plasma/desktoptheme/openSUSE-halloween"
 LNF = USER / "plasma/look-and-feel/org.openSUSE.halloween.desktop/contents"
 INI_NAMES = ("defaults", "plasmarc", "colors", "index.theme")
-INI_SUFFIXES = (".colors", ".desktop", ".plymouth", ".overrides")
+INI_SUFFIXES = (".colors", ".desktop", ".plymouth", ".overrides", ".override")
+THEMES = USER / "themes"
 
 failures = []
 
@@ -50,7 +51,7 @@ def text_files():
     for f in BUILD.rglob("*"):
         if not f.is_file() or f.relative_to(BUILD).parts[0] == "cache":
             continue
-        if f.suffix in (".json", ".qml", ".js", ".svg", ".sh", *INI_SUFFIXES) or f.name in INI_NAMES:
+        if f.suffix in (".json", ".qml", ".js", ".svg", ".sh", ".css", ".xml", *INI_SUFFIXES) or f.name in INI_NAMES:
             yield f
 
 
@@ -62,6 +63,11 @@ def check_syntax():
             try:
                 json.loads(text)
             except ValueError as e:
+                fail(f"{f.relative_to(BUILD)}: {e}")
+        elif f.suffix == ".xml":
+            try:
+                ET.parse(f)
+            except ET.ParseError as e:
                 fail(f"{f.relative_to(BUILD)}: {e}")
         elif f.suffix in INI_SUFFIXES or f.name in INI_NAMES:
             cp = configparser.ConfigParser(strict=False, interpolation=None)
@@ -232,8 +238,18 @@ def icon_dirs(icons):
 
 
 def check_icons():
+    from targets.icons import ADWAITA_ID
+    adwaita = USER / "icons" / ADWAITA_ID
+    adwaita_dirs = icon_dirs(adwaita)
+    for f in adwaita.iterdir():
+        if f.is_symlink() and not f.exists():
+            fail(f"icons {ADWAITA_ID}/{f.name}: broken symlink")
+    if "Adwaita" not in (adwaita / "index.theme").read_text():
+        fail(f"icons {ADWAITA_ID} doesn't inherit Adwaita")
     icons = USER / "icons/openSUSE-halloween"
     dirs = icon_dirs(icons)
+    if set(adwaita_dirs) != set(dirs):
+        fail(f"icons {ADWAITA_ID} lists other directories than openSUSE-halloween")
     for f in icons.rglob("*"):
         if f.is_symlink() and not f.exists():
             fail(f"icon {f.relative_to(icons)}: broken symlink")
@@ -330,6 +346,83 @@ def check_firefox():
        f"{xpi.name} {xpi.stat().st_size / 1e3:.0f} kB")
 
 
+def css_colours(text):
+    return dict(re.findall(r"@define-color\s+([a-z_0-9]+)\s+([^;]+);", text))
+
+
+def check_gtk():
+    """Every colour we set is one adw-gtk3 defines, and text stays readable."""
+    from targets.gtk import ID
+    css = (THEMES / ID / "gtk-3.0/gtk.css").read_text()
+    upstream, ours = css.split("openSUSE Halloween: appended", 1)
+    ours = css_colours(ours)
+    unknown = sorted(set(ours) - set(css_colours(upstream)))
+    if unknown:
+        fail(f"gtk theme sets colours adw-gtk3 doesn't define: {unknown}")
+    pairs = [("window_fg_color", "window_bg_color", 7.0), ("view_fg_color", "view_bg_color", 7.0),
+             ("headerbar_fg_color", "headerbar_bg_color", 7.0), ("sidebar_fg_color", "sidebar_bg_color", 7.0),
+             ("popover_fg_color", "popover_bg_color", 4.5), ("dialog_fg_color", "dialog_bg_color", 4.5),
+             ("accent_fg_color", "accent_bg_color", 4.5), ("accent_color", "window_bg_color", 4.5),
+             ("success_color", "window_bg_color", 4.5), ("warning_color", "window_bg_color", 4.5),
+             ("error_color", "window_bg_color", 4.5)]
+    worst = 99
+    for fg, bg, need in pairs:
+        c = contrast(ours[fg], ours[bg])
+        worst = min(worst, c)
+        if c < need:
+            fail(f"gtk contrast {fg} on {bg} {c:.2f}:1 < {need}:1")
+    for f in ("gtk-dark.css", "assets/check-symbolic.svg"):
+        if not (THEMES / ID / "gtk-3.0" / f).exists():
+            fail(f"gtk theme lacks gtk-3.0/{f}")
+    ok(f"gtk theme: {len(ours)} adw-gtk3 colours set, worst contrast {worst:.1f}")
+
+
+def check_xfwm4():
+    """Each scale has every image its themerc needs and sets every colour they use."""
+    from targets.gtk import ID
+    from targets.xfce import SCALES
+    parts = ["top-left", "top-right", "left", "right", "bottom", "bottom-left", "bottom-right",
+             *(f"title-{i}" for i in range(1, 6))]
+    buttons = ["close", "hide", "maximize", "maximize-toggled", "menu", "shade", "shade-toggled",
+               "stick", "stick-toggled"]
+    need = [f"{p}-{s}" for p in parts for s in ("active", "inactive")]
+    need += [f"{b}-{s}" for b in buttons for s in ("active", "inactive", "prelight", "pressed")]
+    for suffix in SCALES:
+        wm = THEMES / f"{ID}{suffix}/xfwm4"
+        rc = dict(line.split("=", 1) for line in (wm / "themerc").read_text().splitlines() if "=" in line)
+        missing = [n for n in need if not (wm / f"{n}.xpm").exists()]
+        if missing:
+            fail(f"xfwm4 {ID}{suffix} lacks {missing[:4]}")
+        symbols = {s for f in wm.glob("*.xpm") for s in re.findall(r" s ([a-z_0-9]+)\"", f.read_text())}
+        unset = sorted(s for s in symbols if s not in rc)
+        if unset:
+            fail(f"xfwm4 {ID}{suffix} themerc doesn't set {unset}")
+        if not re.fullmatch(r"#[0-9A-F]{6}", rc.get("active_color_2", "")):
+            fail(f"xfwm4 {ID}{suffix} active_color_2 isn't a palette colour")
+    ok(f"xfwm4: {len(SCALES)} scales, {len(need)} images each, every colour set")
+
+
+def check_gnome():
+    """The wallpaper entry and the defaults point at files the build installs."""
+    from targets import gnome
+    for path in (gnome.LIGHT, gnome.DARK):
+        built = USER / "wallpapers" / Path(path).relative_to("/usr/share/wallpapers")
+        if not built.exists():
+            fail(f"gnome wallpaper {path} isn't built")
+    xml = ET.parse(USER / "gnome-background-properties/openSUSEhalloween.xml")
+    if xml.findtext("wallpaper/filename-dark") != gnome.DARK:
+        fail("gnome background XML has no dark picture")
+    if not (THEMES / "openSUSE-halloween/gnome-shell/gnome-shell.css").exists():
+        fail("gnome shell theme missing")
+    for f in [*(BUILD / "defaults/dconf/db/gdm.d").iterdir(), *(BUILD / "defaults/glib-2.0/schemas").iterdir()]:
+        cp = configparser.ConfigParser(interpolation=None)
+        try:
+            cp.read_string(f.read_text())
+        except configparser.Error as e:
+            fail(f"{f.relative_to(BUILD)}: {e}")
+    ok("gnome: shell theme, wallpaper entry, gsettings and GDM defaults")
+
+
 def check_install():
     """Stage `make install` and `make install-defaults` and undo them again: the
     files land only under usr/ and etc/, and uninstalling leaves nothing behind."""
@@ -344,6 +437,13 @@ def check_install():
                 "usr/share/wallpapers/openSUSEhalloween/metadata.json",
                 "usr/share/plymouth/themes/openSUSE-halloween/openSUSE-halloween.plymouth",
                 f"usr/lib64/firefox/browser/extensions/{FIREFOX_ID}.xpi"]
+        if (THEMES / "openSUSE-halloween").exists():
+            need += ["usr/share/themes/openSUSE-halloween/gtk-3.0/gtk.css",
+                     "usr/share/icons/openSUSE-halloween-adwaita/16x16/places"]
+        if (USER / "gnome-background-properties").exists():
+            need += ["usr/share/gnome-background-properties/openSUSEhalloween.xml",
+                     "usr/share/glib-2.0/schemas/30_openSUSE-halloween.gschema.override",
+                     "etc/dconf/db/gdm.d/30-openSUSE-halloween"]
         if (SYSTEM / "sddm").exists():
             need += ["usr/share/sddm/themes/breeze-openSUSE-halloween/Main.qml",
                      "etc/sddm.conf.d/zz-openSUSE-halloween.conf"]
@@ -387,6 +487,12 @@ def main():
         check_plasma_style()
         check_look_and_feel()
         check_sddm()
+    if "gnome" in desktops or "xfce" in desktops:
+        check_gtk()
+    if "gnome" in desktops:
+        check_gnome()
+    if "xfce" in desktops:
+        check_xfwm4()
     check_install()
     check_reuse()
     placeholders = (BUILD / "placeholders.txt").read_text().split("\n") if (BUILD / "placeholders.txt").exists() else []

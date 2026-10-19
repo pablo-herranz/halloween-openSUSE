@@ -25,3 +25,14 @@ base = "https://invent.kde.org/plasma/libplasma/-/raw/v6.8.0/src/desktoptheme/br
 [kpluginmetadata]
 url = "https://invent.kde.org/sysadmin/ci-utilities/-/raw/68adf5e6e8c83db9327f7b1d2980e67fc12d548c/resources/jsonschemas/kpluginmetadata.schema.json"
 sha256 = "3c89da0d5f743c6c76529b6b672de4857feb91856fc72f142e3008b69926c437"
+
+# Release archives the GNOME and Xfce editions build on: adw-gtk3 (LGPL-2.1),
+# recoloured into the GTK 3 theme by tools/targets/gtk.py, and xfwm4 (GPL-2.0+),
+# whose default window-manager theme tools/targets/xfce.py recolours.
+[archives.adw-gtk3]
+url = "https://github.com/lassekongo83/adw-gtk3/releases/download/v6.5/adw-gtk3v6.5.tar.xz"
+sha256 = "a81780fadfc432be0fc3d89c4ebb41aa28e4f032d42c36f9789c57dd10cfa41c"
+
+[archives.xfwm4]
+url = "https://archive.xfce.org/src/xfce/xfwm4/4.20/xfwm4-4.20.0.tar.bz2"
+sha256 = "a58b63e49397aa0d8d1dcf0636be93c8bb5926779aef5165e0852890190dcf06"

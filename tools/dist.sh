@@ -26,7 +26,7 @@ mkdir -p "$out/$name/build" "$out/$name/tools"
 cp -R build/user build/root build/firefox build/defaults build/MANIFEST.sha256 "$out/$name/build/"
 cp tools/install.py "$out/$name/tools/"
 cp -R Makefile README.md CHANGELOG.md REUSE.toml LICENSES "$out/$name/"
-tar -C "$out" -czf "$out/$name.tar.gz" "$name"
+tar --no-xattrs -C "$out" -czf "$out/$name.tar.gz" "$name"
 rm -rf "${out:?}/$name"
 cp build/firefox/openSUSE-halloween.xpi "$out/$name-firefox.xpi"
 

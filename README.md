@@ -1,12 +1,14 @@
 # halloween-openSUSE
 
-A cosy autumn Halloween theme for openSUSE Tumbleweed with KDE Plasma: warm
-candle-lit colours, falling leaves, carved pumpkins and a friendly chameleon in
-a witch hat.
+A cosy autumn Halloween theme for openSUSE Tumbleweed with KDE Plasma, GNOME
+and Xfce: warm candle-lit colours, falling leaves, carved pumpkins and a
+friendly chameleon in a witch hat.
 
 [![Check](https://github.com/plusky/halloween-openSUSE/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/plusky/halloween-openSUSE/actions/workflows/check.yml)
 [![Licence: multiple (REUSE)](https://img.shields.io/badge/licence-multiple_(REUSE)-blue)](#licence)
 [![KDE Plasma 6.8+](https://img.shields.io/badge/KDE_Plasma-6.8%2B-1d99f3)](https://kde.org/plasma-desktop/)
+[![GNOME 50+](https://img.shields.io/badge/GNOME-50%2B-4a86cf)](https://www.gnome.org/)
+[![Xfce 4.20+](https://img.shields.io/badge/Xfce-4.20%2B-2284f2)](https://www.xfce.org/)
 [![openSUSE Tumbleweed](https://img.shields.io/badge/openSUSE-Tumbleweed-73ba25)](https://get.opensuse.org/tumbleweed/)
 
 <img src="docs/screenshots/desktop.jpg" width="100%" alt="KDE Plasma desktop with a storybook wallpaper: a green chameleon in a purple witch hat and striped scarf sits on a mossy branch beside three glowing jack-o'-lanterns, birch trees and a rising harvest moon at dusk. The panel at the bottom shows the chameleon launcher and pumpkin-orange app icons.">
@@ -21,29 +23,38 @@ a witch hat.
 | File types | Firefox theme |
 | <img src="docs/screenshots/splash.jpg" alt="Splash screen: the chameleon hugging a jack-o'-lantern above five small lanterns lighting up one by one"> | <img src="docs/screenshots/clock.jpg" alt="An analog clock widget with a carved pumpkin face on the desktop"> |
 | Splash screen | Pumpkin clock |
+| <img src="docs/screenshots/gnome.jpg" alt="GNOME with the night wallpaper: Files shows orange folders with emblems, and the quick settings menu has plum panels with ember-orange toggles"> | <img src="docs/screenshots/xfce.jpg" alt="Xfce with the night wallpaper: Thunar in dark plum with orange folders, plum window title bar, a dark panel with a pumpkin task button and a Halloween notification"> |
+| GNOME | Xfce |
 
 ## What's included
 
 | Piece | ID | Works with |
 |---|---|---|
-| Wallpaper: dusk by day, moonlit by night | `openSUSEhalloween` | Plasma desktop and lock screen |
+| Wallpaper: dusk by day, moonlit by night | `openSUSEhalloween` | Plasma, GNOME (light and dark), Xfce |
 | Plasma style: autumn colours, leaf sprig on popups, ember tooltip glow, pumpkin clock | `openSUSE-halloween` | Plasma |
 | Colour scheme | `openSUSEHalloween` | Plasma and KDE apps |
 | Global theme with a pumpkin splash screen | `org.openSUSE.halloween.desktop` | Plasma |
-| Icon theme over Breeze Dark: folders, file types, drives, trash, KDE apps, a web-browser icon (also for Firefox), app-menu and power icons | `openSUSE-halloween` | any freedesktop desktop |
+| Icon theme over Breeze Dark: folders, file types, drives, trash, KDE apps, a web-browser icon (also for Firefox), app-menu and power icons | `openSUSE-halloween` | Plasma |
+| The same icons over Adwaita | `openSUSE-halloween-adwaita` | GNOME, Xfce |
+| GTK 3 theme: night colours with ember and pumpkin accents, built on [adw-gtk3](https://github.com/lassekongo83/adw-gtk3) | `openSUSE-halloween` | GNOME, Xfce, GTK 3 apps |
+| GNOME Shell theme: top bar, menus, quick settings, calendar | `openSUSE-halloween` | GNOME with the User Themes extension |
+| Window manager theme, also at 1.5× and 2× | `openSUSE-halloween`, `-hdpi`, `-xhdpi` | Xfce (xfwm4) |
+| Notification theme | `openSUSE-halloween` | Xfce (xfce4-notifyd) |
 | Login screen, built on openSUSE's `breeze-openSUSE` | `breeze-openSUSE-halloween` | SDDM |
 | Boot splash | `openSUSE-halloween` | Plymouth |
 | Firefox theme: plum toolbars, pumpkin accents, the moonlit forest behind the tabs | `openSUSE-halloween@pluskal.org` | Firefox |
 
 openSUSE's green and blue are replaced by an all-autumn palette
 ([`art/palette.toml`](art/palette.toml)); openSUSE green appears only on the
-chameleon. KDE Plasma is the first desktop; [GNOME](gnome/) and [Xfce](xfce/)
-are planned, and the wallpapers, icons, boot splash and Firefox theme in
-[`shared/`](shared/) already work there.
+chameleon. All the pieces are dark, like the night they're named after;
+libadwaita apps on GNOME keep their own colours but take the orange accent.
+See [gnome/](gnome/) and [xfce/](xfce/) for what each edition covers.
 
 ## Requirements
 
-- openSUSE Tumbleweed; KDE Plasma 6.8 or newer for the Plasma pieces
+- openSUSE Tumbleweed with KDE Plasma 6.8, GNOME 50 or Xfce 4.20, or newer
+- For the GNOME Shell theme, the User Themes extension
+  (`gnome-shell-extension-user-theme`)
 - For the login screen, openSUSE's `breeze-openSUSE` SDDM theme
   (`plasma6-sddm-theme-openSUSE`), which it builds on
 - To build: Python 3.11 or newer, `make` and [Git LFS](https://git-lfs.com/)
@@ -58,7 +69,7 @@ want. RPM packages for openSUSE are planned and will do the same.
 git lfs install && git lfs pull
 make check                   # build into build/ and validate it
 sudo make install            # copy the theme to /usr/share and /usr/lib64
-sudo make install-defaults   # optional: make it the default login screen
+sudo make install-defaults   # optional: make it the default (login screen, GNOME)
 ```
 
 Then pick it:
@@ -70,6 +81,24 @@ Then pick it:
 - **Login screen:** System Settings → *Colors & Themes* → *Login Screen
   (SDDM)* → *openSUSE Halloween*, or `make install-defaults`, which adds
   `/etc/sddm.conf.d/zz-openSUSE-halloween.conf`.
+- **GNOME:** in Settings → *Appearance*, pick the dark style, the orange
+  accent and the *openSUSE Halloween* background. In GNOME Tweaks →
+  *Appearance*, pick `openSUSE-halloween` for *Legacy Applications* and *Shell*
+  (with the User Themes extension enabled), and `openSUSE-halloween-adwaita`
+  for *Icons*. Or let `make install-defaults` do it for everyone who hasn't
+  chosen otherwise: it adds a GSettings override (run
+  `glib-compile-schemas /usr/share/glib-2.0/schemas` after it) and gives the
+  login screen (GDM) the orange accent through dconf (run `dconf update`).
+  GDM's background can't be changed.
+- **Xfce:** in Settings → *Appearance* pick `openSUSE-halloween` (style) and
+  `openSUSE-halloween-adwaita` (icons); in *Window Manager* pick
+  `openSUSE-halloween` (or `-hdpi` / `-xhdpi` with display scaling); in
+  *Notifications* pick `openSUSE-halloween`; and choose the wallpaper in
+  *Desktop* from `/usr/share/wallpapers/openSUSEhalloween/contents/images_dark/`.
+  Xfce's defaults come from openSUSE's branding packages, so there are none
+  to install. For the login screen (LightDM), an administrator can set
+  `theme-name=openSUSE-halloween`, `icon-theme-name=openSUSE-halloween-adwaita`
+  and a `background=` from the wallpaper in `/etc/lightdm/lightdm-gtk-greeter.conf`.
 - **Boot splash:** note the current theme (`plymouth-set-default-theme`), then
   switch and rebuild the initrds:
 
@@ -132,8 +161,6 @@ How the pieces fit together is in [docs/architecture.md](docs/architecture.md).
 
 ## Roadmap
 
-- GNOME and Xfce editions sharing the wallpapers, icons and boot splash
-  ([gnome/](gnome/), [xfce/](xfce/))
 - openSUSE RPM packages, built in the Open Build Service, for the
   distribution
 
@@ -165,6 +192,10 @@ original drawing, not Firefox's logo.
 - KDE Visual Design Group: Breeze, the Breeze Plasma style and splash
 - openSUSE KDE team: the `breeze-openSUSE` login theme and Plasma branding
 - Plymouth: the two-step plugin and the spinner theme's dialog images
+- lassekongo83 and the adw-gtk3 contributors: adw-gtk3, which the GTK 3 theme
+  is built on
+- Olivier Fourdan and the Xfce team: xfwm4's default theme, which the window
+  manager theme recolours
 
 ## Licence
 
@@ -174,5 +205,7 @@ header or in [`REUSE.toml`](REUSE.toml), and the texts are in
 
 - Artwork, including the icons and the Firefox theme: CC-BY-SA-4.0
 - Plasma style and colour scheme: LGPL-2.0-or-later (derived from Breeze)
-- Splash, look-and-feel, Plymouth theme, tools and scripts: GPL-2.0-or-later
+- GTK 3 theme: LGPL-2.1-or-later (derived from adw-gtk3, LGPL-2.1)
+- Splash, look-and-feel, Plymouth theme, GNOME Shell stylesheet, Xfce window
+  manager and notification themes, tools and scripts: GPL-2.0-or-later
 - Documentation and small configuration files: CC0-1.0

@@ -1,0 +1,26 @@
+# Installed by the optional defaults (make install-defaults): the Halloween
+# theme as the GNOME default for users who haven't chosen their own. Named to
+# sort after openSUSE's 20_openSUSE-branding override, so it wins.
+
+[org.gnome.desktop.interface]
+gtk-theme='openSUSE-halloween'
+icon-theme='openSUSE-halloween-adwaita'
+accent-color='orange'
+color-scheme='prefer-dark'
+
+[org.gnome.desktop.background]
+picture-uri='file://@LIGHT@'
+picture-uri-dark='file://@DARK@'
+picture-options='zoom'
+primary-color='@night@'
+
+[org.gnome.desktop.screensaver]
+picture-uri='file://@DARK@'
+picture-options='zoom'
+primary-color='@night@'
+
+[org.gnome.shell]
+enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
+
+[org.gnome.shell.extensions.user-theme]
+name='openSUSE-halloween'

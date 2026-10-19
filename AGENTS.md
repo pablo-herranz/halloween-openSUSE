@@ -37,7 +37,8 @@ installs it.
 - Colours: only in `art/palette.toml`, by name. Generated files take them from
   the palette, never as hard-coded hex values.
 - Hand-written sources: `shared/` for any desktop, `plasma/` for KDE Plasma.
-  `gnome/` and `xfce/` are plans with no code yet.
+  `gnome/` and `xfce/` hold their editions' own pieces; their GTK 3 theme
+  is built from `shared/gtk/`.
 - A new build target: copy `tools/targets/sddm.py`, set `DESKTOP`, and add it
   to `TARGETS` in `tools/targets/__init__.py`.
 - New icons: an SVG master in `art/source/vectors/`, mapped to icon names in

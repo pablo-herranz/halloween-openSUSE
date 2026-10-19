@@ -1,0 +1,40 @@
+/* SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ *
+ * openSUSE Halloween notifications for xfce4-notifyd, filled in from
+ * art/palette.toml by tools/targets/xfce.py.
+ */
+
+#XfceNotifyWindow {
+  background-color: @header@;
+  color: @cream@;
+  border: 1px solid @pumpkin_dark@;
+  border-radius: 10px;
+}
+
+#XfceNotifyWindow:hover {
+  background-color: @button@;
+}
+
+#XfceNotifyWindow label#summary {
+  color: @candle@;
+  font-weight: bold;
+}
+
+#XfceNotifyWindow label#body {
+  color: @cream@;
+}
+
+#XfceNotifyWindow progressbar progress {
+  background-color: @pumpkin@;
+}
+
+#XfceNotifyWindow button {
+  background-color: @button@;
+  color: @cream@;
+}
+
+#XfceNotifyWindow button:hover {
+  background-color: @ember@;
+  color: @white@;
+}
