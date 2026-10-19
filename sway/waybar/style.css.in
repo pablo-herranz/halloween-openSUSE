@@ -1,0 +1,178 @@
+/* SPDX-FileCopyrightText: 2026 Jan Baier <jan.baier@amagical.net>
+ * SPDX-License-Identifier: CC0-1.0
+ *
+ * openSUSE Halloween theme for waybar. Palette tokens filled from
+ * art/palette.toml by tools/targets/sway.py.
+ */
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrains Mono", "FiraCode Nerd Font", "DejaVu Sans Mono", monospace;
+    font-size: 12px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: @night@;
+    color: @cream@;
+    border-bottom: 1px solid @border@;
+}
+
+#workspaces {
+    margin: 4px 8px;
+    padding: 0;
+    background: @view@;
+    border: 1px solid @border@;
+    border-radius: 4px;
+}
+
+#workspaces button {
+    padding: 0 4px;
+    color: @inactive@;
+    background: transparent;
+    border-radius: 3px;
+    transition: all 0.15s ease;
+}
+
+#workspaces button:hover {
+    background: @plum@;
+    color: @cream@;
+}
+
+#workspaces button.focused,
+#workspaces button.visible {
+    background: @pumpkin@;
+    color: @cream@;
+    font-weight: bold;
+}
+
+#workspaces button.urgent {
+    background: @cranberry@;
+    color: @white@;
+    font-weight: bold;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { background: @cranberry_dark@; }
+}
+
+#clock,
+#cpu,
+#memory,
+#temperature,
+#network,
+#pulseaudio,
+#battery,
+#disk,
+#bluetooth,
+#custom-scratchpad,
+#custom-zypper,
+#custom-layout,
+#custom-notification,
+#tray {
+    margin: 4px 4px;
+    padding: 0 10px;
+    background: @view@;
+    border: 1px solid @border@;
+    border-radius: 4px;
+    color: @cream@;
+}
+
+#clock {
+    font-weight: 500;
+}
+
+#cpu.warning,
+#memory.warning,
+#temperature.warning {
+    color: @candle@;
+    border-color: @candle@;
+}
+
+#cpu.critical,
+#memory.critical,
+#temperature.critical,
+#battery.critical {
+    color: @cranberry@;
+    border-color: @cranberry@;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    50% { background: @cranberry_dark@; }
+}
+
+#network.disconnected {
+    color: @cranberry@;
+    border-color: @cranberry@;
+}
+
+#pulseaudio.muted {
+    color: @inactive@;
+}
+
+#bluetooth.disabled,
+#bluetooth.off {
+    color: @inactive@;
+}
+
+#bluetooth.connected {
+    color: @olive@;
+}
+
+#bluetooth.discoverable {
+    color: @plum@;
+}
+
+#disk.warning {
+    color: @candle@;
+    border-color: @candle@;
+}
+
+#disk.critical {
+    color: @cranberry@;
+    border-color: @cranberry@;
+}
+
+#battery.charging {
+    color: @olive@;
+}
+
+#battery.warning:not(.charging) {
+    color: @candle@;
+    border-color: @candle@;
+}
+
+#battery.critical:not(.charging) {
+    color: @cranberry@;
+    border-color: @cranberry@;
+}
+
+#tray {
+    padding: 0 8px;
+}
+
+/* the notification bell lights up plum while a notification is waiting */
+#custom-notification.notification,
+#custom-notification.dnd-notification {
+    color: @plum@;
+    border-color: @plum@;
+}
+
+#tray > .needs-attention {
+    background: @cranberry_dark@;
+    border-radius: 3px;
+}
+
+tooltip {
+    background: @header@;
+    border: 1px solid @border@;
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: @cream@;
+}
+
+tooltip label {
+    color: @cream@;
+}

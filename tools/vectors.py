@@ -239,7 +239,8 @@ SYMBOLIC = {
     "glyph-crystal": ("categories", ("help-about-symbolic",)),
     "glyph-web": ("categories", ("applications-internet-symbolic",)),
     "glyph-quill": ("categories", ("applications-office-symbolic",)),
-    "glyph-gear": ("categories", ("applications-system-symbolic", "preferences-system-symbolic")),
+    "glyph-gear": ("categories", ("applications-system-symbolic", "preferences-system-symbolic",
+                                  "preferences-system-notifications-symbolic", "preferences-system-notifications")),
     "glyph-broom": ("categories", ("applications-utilities-symbolic",)),
     "glyph-signpost": ("actions", ("compass",)),
     # Thunar's side pane asks for go-home for Home; Dolphin's Home button too
@@ -254,6 +255,8 @@ SYMBOLIC = {
     "glyph-lock": ("actions", ("system-lock-screen", "system-lock-screen-symbolic")),
     "glyph-logout": ("actions", ("system-log-out", "system-log-out-symbolic", "xfsm-logout")),
     "glyph-ghosts": ("actions", ("system-switch-user", "system-switch-user-symbolic")),
+    "glyph-bell": ("actions", ("notifications-disabled-symbolic", "notifications-disabled",
+                                  "notification-symbolic", "notification", "bell-symbolic", "bell")),
 }
 SYMBOLIC_SIZE = 16
 

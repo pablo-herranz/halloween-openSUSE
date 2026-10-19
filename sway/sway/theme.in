@@ -1,0 +1,69 @@
+# SPDX-FileCopyrightText: 2026 Jan Baier <jan.baier@amagical.net>
+# SPDX-License-Identifier: CC0-1.0
+#
+# openSUSE Halloween theme for sway. Include from your ~/.config/sway/config.
+# See README.md for the include path.
+#
+# This file only defines theme colours and bar settings. Keybindings, output
+# setup, window rules and other preferences belong in your main config.
+
+# Colours from the Halloween palette
+set $night            @night@
+set $view             @view@
+set $view_alt         @view_alt@
+set $header           @header@
+set $button           @button@
+set $complementary    @complementary@
+set $raised           @raised@
+set $border           @border@
+set $pumpkin_dark     @pumpkin_dark@
+set $cream            @cream@
+set $inactive         @inactive@
+set $white            @white@
+set $pumpkin          @pumpkin@
+set $ember            @ember@
+set $candle           @candle@
+set $apricot          @apricot@
+set $plum             @plum@
+set $olive            @olive@
+set $cranberry        @cranberry@
+set $cranberry_dark   @cranberry_dark@
+
+# Window colours
+#               border           background       text             indicator       child_border
+client.focused          $pumpkin        $header          $cream           $pumpkin        $pumpkin
+client.focused_inactive $border         $night           $inactive        $night          $border
+client.unfocused        $border         $night           $inactive        $night          $border
+client.urgent           $cranberry      $cranberry_dark  $white           $cranberry      $cranberry
+client.placeholder      $complementary  $complementary   $complementary   $complementary  $complementary
+
+# Title bar (when using titlebar decorations)
+default_border pixel 2
+default_floating_border pixel 2
+
+# Gaps
+gaps inner 8
+gaps outer 4
+
+# Bar: use waybar (installed separately)
+bar {
+    swaybar_command waybar
+    position top
+    height 32
+    colors {
+        background $night
+        statusline $cream
+        separator  $border
+        focused_background $header
+        focused_statusline $cream
+        focused_separator $pumpkin
+        focused_workspace $pumpkin $pumpkin $cream
+        active_workspace $ember $ember $white
+        inactive_workspace $night $night $inactive
+        urgent_workspace $cranberry $cranberry_dark $white
+        binding_mode $plum $plum $cream
+    }
+    workspace_buttons yes
+    binding_mode_indicator yes
+    verbose yes
+}

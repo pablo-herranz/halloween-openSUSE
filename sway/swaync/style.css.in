@@ -1,0 +1,250 @@
+/* SPDX-FileCopyrightText: 2026 Jan Baier <jan.baier@amagical.net>
+ * SPDX-License-Identifier: CC0-1.0
+ *
+ * openSUSE Halloween theme for swaync (Sway Notification Center), filled in
+ * from art/palette.toml by tools/targets/sway.py.
+ */
+
+/* Reset inherited GTK theme backgrounds */
+.blank-window {
+    background: transparent;
+}
+
+/* High-specificity overrides for the GTK window and its containers */
+window#control-center,
+window#control-center > box,
+window#control-center > *,
+#control-center {
+    background: @night@;
+    color: @cream@;
+}
+
+/* Control center panel */
+.control-center {
+    background: @night@;
+    color: @cream@;
+    border: 1px solid @border@;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.control-center-list {
+    background: transparent;
+}
+
+.control-center-list-placeholder {
+    color: @inactive@;
+}
+
+.control-center-list-placeholder image {
+    /* swaync's hardcoded empty-state icon, mapped to the carved-gear glyph */
+    -gtk-icon-name: "preferences-system-notifications-symbolic";
+    color: @border@;
+}
+
+/* Notification rows inside the control center */
+.control-center .notification-row {
+    background: transparent;
+    margin: 4px 0;
+}
+
+.control-center .notification-row .notification-background {
+    background: @header@;
+    border: 1px solid @border@;
+    border-radius: 6px;
+    padding: 8px;
+    margin: 4px;
+}
+
+.control-center .notification-row .notification-background:hover {
+    background: @raised@;
+}
+
+.control-center .notification-row .notification-background .notification {
+    background: transparent;
+    color: @cream@;
+}
+
+.control-center .notification-row .notification-background .notification .summary {
+    color: @cream@;
+    font-weight: bold;
+}
+
+.control-center .notification-row .notification-background .notification .body {
+    color: @inactive@;
+}
+
+.control-center .notification-row .notification-background .notification .time {
+    color: @inactive@;
+    font-size: 0.9em;
+}
+
+.control-center .notification-row .notification-background .close-button {
+    background: @button@;
+    color: @cream@;
+    border-radius: 4px;
+    min-width: 24px;
+    min-height: 24px;
+}
+
+.control-center .notification-row .notification-background .close-button:hover {
+    background: @ember@;
+    color: @white@;
+}
+
+.control-center .notification-row .notification-background .notification.critical {
+    border-left: 3px solid @cranberry@;
+}
+
+/* Floating notifications */
+.floating-notifications {
+    background: transparent;
+}
+
+.floating-notifications .notification-row .notification-background {
+    background: @header@;
+    color: @cream@;
+    border: 1px solid @border@;
+    border-radius: 6px;
+    margin: 6px;
+    padding: 8px;
+}
+
+.floating-notifications .notification-row .notification-background .notification .summary {
+    color: @cream@;
+    font-weight: bold;
+}
+
+.floating-notifications .notification-row .notification-background .notification .body {
+    color: @inactive@;
+}
+
+.floating-notifications .notification-row .notification-background .close-button {
+    background: @button@;
+    color: @cream@;
+    border-radius: 4px;
+}
+
+.floating-notifications .notification-row .notification-background .close-button:hover {
+    background: @ember@;
+    color: @white@;
+}
+
+/* Widgets */
+.widget-title {
+    background: @header@;
+    color: @cream@;
+    border-radius: 6px;
+    margin: 6px;
+    padding: 8px;
+}
+
+.widget-title button {
+    background: @button@;
+    color: @cream@;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+.widget-title button:hover {
+    background: @ember@;
+    color: @white@;
+}
+
+.widget-dnd {
+    background: @header@;
+    color: @cream@;
+    border-radius: 6px;
+    margin: 6px;
+    padding: 8px;
+}
+
+.widget-dnd > switch {
+    background: @button@;
+    border-radius: 4px;
+}
+
+.widget-dnd > switch:checked {
+    background: @pumpkin@;
+}
+
+.widget-dnd > switch slider {
+    background: @cream@;
+    border-radius: 3px;
+}
+
+.widget-buttons-grid {
+    background: @header@;
+    border-radius: 6px;
+    margin: 6px;
+    padding: 8px;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild > button {
+    background: @button@;
+    color: @cream@;
+    border-radius: 4px;
+    margin: 2px;
+    padding: 4px 8px;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild > button:hover {
+    background: @ember@;
+    color: @white@;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild > button.toggle:checked {
+    background: @pumpkin@;
+    color: @white@;
+}
+
+.widget-volume,
+.widget-backlight {
+    background: @header@;
+    color: @cream@;
+    border-radius: 6px;
+    margin: 6px;
+    padding: 8px;
+}
+
+.widget-volume trough,
+.widget-backlight trough {
+    background: @button@;
+    border-radius: 4px;
+    min-height: 6px;
+}
+
+.widget-volume slider,
+.widget-backlight slider {
+    background: @pumpkin@;
+    border-radius: 4px;
+    min-width: 12px;
+    min-height: 12px;
+}
+
+.widget-mpris {
+    background: @header@;
+    color: @cream@;
+    border-radius: 6px;
+    margin: 6px;
+    padding: 8px;
+}
+
+.widget-mpris button {
+    background: @button@;
+    color: @cream@;
+    border-radius: 4px;
+}
+
+.widget-mpris button:hover {
+    background: @ember@;
+    color: @white@;
+}
+
+/* Scrollbars */
+scrollbar slider {
+    background: @border@;
+    border-radius: 4px;
+    min-width: 6px;
+    min-height: 6px;
+}
