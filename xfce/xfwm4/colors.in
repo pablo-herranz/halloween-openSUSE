@@ -6,13 +6,13 @@
 # scale's themerc, filled in from art/palette.toml; these comment lines are
 # left out.
 active_color_2=@header@
-active_hilight_2=@button@
+active_hilight_2=@raised@
 active_mid_2=@header@
 active_shadow_2=@complementary@
 active_text_color=@cream@
 active_text_shadow_color=@complementary@
 inactive_color_2=@night@
-inactive_hilight_2=@header@
+inactive_hilight_2=@button@
 inactive_mid_2=@night@
 inactive_shadow_2=@complementary@
 inactive_text_color=@inactive@

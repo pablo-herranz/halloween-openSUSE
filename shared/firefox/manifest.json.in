@@ -41,7 +41,7 @@
       "button_background_active": "rgba(@cream_rgb@, 0.2)",
       "toolbar_field": "@view@",
       "toolbar_field_text": "@cream@",
-      "toolbar_field_border": "@button@",
+      "toolbar_field_border": "@border@",
       "toolbar_field_focus": "@view@",
       "toolbar_field_text_focus": "@cream@",
       "toolbar_field_border_focus": "@pumpkin@",

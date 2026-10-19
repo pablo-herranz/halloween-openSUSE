@@ -3,9 +3,12 @@
  *
  * openSUSE Halloween for GNOME Shell. The User Themes extension loads this on
  * top of the Shell's own light or dark stylesheet, so it only recolours: the
- * top bar, menus, quick settings, the calendar and on-screen displays. The
- * accent (orange) comes from the accent-color setting. Palette tokens are
- * filled in from art/palette.toml by tools/targets/gnome.py.
+ * top bar, menus, quick settings, the calendar and on-screen displays. As in
+ * Plasma: hover is a plum tint, keyboard focus a pumpkin ring, checked and
+ * selected states ember behind white text, levels and sliders pumpkin.
+ * St reads rgba(), st-transparentize() and st-mix(), not GTK's alpha() or
+ * mix(). Palette tokens are filled in from art/palette.toml by
+ * tools/targets/gnome.py.
  */
 
 #panel {
@@ -16,14 +19,17 @@
   color: @cream@;
 }
 
-#panel .panel-button:hover,
+#panel .panel-button:hover {
+  background-color: st-transparentize(@plum@, 0.75);
+}
+
 #panel .panel-button:focus {
-  background-color: alpha(@pumpkin@, 0.22);
+  box-shadow: inset 0 0 0 2px @pumpkin@;
 }
 
 #panel .panel-button:active,
 #panel .panel-button:checked {
-  background-color: alpha(@pumpkin@, 0.38);
+  background-color: @ember@;
   color: @white@;
 }
 
@@ -37,9 +43,13 @@
   color: @cream@;
 }
 
-.popup-menu-item:hover,
+.popup-menu-item:hover {
+  background-color: st-transparentize(@plum@, 0.75);
+}
+
 .popup-menu-item:focus {
-  background-color: alpha(@pumpkin@, 0.22);
+  background-color: st-transparentize(@plum@, 0.75);
+  box-shadow: inset 0 0 0 2px @pumpkin@;
 }
 
 .quick-settings {
@@ -47,22 +57,44 @@
   color: @cream@;
 }
 
+/* Off toggles, their menu arrows and the round buttons on top stand off the
+   menu; on toggles are ember */
 .quick-toggle,
-.quick-menu-toggle .quick-toggle {
-  background-color: @button@;
+.quick-toggle-has-menu .quick-toggle-menu-button,
+.quick-settings .icon-button {
+  background-color: @raised@;
   color: @cream@;
 }
 
+.quick-toggle:hover,
+.quick-toggle-has-menu .quick-toggle-menu-button:hover,
+.quick-settings .icon-button:hover {
+  background-color: st-mix(@raised@, @plum@, 0.25);
+}
+
+.quick-toggle:focus,
+.quick-toggle-has-menu .quick-toggle-menu-button:focus,
+.quick-settings .icon-button:focus {
+  box-shadow: inset 0 0 0 2px @pumpkin@;
+}
+
 .quick-toggle:checked,
-.quick-menu-toggle .quick-toggle:checked,
-.quick-menu-toggle .quick-toggle-arrow:checked {
+.quick-toggle-has-menu .quick-toggle-menu-button:checked {
   background-color: @ember@;
   color: @white@;
+}
+
+.quick-toggle-has-menu:checked .quick-toggle-separator {
+  background-color: st-transparentize(@white@, 0.6);
 }
 
 .quick-toggle-menu {
   background-color: @button@;
   color: @cream@;
+}
+
+.slider {
+  -barlevel-active-background-color: @pumpkin@;
 }
 
 .datemenu-popover .calendar,

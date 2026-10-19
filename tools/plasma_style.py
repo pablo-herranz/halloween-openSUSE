@@ -3,8 +3,10 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Build the openSUSE-halloween Plasma style from pinned Breeze sources.
 
-Breeze's frame SVGs take their colours from the style's `colors` file, so most
-of the autumn look comes for free. On top of that this script:
+Breeze's frame SVGs take their colours from the colour scheme, so with the
+openSUSE Halloween scheme most of the autumn look comes for free. The style
+ships no `colors` file of its own, like Breeze, so a high-contrast or other
+scheme the user picks still applies to the panel and popups. This script:
   - adds a leaf sprig `overlay` to popups (dialogs/background); the panel
     keeps Breeze's plain frame, which takes the style's colours,
   - tints the tooltip shadow ember so tooltips glow warmly,
@@ -29,7 +31,8 @@ VARIANTS = ("", "translucent/", "opaque/", "solid/")
 
 # Ornament placement: (ornament file, target height in px, opacity, hint elements)
 OVERLAYS = {
-    "dialogs/background.svg": ("popup-sprig.svg", 40, 0.4, ["hint-overlay-pos-right"]),
+    # small: popups keep buttons in every corner (Kickoff's pin sits under it)
+    "dialogs/background.svg": ("popup-sprig.svg", 26, 0.4, ["hint-overlay-pos-right"]),
 }
 # No panel overlay: anything drawn into the panel's background sits under the
 # launcher, tasks, tray and clock, and a tiled garland proved too busy.
@@ -126,13 +129,12 @@ def pumpkin_clock(svg, palette):
     return append(svg, f'  <g id="ClockFace">{frag}</g>\n')
 
 
-def build(out, palette, colors_text):
+def build(out, palette):
     out = Path(out)
     if out.exists():
         shutil.rmtree(out)
     for f in ("metadata.json", "plasmarc"):
         write(out / f, (SRC / f).read_text())
-    write(out / "colors", colors_text)
     for variant in VARIANTS:
         for name, (orn, height, opacity, hints) in OVERLAYS.items():
             path = variant + name
@@ -146,12 +148,11 @@ def build(out, palette, colors_text):
 
 def main():
     from common import load_palette
-    from targets.plasma import render_colors
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("out", nargs="?", default=str(ROOT / "build/user/plasma/desktoptheme/openSUSE-halloween"))
     args = ap.parse_args()
     palette = load_palette()
-    print(build(args.out, palette, render_colors(palette)))
+    print(build(args.out, palette))
 
 
 if __name__ == "__main__":

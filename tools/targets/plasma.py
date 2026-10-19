@@ -99,6 +99,6 @@ def build(ctx):
     p = ctx.palette
     colors = render_colors(p)
     write(USER / f"color-schemes/{SCHEME}.colors", colors)
-    plasma_style.build(USER / "plasma/desktoptheme" / STYLE, p, colors)
+    plasma_style.build(USER / "plasma/desktoptheme" / STYLE, p)
     ctx.placeholders.extend(f"ornament {n}" for n in plasma_style.ORNAMENTS if vectors.ornament(n, p) is None)
     build_look_and_feel(ctx)
