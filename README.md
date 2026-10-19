@@ -1,109 +1,77 @@
 # halloween-openSUSE
 
-A cosy autumn Halloween edition of the openSUSE desktop: warm candle-lit
-colours, falling leaves, carved pumpkins, and a friendly chameleon inspired by
-openSUSE's Geeko. It currently covers KDE Plasma 6 on openSUSE Tumbleweed;
-the layout leaves room for other desktops.
+A cosy autumn Halloween theme for openSUSE Tumbleweed with KDE Plasma: warm
+candle-lit colours, falling leaves, carved pumpkins and a friendly chameleon in
+a witch hat.
 
-> **Status:** work in progress. All artwork is in place; testing on a real
-> machine and screenshots come before the first release.
+[![Check](https://github.com/plusky/halloween-openSUSE/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/plusky/halloween-openSUSE/actions/workflows/check.yml)
+[![Licence: multiple (REUSE)](https://img.shields.io/badge/licence-multiple_(REUSE)-blue)](#licence)
+[![KDE Plasma 6.8+](https://img.shields.io/badge/KDE_Plasma-6.8%2B-1d99f3)](https://kde.org/plasma-desktop/)
+[![openSUSE Tumbleweed](https://img.shields.io/badge/openSUSE-Tumbleweed-73ba25)](https://get.opensuse.org/tumbleweed/)
+
+<img src="docs/screenshots/desktop.jpg" width="100%" alt="KDE Plasma desktop with a storybook wallpaper: a green chameleon in a purple witch hat and striped scarf sits on a mossy branch beside three glowing jack-o'-lanterns, birch trees and a rising harvest moon at dusk. The panel at the bottom shows the chameleon launcher and pumpkin-orange app icons.">
+
+| | |
+|---|---|
+| <img src="docs/screenshots/launcher.jpg" alt="The application launcher in dark plum colours, with Halloween icons for apps, categories and power actions"> | <img src="docs/screenshots/dolphin.jpg" alt="Dolphin file manager with orange folders, each carrying an emblem such as a scroll, an acorn or a film reel"> |
+| App launcher | Dolphin with the folder icons |
+| <img src="docs/screenshots/desktop-night.jpg" alt="The same wallpaper at night, with stars and the lanterns glowing"> | <img src="docs/screenshots/login.jpg" alt="Login screen over a blurred night version of the wallpaper"> |
+| The wallpaper at night | Login screen (SDDM) |
+| <img src="docs/screenshots/splash.jpg" alt="Splash screen: the chameleon hugging a jack-o'-lantern above five small lanterns lighting up one by one"> | <img src="docs/screenshots/firefox.jpg" alt="Firefox with plum toolbars and the moonlit forest behind the tabs"> |
+| Splash screen | Firefox theme |
 
 ## What's included
 
-| Piece | ID | Where it applies |
+| Piece | ID | Works with |
 |---|---|---|
-| Wallpaper (dusk by day, moonlit by night) | `openSUSEhalloween` | desktop and lock screen |
-| Plasma style: autumn colours, leaf trim, ember tooltip glow, pumpkin clock | `openSUSE-halloween` | panel, popups, widgets |
-| Colour scheme | `openSUSEHalloween` | applications |
-| Look-and-feel with pumpkin splash | `org.openSUSE.halloween.desktop` | ties the above together |
-| Icons (places, trash, launcher, KDE apps, app menu and power actions) over Breeze Dark | `openSUSE-halloween` | any freedesktop desktop |
-| Login screen | `breeze-openSUSE-halloween` | SDDM |
+| Wallpaper: dusk by day, moonlit by night | `openSUSEhalloween` | Plasma desktop and lock screen |
+| Plasma style: autumn colours, leaf sprig on popups, ember tooltip glow, pumpkin clock | `openSUSE-halloween` | Plasma |
+| Colour scheme | `openSUSEHalloween` | Plasma and KDE apps |
+| Global theme with a pumpkin splash screen | `org.openSUSE.halloween.desktop` | Plasma |
+| Icon theme: folders, places, trash, KDE apps, app-menu and power icons over Breeze Dark | `openSUSE-halloween` | any freedesktop desktop |
+| Login screen, built on openSUSE's `breeze-openSUSE` | `breeze-openSUSE-halloween` | SDDM |
 | Boot splash | `openSUSE-halloween` | Plymouth |
-| Firefox theme "openSUSE Halloween": plum toolbars, pumpkin accents, jack-o'-lanterns by moonlight behind the tabs | `openSUSE-halloween@pluskal.org` | Firefox |
+| Firefox theme: plum toolbars, pumpkin accents, the moonlit forest behind the tabs | `openSUSE-halloween@pluskal.org` | Firefox |
 
 openSUSE's green and blue are replaced by an all-autumn palette
 ([`art/palette.toml`](art/palette.toml)); openSUSE green appears only on the
-chameleon.
+chameleon. KDE Plasma is the first desktop; [GNOME](gnome/) and [Xfce](xfce/)
+are planned, and the wallpapers, icons, boot splash and Firefox theme in
+[`shared/`](shared/) already work there.
 
 ## Requirements
 
-- openSUSE Tumbleweed with Plasma 6.8 or newer and the openSUSE branding
-  (`breeze-openSUSE` SDDM theme, `plymouth`)
+- openSUSE Tumbleweed with KDE Plasma 6.8 or newer and the openSUSE branding
+  (the `breeze-openSUSE` SDDM theme and `plymouth`)
 - systemd-boot with `sdbootutil`, for the boot splash
-- To build: Python 3.12+, `make`, `rsync`, and `git lfs` for the art masters
+- To build: Python 3.11 or newer, `make` and [Git LFS](https://git-lfs.com/)
 
 ## Install
 
-On the openSUSE machine itself, from a checkout of this repository:
+On the openSUSE machine, from a checkout of this repository:
 
 ```bash
-make build                                      # needs Python 3.12+ and git lfs
+git lfs install && git lfs pull
+make build
 build/install/install-user.sh                   # wallpaper, Plasma style, colours, icons, splash
 sudo build/install/install-root.sh              # login screen; installs the boot splash
-sudo build/install/install-root.sh --plymouth   # after testing it: activate the boot splash
+sudo build/install/install-root.sh --plymouth   # after trying it: make it the boot splash
 build/install/verify.sh                         # report what is active
 ```
 
-`install-root.sh --files` installs without switching anything, for testing
-the login screen first. The boot splash only becomes active with
-`--plymouth`, which also rebuilds the initrds; until then a kernel update
-can't pick it up by surprise.
+- The user install keeps your panels and widgets, and saves your previous
+  settings on its first run.
+- `install-root.sh --files` installs without switching anything, so you can
+  try the login screen first.
+- The boot splash only becomes active with `--plymouth`, which also rebuilds
+  the initrds; until then a kernel update can't pick it up by surprise.
 
-The user install keeps your panels and widgets. It saves the previous
-settings on first run, and `install/uninstall-user.sh` restores them;
-`sudo install/uninstall-root.sh` restores the login screen and boot splash.
-
-### Development: build on one machine, test on another
-
-The remote `make` targets are only useful while developing the theme: they
-build on your workstation, copy `build/` to `~/.cache/halloween-openSUSE` on
-a test machine over SSH, and run the same scripts there. Name the test
-machine with `TARGET`:
+### Uninstall
 
 ```bash
-make install-user TARGET=user@testbox
-make install-root TARGET=user@testbox      # asks for sudo on the test machine
-make plymouth TARGET=user@testbox
-make verify TARGET=user@testbox
-make screens TARGET=user@testbox && make fetch-screenshots TARGET=user@testbox
+build/install/uninstall-user.sh        # restores your previous Plasma settings
+sudo build/install/uninstall-root.sh   # restores the login screen and boot splash
 ```
-
-### Firefox
-
-`make build` makes `build/firefox/openSUSE-halloween.xpi`, plus the same
-theme unpacked in `build/firefox/openSUSE-halloween/`. It only recolours
-Firefox; Firefox's own icon and logo stay as they are.
-
-The `.xpi` isn't signed by Mozilla yet. Regular Firefox releases, openSUSE's
-included, only install signed add-ons from `about:addons` or a web page:
-
-- **Firefox, signed:** upload the `.xpi` to
-  [addons.mozilla.org](https://addons.mozilla.org/developers/), either
-  listed or "on your own" (unlisted, signed for self-distribution). Then
-  install it from its AMO page, or open the signed `.xpi` in Firefox.
-- **Firefox Developer Edition, Nightly or ESR:** set
-  `xpinstall.signatures.required` to `false` in `about:config`, then in
-  `about:addons` choose ⚙ → *Install Add-on From File…* and pick the `.xpi`.
-  Release builds ignore this setting.
-- **Any Firefox, until it restarts:** in
-  `about:debugging#/runtime/this-firefox` choose *Load Temporary Add-on…* and
-  pick the `.xpi`.
-- **openSUSE's Firefox, for everyone on the machine:** openSUSE builds
-  Firefox to load unsigned add-ons from its own folder. The file name must be
-  the add-on ID:
-
-  ```bash
-  sudo install -Dm644 build/firefox/openSUSE-halloween.xpi "/usr/lib64/firefox/browser/extensions/openSUSE-halloween@pluskal.org.xpi"
-  ```
-
-  Restart Firefox, then pick the theme in `about:addons` → *Themes*. Firefox
-  doesn't check signatures in that folder, so only put files there that you
-  built or trust. Firefox updates leave the file in place; to remove it,
-  pick another theme and delete the file.
-
-`install/test-screens.sh firefox` loads the theme as a temporary add-on in a
-throwaway profile and takes a screenshot; it leaves your own Firefox profiles
-alone.
 
 ### If the boot splash causes trouble
 
@@ -113,50 +81,74 @@ alone.
 - From a text console (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>F3</kbd>), run
   `sudo build/install/uninstall-root.sh`.
 
-## Build
+### Firefox
+
+`make build` makes `build/firefox/openSUSE-halloween.xpi`. It only recolours
+Firefox; Firefox's own logo stays as it is. The `.xpi` isn't signed by
+Mozilla yet, and regular Firefox releases only install signed add-ons:
+
+- **openSUSE's Firefox, for everyone on the machine:** openSUSE builds Firefox
+  to load add-ons from its own folder. The file name must be the add-on ID:
+
+  ```bash
+  sudo install -Dm644 build/firefox/openSUSE-halloween.xpi "/usr/lib64/firefox/browser/extensions/openSUSE-halloween@pluskal.org.xpi"
+  ```
+
+  Restart Firefox, then pick the theme in `about:addons` → *Themes*. Firefox
+  doesn't check signatures in that folder, so only put files there that you
+  built or trust. To remove it, pick another theme and delete the file.
+- **Firefox Developer Edition, Nightly or ESR:** set
+  `xpinstall.signatures.required` to `false` in `about:config`, then choose
+  ⚙ → *Install Add-on From File…* in `about:addons`.
+- **Any Firefox, until it restarts:** choose *Load Temporary Add-on…* in
+  `about:debugging#/runtime/this-firefox`.
+
+## Contributing
+
+Contributions are welcome: new icons, fixes, other desktops. Start with
+[CONTRIBUTING.md](CONTRIBUTING.md), which covers the development setup, how
+the build works and how to propose artwork. AI coding agents should read
+[AGENTS.md](AGENTS.md). Everyone is expected to follow the
+[code of conduct](CODE_OF_CONDUCT.md).
 
 ```bash
-make check      # build into build/ and validate it
-make release-check   # also fails while placeholders are in use
+make check   # build everything into build/ and validate it
+make lint    # ruff and ShellCheck
 ```
 
-`tools/build.py` makes every size and format from the masters in
-`art/source/` (Git LFS). Missing masters are replaced by drawn placeholders,
-listed in `build/placeholders.txt`. The Plasma style is generated from
-Breeze's SVGs, pinned to libplasma v6.8.0 by hash in `tools/upstream.toml`.
-
-`tools/check.py` validates metadata, colour contrast (7:1 for text, 4.5:1
-for the rest), image sizes, file budgets, the Plasma style's SVG element IDs,
-icon SVGs, the Firefox theme (manifest, 4.5:1 for every text colour and for
-tab titles over the header image, a header of at most 200 px and 300 kB,
-an `.xpi` that matches the unpacked theme) and REUSE compliance.
-
-The Firefox theme's colours come from `art/palette.toml` through
-`firefox/manifest.json.in`. Its header is a band of the night wallpaper
-(`[firefox]` in `art/crops.toml`). Bright parts like the moon are made more
-transparent, so tab titles drawn over them stay readable.
+How the pieces fit together is in [docs/architecture.md](docs/architecture.md).
 
 ## Roadmap
 
-- Generated artwork replacing the placeholders
+- GNOME and Xfce editions sharing the wallpapers, icons and boot splash
+  ([gnome/](gnome/), [xfce/](xfce/))
 - A fully recoloured Breeze icon set
-- GNOME, Xfce and GTK themes, sharing the wallpapers, icons and boot splash
+- Packages: the KDE Store for the Plasma pieces, and an openSUSE Build
+  Service package for the login screen and boot splash
+- A signed Firefox theme on addons.mozilla.org
 
 ## About the artwork
 
-The artwork is made with generative AI (Picsart), then selected, retouched
-and assembled by hand. Every prompt, model and setting is recorded in
-[`art/prompts/`](art/prompts/).
+The artwork is made with generative AI (Picsart: Flux 2 Pro, Nano Banana 2 and
+Recraft), then selected, cut out, retouched and composed by hand: every folder
+icon is assembled from a master folder and an emblem, crops and colours are
+adjusted by the build tools. Every prompt, model, setting and choice is
+recorded in [`art/prompts/`](art/prompts/).
+
+Purely AI-generated material may not be protected by copyright in some
+countries (see the US Copyright Office's 2025 report on copyrightability). The
+licence below covers the human selection, composition and editing.
 
 ## Trademarks
 
 openSUSE and the openSUSE logo are trademarks of SUSE LLC. This project is
-not affiliated with or endorsed by SUSE or the openSUSE Project. The
-chameleon here is an original character inspired by the Geeko; it is not the
-openSUSE logo or a modification of it.
+not affiliated with or endorsed by SUSE or the openSUSE Project. The chameleon
+is an original character inspired by the Geeko; it is not the openSUSE logo
+or a modification of it.
 
 Firefox is a trademark of the Mozilla Foundation. The Firefox theme only sets
-colours and a header image; it does not change or replace Firefox's logo.
+colours and a header image, and the icon theme's web-browser icon is an
+original drawing, not Firefox's logo.
 
 ## Credits
 
@@ -166,11 +158,11 @@ colours and a header image; it does not change or replace Firefox's logo.
 
 ## Licence
 
-[REUSE](https://reuse.software)-compliant; see [`REUSE.toml`](REUSE.toml)
-and the file headers.
+[REUSE](https://reuse.software)-compliant: every file's licence is in its
+header or in [`REUSE.toml`](REUSE.toml), and the texts are in
+[`LICENSES/`](LICENSES/).
 
-- Artwork, including the Firefox theme: CC-BY-SA-4.0
-- Plasma style: LGPL-2.0-or-later (derived from Breeze)
-- Colour scheme: LGPL-2.0-or-later (derived from Breeze Dark)
+- Artwork, including the icons and the Firefox theme: CC-BY-SA-4.0
+- Plasma style and colour scheme: LGPL-2.0-or-later (derived from Breeze)
 - Splash, look-and-feel, Plymouth theme, tools and scripts: GPL-2.0-or-later
-- Small config and docs: CC0-1.0
+- Documentation and small configuration files: CC0-1.0

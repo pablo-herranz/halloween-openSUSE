@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Turn screenshots from install/test-screens.sh into package previews.
 
-Reads art/screenshots/{desktop-light,lockscreen,splash,sddm}.png and writes
-art/previews/, which tools/build.py prefers over its generated mock-ups.
+Reads art/screenshots/*.png (1920x1080) and writes art/previews/, which
+tools/build.py prefers over its generated mock-ups, and the web-sized images
+in docs/screenshots/ that the README shows.
 """
 
 from PIL import Image
@@ -14,6 +15,7 @@ from imaging import crop_ratio
 
 SHOTS = ROOT / "art/screenshots"
 OUT = ROOT / "art/previews"
+DOCS = ROOT / "docs/screenshots"
 TARGETS = {
     "preview.png": ("desktop-light.png", (600, 337)),
     "fullscreenpreview.jpg": ("desktop-light.png", (1920, 1080)),
@@ -23,7 +25,36 @@ TARGETS = {
 }
 
 
+# README images: (screenshot, width). The hero is full width, the gallery
+# shows two per row.
+WEB = {
+    "desktop.jpg": ("desktop-light.png", 1600),
+    "desktop-night.jpg": ("desktop-dark.png", 960),
+    "launcher.jpg": ("kickoff.png", 960),
+    "dolphin.jpg": ("dolphin.png", 960),
+    "login.jpg": ("sddm.png", 960),
+    "splash.jpg": ("splash.png", 960),
+    "lockscreen.jpg": ("lockscreen.png", 960),
+    "clock.jpg": ("clock.png", 960),
+    "firefox.jpg": ("firefox.png", 960),
+}
+
+
+def web_images():
+    DOCS.mkdir(parents=True, exist_ok=True)
+    for name, (src, width) in WEB.items():
+        f = SHOTS / src
+        if not f.exists():
+            print(f"skip  {name}: no {f.relative_to(ROOT)}")
+            continue
+        img = Image.open(f).convert("RGB")
+        img = img.resize((width, round(img.height * width / img.width)), Image.LANCZOS)
+        img.save(DOCS / name, "JPEG", quality=84, optimize=True, progressive=True)
+        print(f"wrote {(DOCS / name).relative_to(ROOT)}")
+
+
 def main():
+    web_images()
     OUT.mkdir(parents=True, exist_ok=True)
     for name, (src, size) in TARGETS.items():
         f = SHOTS / src
