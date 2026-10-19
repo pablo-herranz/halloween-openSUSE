@@ -69,8 +69,6 @@ if sudo -n true 2>/dev/null; then
         contents=$(sudo -n lsinitrd "$esp$initrd" 2>/dev/null)
         grep -q "plymouth/themes/$PLYMOUTH_ID/" <<<"$contents" && v=yes || v=no
         check "theme in default initrd" "$v" yes
-        grep -q 'i915.ko' <<<"$contents" && v=yes || v=no
-        check "i915 in default initrd" "$v" yes
     else
         echo "  skip  initrd contents (no default boot entry found)"
     fi

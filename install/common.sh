@@ -1,6 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Shared settings and helpers for the install scripts. Sourced, not run.
+# shellcheck shell=bash
+# The settings below are used by the scripts that source this file.
+# shellcheck disable=SC2034
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 BUILD_DIR=$(cd "$HERE/.." && pwd)   # the deployed build/ tree: user/ root/ install/

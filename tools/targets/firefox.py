@@ -39,8 +39,9 @@ def header(p, night):
 
     def readable(x):
         col = band.getpixel((x, 0))
-        steps = [a / 50 for a in range(51)
-                 if contrast(p["cream"], [f + (v - f) * a / 50 for f, v in zip(frame, col)]) >= TITLE_CONTRAST]
+        def over_frame(a):
+            return [f + (v - f) * a for f, v in zip(frame, col, strict=True)]
+        steps = [a / 50 for a in range(51) if contrast(p["cream"], over_frame(a / 50)) >= TITLE_CONTRAST]
         return round(255 * min(DIM, max(steps, default=0)))
     limit = Image.new("L", (img.width, 1))
     limit.putdata([readable(x) for x in range(img.width)])

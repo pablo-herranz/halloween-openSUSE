@@ -12,6 +12,7 @@ STATE=/var/lib/halloween-openSUSE
 LOCAL=/usr/local/share
 SDDM_HOME=$(getent passwd sddm | cut -d: -f6)
 PLYMOUTH_THEME=bgrt
+# shellcheck source=/dev/null
 [ -f "$STATE/root-state.env" ] && . "$STATE/root-state.env"
 
 log "restoring the login screen"

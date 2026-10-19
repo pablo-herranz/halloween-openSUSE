@@ -11,8 +11,9 @@ session_env
 DATA=${XDG_DATA_HOME:-$HOME/.local/share}
 STATE=$DATA/halloween-openSUSE
 LNF=$DEFAULT_LNF STYLE=$DEFAULT_STYLE SCHEME=$DEFAULT_SCHEME ICONS=$DEFAULT_ICONS
-SPLASH=$DEFAULT_LNF LOCK_IMAGE= DESKTOP_IMAGES=
+SPLASH=$DEFAULT_LNF LOCK_IMAGE='' DESKTOP_IMAGES=''
 if [ -f "$STATE/user-state.env" ]; then
+    # shellcheck source=/dev/null
     . "$STATE/user-state.env"
 else
     warn "no saved settings found, restoring the openSUSE defaults"

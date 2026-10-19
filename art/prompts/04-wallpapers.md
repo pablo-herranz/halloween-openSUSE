@@ -59,7 +59,7 @@ Same prompt for both models, concept sheet as the reference:
 | E | Same composition as D, stars, glowing lanterns |
 | F | Same, but candle flames stick out of the pumpkin tops |
 
-**D** (dusk) and **E** (night) approved on 2026-10-18.
+Chosen: **D** (dusk) and **E** (night).
 
 ## 4K finals
 

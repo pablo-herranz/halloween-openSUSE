@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: 2026 Martin Pluskal <martin@pluskal.org>
+# SPDX-License-Identifier: CC0-1.0
+
+# Not a Python package: this only configures the tools that check tools/.
+# Runtime dependencies are in tools/requirements.txt, linters in
+# tools/requirements-dev.txt.
+[project]
+name = "halloween-openSUSE"
+version = "2026.10.0"
+requires-python = ">=3.11"
+
+[tool.ruff]
+src = ["tools"]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]

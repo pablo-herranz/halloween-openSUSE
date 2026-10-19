@@ -26,7 +26,7 @@ SPDX-License-Identifier = "GPL-2.0-or-later"
 [[annotations]]
 path = [
     "README.md", "CHANGELOG.md", ".gitignore", ".gitattributes", "REUSE.toml",
-    "tools/requirements.txt", "tools/upstream.toml", "plasma/sddm/**",
+    "tools/requirements.txt", "tools/requirements-dev.txt", "tools/upstream.toml", "plasma/sddm/**",
     "gnome/**", "xfce/**",
     "art/*.toml", "art/*.md", "art/prompts/**",
 ]

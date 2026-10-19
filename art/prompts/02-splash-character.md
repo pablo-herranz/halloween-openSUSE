@@ -1,6 +1,6 @@
 # 02 Splash and boot-splash chameleon
 
-The chameleon from the approved concept sheet, alone, for the Plasma splash
+The chameleon from the concept sheet, alone, for the Plasma splash
 (`hero.png`, 512 px) and the Plymouth watermark (300 px).
 
 | Model | Settings | References |
@@ -29,8 +29,8 @@ pumpkin on the left, tail on the right.
 
 ## Post-processing
 
-1. `picsart_remove_bg` (model `picsart-sod-v8-2`): clean edge, no
+1. Picsart background removal (model `picsart-sod-v8-2`): clean edge, no
    magenta left in visible pixels.
-2. `tools/cutout.py art/drafts/02-hero/hero-a-cut.png art/source/hero.png`:
+2. `tools/cutout.py <cut-out.png> art/source/hero.png`:
    drops matting specks (alpha ≤ 16), removes magenta spill from soft edges,
    trims to the subject with 16 px padding (760x855).

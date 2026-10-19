@@ -9,8 +9,8 @@ art/previews/, which tools/build.py prefers over its generated mock-ups.
 
 from PIL import Image
 
-from imaging import crop_ratio
 from common import ROOT
+from imaging import crop_ratio
 
 SHOTS = ROOT / "art/screenshots"
 OUT = ROOT / "art/previews"

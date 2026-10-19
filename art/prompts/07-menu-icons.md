@@ -1,7 +1,7 @@
 # 07 Start menu and app icons
 
-Asked for on 2026-10-19: every icon in the app launcher Halloween-themed,
-including Discover (the store). Icon names come from the Kickoff and kicker
+Goal: every icon in the app launcher Halloween-themed, including Discover
+(the store). Icon names come from the Kickoff and kicker
 binaries on Plasma 6.8 and the menu's `.desktop` and `.directory` files.
 
 Not redrawn: brand logos of other projects (Firefox, Qt D-Bus Viewer, the

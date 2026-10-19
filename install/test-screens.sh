@@ -6,8 +6,9 @@
 # next to this build. Run as the desktop user (also works over SSH).
 #
 # usage: test-screens.sh [desktop|splash|lock|sddm|widgets|dolphin|firefox|plymouth|all]
-#   plymouth needs sudo and the plymouth-x11-renderer package; it switches the
-#   default theme only while the test runs and never touches the initrd.
+#   plymouth needs sudo and Plymouth's X11 renderer (not packaged on openSUSE:
+#   there, test the boot splash by rebooting). It switches the default theme
+#   only while the test runs and never touches the initrd.
 #   firefox uses a throwaway profile; your own Firefox profiles are not touched.
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
@@ -15,7 +16,16 @@ session_env
 
 DATA=${XDG_DATA_HOME:-$HOME/.local/share}
 OUT=$BUILD_DIR/screenshots
-WL=${WAYLAND_SESSION_SOCKET:-wayland-1}   # the Plasma session's socket, not SSH's
+# The Plasma session's Wayland socket, not SSH's: the first one in the runtime dir
+wayland_socket() {
+    local s
+    for s in "$XDG_RUNTIME_DIR"/wayland-[0-9]*; do
+        case $s in *.lock) continue ;; esac
+        [ -S "$s" ] && { basename "$s"; return; }
+    done
+}
+WL=${WAYLAND_SESSION_SOCKET:-$(wayland_socket)}
+[ -n "$WL" ] || die "no Wayland socket in $XDG_RUNTIME_DIR: is a Plasma session running?"
 BASE_URL="file://$DATA/wallpapers/$WALLPAPER_ID"
 mkdir -p "$OUT"
 
@@ -23,7 +33,7 @@ mkdir -p "$OUT"
 # KDE's platform theme and draws them with its default light palette
 if pid=$(pgrep -u "$(id -u)" -x plasmashell | head -1); then
     while IFS= read -r -d '' var; do
-        case $var in XDG_CURRENT_DESKTOP=*|KDE_FULL_SESSION=*|KDE_SESSION_VERSION=*|DESKTOP_SESSION=*) export "$var" ;; esac
+        case $var in XDG_CURRENT_DESKTOP=*|KDE_FULL_SESSION=*|KDE_SESSION_VERSION=*|DESKTOP_SESSION=*) export "${var?}" ;; esac
     done < "/proc/$pid/environ"
 fi
 
@@ -36,7 +46,7 @@ set_wallpaper() {
     plasma_script "desktops().forEach(d => { d.currentConfigGroup = ['Wallpaper', 'org.kde.image', 'General']; d.writeConfig('Image', '$1'); d.reloadConfig(); })" >/dev/null
 }
 
-xauth_file() { ls "$XDG_RUNTIME_DIR"/xauth_* 2>/dev/null | head -1; }
+xauth_file() { find "$XDG_RUNTIME_DIR" -maxdepth 1 -name 'xauth_*' -print -quit 2>/dev/null; }
 
 desktop() {
     for variant in light dark; do
@@ -179,15 +189,21 @@ EOF
     shot firefox
 }
 
-plymouth() {
-    rpm -q plymouth-x11-renderer >/dev/null || die "install plymouth-x11-renderer first"
-    local display=${DISPLAY:-:0} xauth previous
+plymouth_test() {
+    local renderer
+    renderer=$(find /usr/lib64/plymouth/renderers /usr/lib/plymouth/renderers -name x11.so -print -quit 2>/dev/null)
+    [ -n "$renderer" ] || die "Plymouth's X11 renderer isn't installed (openSUSE doesn't package it): test the boot splash by rebooting instead"
+    local display=${DISPLAY:-:0} xauth previous log_file
     xauth=$(xauth_file)
-    # plymouthd shows the default theme: switch it only for this test
+    log_file=$(mktemp -t plymouth-test.XXXXXX)
+    # plymouthd shows the default theme: switch it only for this test, and put
+    # the old one back however the test ends ($previous is expanded right now,
+    # because the trap runs after this function's locals are gone)
     previous=$(plymouth-set-default-theme)
     sudo plymouth-set-default-theme "$PLYMOUTH_ID"
-    trap 'sudo plymouth quit 2>/dev/null; sudo plymouth-set-default-theme "$previous"' EXIT
-    sudo env DISPLAY="$display" XAUTHORITY="$xauth" plymouthd --debug --debug-file=/tmp/plymouth-test.log
+    # shellcheck disable=SC2064
+    trap "sudo plymouth quit 2>/dev/null; sudo plymouth-set-default-theme $(printf %q "$previous")" EXIT
+    sudo env DISPLAY="$display" XAUTHORITY="$xauth" plymouthd --debug --debug-file="$log_file"
     sudo plymouth show-splash
     sleep 4
     shot plymouth-boot
@@ -198,11 +214,12 @@ plymouth() {
     sleep 2
     shot plymouth-password
     sudo plymouth quit
-    log "debug log: /tmp/plymouth-test.log"
+    log "debug log: $log_file"
 }
 
 case ${1:-all} in
-    desktop|splash|lock|sddm|widgets|dolphin|firefox|plymouth) "$1" ;;
+    desktop|splash|lock|sddm|widgets|dolphin|firefox) "$1" ;;
+    plymouth) plymouth_test ;;
     all) desktop; splash; lock; sddm; widgets; dolphin; firefox ;;
     *) die "usage: $0 [desktop|splash|lock|sddm|widgets|dolphin|firefox|plymouth|all]" ;;
 esac

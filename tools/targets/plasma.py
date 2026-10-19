@@ -75,10 +75,16 @@ def build_look_and_feel(ctx):
     previews = out / "contents/previews"
     previews.mkdir(parents=True, exist_ok=True)
     shots = ROOT / "art/previews"
+    def desktop(size):
+        return panel_mock(crop_to(wallpapers, "dusk", 16 / 9), p).resize(size, Image.LANCZOS)
+
+    def lock(size):
+        return ImageEnhance.Brightness(crop_to(wallpapers, "night", 16 / 9)).enhance(0.8).resize(size, Image.LANCZOS)
+
     made = {
-        "preview.png": lambda: panel_mock(crop_to(wallpapers, "dusk", 16 / 9), p).resize((600, 337), Image.LANCZOS),
-        "fullscreenpreview.jpg": lambda: panel_mock(crop_to(wallpapers, "dusk", 16 / 9), p).resize((1920, 1080), Image.LANCZOS),
-        "lockscreen.png": lambda: ImageEnhance.Brightness(crop_to(wallpapers, "night", 16 / 9)).enhance(0.8).resize((600, 337), Image.LANCZOS),
+        "preview.png": lambda: desktop((600, 337)),
+        "fullscreenpreview.jpg": lambda: desktop((1920, 1080)),
+        "lockscreen.png": lambda: lock((600, 337)),
         "splash.png": lambda: splash_mock(p, bg, fit(ctx.hero, 512), fit(lit, 192)).resize((300, 169), Image.LANCZOS),
     }
     for name, make in made.items():
