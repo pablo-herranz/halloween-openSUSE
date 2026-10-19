@@ -24,3 +24,7 @@ enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
 
 [org.gnome.shell.extensions.user-theme]
 name='openSUSE-halloween'
+
+# IBus draws the keyboard layout (EN) in the panel itself, blue by default
+[org.freedesktop.ibus.panel]
+xkb-icon-rgba='@cream@'

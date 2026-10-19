@@ -120,6 +120,10 @@ Then pick it:
   to install. For the login screen (LightDM), an administrator can set
   `theme-name=openSUSE-halloween`, `icon-theme-name=openSUSE-halloween-adwaita`
   and a `background=` from the wallpaper in `/etc/lightdm/lightdm-gtk-greeter.conf`.
+- **Keyboard layout:** where IBus runs (it comes with GNOME), it draws the
+  layout, such as "EN", in the panel itself, blue unless told otherwise.
+  `make install-defaults` makes it the theme's cream; or, for one user,
+  `gsettings set org.freedesktop.ibus.panel xkb-icon-rgba '#F2E9E1'`.
 - **Boot splash:** note the current theme (`plymouth-set-default-theme`), then
   switch and rebuild the initrds:
 

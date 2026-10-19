@@ -13,8 +13,9 @@ Firefox theme:
 `make install-defaults` adds the optional defaults from [`defaults/`](defaults/):
 
 - `30_openSUSE-halloween.gschema.override`: GTK and icon theme, dark style,
-  orange accent, wallpaper and lock screen, and the Shell theme with the User
-  Themes extension enabled. It sorts after openSUSE's
+  orange accent, wallpaper and lock screen, the Shell theme with the User
+  Themes extension enabled, and IBus's keyboard layout indicator in cream
+  (on every desktop where IBus runs; blue otherwise). It sorts after openSUSE's
   `20_openSUSE-branding` override, and only applies to settings a user hasn't
   changed. Packages run `glib-compile-schemas` through a file trigger.
 - a `gdm` dconf profile and `gdm.d/30-openSUSE-halloween`: the login screen

@@ -327,6 +327,14 @@ def icon_dirs(icons):
     return dirs
 
 
+# Icon names the desktops show in plain sight that the theme must draw, one
+# colour (they are actions and panel buttons), with where each is asked for
+ONE_COLOUR_SEEN = {
+    "go-home": "Thunar's side pane, Home (thunar-shortcuts-model.c); Dolphin's Home button",
+    "org.xfce.panel.showdesktop": "the Xfce panel's show desktop button (xfce4-panel)",
+}
+
+
 def check_icons():
     from targets.icons import ADWAITA_ID
     adwaita = USER / "icons" / ADWAITA_ID
@@ -373,6 +381,12 @@ def check_icons():
                 fail(f"icon {rel}: fill=currentColor on a <{el.tag.split('}')[-1]}> without class ColorScheme-Text")
                 break
         n += 1
+    for name, where in ONE_COLOUR_SEEN.items():
+        found = [f for f in icons.glob(f"*/*/{name}.svg")]
+        if not found:
+            fail(f"icon {name} is missing: {where} shows a stock icon")
+        elif "ColorScheme-Text" not in found[0].read_text():
+            fail(f"icon {name} should be one colour: {where}")
     ok(f"icons: {n} SVGs in the {len(dirs)} directories index.theme lists")
 
 
@@ -616,6 +630,15 @@ def check_gnome():
             cp.read_string(f.read_text())
         except configparser.Error as e:
             fail(f"{f.relative_to(BUILD)}: {e}")
+    # IBus draws the keyboard layout ("EN") in the panel itself, in this colour;
+    # its default is blue
+    cp = configparser.ConfigParser(interpolation=None)
+    cp.read_string((BUILD / "defaults/glib-2.0/schemas/30_openSUSE-halloween.gschema.override").read_text())
+    ibus = cp.get("org.freedesktop.ibus.panel", "xkb-icon-rgba", fallback="").strip("'")
+    if not re.fullmatch(r"#[0-9A-Fa-f]{6}", ibus):
+        fail("gnome defaults don't set IBus's layout colour (org.freedesktop.ibus.panel xkb-icon-rgba)")
+    elif contrast(rgb(ibus), rgb(load_palette()["night"])) < 4.5:
+        fail(f"IBus's layout colour {ibus} is below 4.5:1 on the panel")
     ok("gnome: shell theme, wallpaper entry, gsettings and GDM defaults")
 
 
