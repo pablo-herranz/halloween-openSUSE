@@ -34,6 +34,11 @@ The first release, 2026.10.0, is being prepared.
   GNOME and Xfce, including GNOME's and Xfce's own file manager, terminal,
   settings, editor, image viewer, software, system monitor, archive,
   scanner, screenshot, passwords and characters apps
+- Icons for the apps GNOME and Xfce ship by default and their KDE
+  counterparts (calculator, clocks, contacts, maps, mail, music, videos,
+  notes, logs and more), YaST, printers, phones, input devices, headphones,
+  displays and computers, each with one seasonal touch; settings dialogs show
+  their glyph carved into a pumpkin, so they tell apart at 16 px
 - Firefox theme, with a header that stays sharp on HiDPI screens
 - `make install`, which installs the theme like a package: it copies the files
   into the system paths and changes no settings; `make install-defaults` adds
@@ -43,7 +48,12 @@ The first release, 2026.10.0, is being prepared.
   (`tools/dev/vm/`)
 - Build tools that make every size and format from the art masters, with
   checks for contrast, sizes, Plasma compatibility and REUSE compliance
-- Contributor documentation, AGENTS.md and continuous integration
+- Contributor documentation, AGENTS.md and continuous integration, with a
+  design review checklist (CONTRIBUTING.md) whose measurable rules are checks:
+  WCAG contrast for every text, focus, selection and on/off colour on Plasma,
+  GTK, Firefox and the login screen's labels; one-colour icons that Qt can
+  recolour; no GTK-only colour functions in the GNOME Shell stylesheet; and
+  no unthemed colours in the boot splash's prompt
 - Wallpapers for every common screen shape (16:9 to 5K, 16:10 to 4K, 3:2,
   21:9, 32:9, 4:3, 5:4 and portrait), cropped around the chameleon, and one
   16:10 picture per variant that GNOME and Xfce zoom to any screen

@@ -136,14 +136,18 @@ describe the newer two. To add another:
 ## Adding icons
 
 Folder icons are the master folder (`art/source/vectors/folder.svg`) with an
-emblem glyph in place of its leaf; other icons are cleaned-up masters. Add the
-SVG master to `art/source/vectors/` and map it to icon names in
-`tools/vectors.py` (`FOLDER_EMBLEMS`, `APPS`, `SYMBOLIC`, `ALIASES`). Symbolic
-icons are written in KDE's format so they follow the colour scheme. Check the
-result with `make icon-preview`.
+emblem glyph in place of its leaf, file types the page master with one on its
+sheet, settings icons a glyph carved into the pumpkin master; other icons are
+cleaned-up masters, their colours held to the palette by `normalise()`. Add
+the SVG master to `art/source/vectors/` and map it to icon names in
+`tools/vectors.py` (`FOLDER_EMBLEMS`, `APPS`, `DEVICES`, `SETTINGS`,
+`MIME_EMBLEMS`, `SYMBOLIC`, `ALIASES`). Symbolic icons are written in KDE's
+format so they follow the colour scheme. Check the result with
+`make icon-preview` and the design review in CONTRIBUTING.md.
 
 ## Changing colours
 
 Edit `art/palette.toml` and run `make check`: every generated file picks up
 the change, and the contrast checks tell you if a pair of colours became too
-close.
+close. The Plasma style has no colour file of its own: it takes the colour
+scheme's, so a scheme the user picks (high contrast, say) still applies.
