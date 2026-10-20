@@ -6,6 +6,8 @@ calendar-based: `YEAR.MONTH.PATCH`, the month without a leading zero.
 
 ## [Unreleased]
 
+## [2026.10.4] - 2026-10-20
+
 ### Fixed
 
 - Plasma showed our file-type pages for Breeze icons whose names only start
@@ -139,7 +141,8 @@ The first release.
   each desktop shows on common screens, and the boot splash's layout from
   720p to 4K
 
-[Unreleased]: https://github.com/plusky/halloween-openSUSE/compare/v2026.10.3...HEAD
+[Unreleased]: https://github.com/plusky/halloween-openSUSE/compare/v2026.10.4...HEAD
+[2026.10.4]: https://github.com/plusky/halloween-openSUSE/compare/v2026.10.3...v2026.10.4
 [2026.10.3]: https://github.com/plusky/halloween-openSUSE/compare/v2026.10.2...v2026.10.3
 [2026.10.2]: https://github.com/plusky/halloween-openSUSE/compare/v2026.10.1...v2026.10.2
 [2026.10.1]: https://github.com/plusky/halloween-openSUSE/compare/v2026.10.0...v2026.10.1
