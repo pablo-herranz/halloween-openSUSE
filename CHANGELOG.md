@@ -6,6 +6,19 @@ calendar-based: `YEAR.MONTH.PATCH`, the month without a leading zero.
 
 ## [Unreleased]
 
+### Added
+
+- A Sway edition, contributed by Jan Baier: window colours, borders and gaps
+  for Sway, a Waybar stylesheet and a SwayNotificationCenter theme, installed
+  in `/usr/share/openSUSE-halloween/`; the README says how to pick them
+- One-colour icons for the bell (`notification`, `bell`) and for
+  SwayNotificationCenter's empty list (`preferences-system-notifications`)
+
+### Fixed
+
+- Plasma's battery applet showed our sleep icon whether sleep was blocked or
+  not; those two states, like the notification icon's, keep Breeze's icons
+
 ## [2026.10.2] - 2026-10-19
 
 ### Added

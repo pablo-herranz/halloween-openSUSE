@@ -20,6 +20,10 @@ MEDIA = {"text", "application", "image", "audio", "inode", "video", "message", "
          "x-epoc"}
 # Shortened names whose icon is ours on purpose: a variant of the same thing
 KEEP_SUFFIXES = ("-rtl", "-update", "-large", "-template", "-master", "-compressed")
+# Words that add a state to a name (the tray's notification-active and
+# notification-empty, the battery applet's system-suspend-inhibited): one glyph
+# of ours can't show which state it is, so those keep Breeze's
+STATES = {"active", "inactive", "disabled", "empty", "inhibited", "uninhibited", "progress"}
 
 
 def breeze():
@@ -64,6 +68,8 @@ def wanted(name, hit, one_colour):
         return True                                  # file types: our generic page
     if name.startswith("folder") and not name.endswith("-symbolic"):
         return True                                  # folder variants: our folder
+    if STATES & set(name.removesuffix("-symbolic")[len(hit.removesuffix("-symbolic")):].split("-")):
+        return False                                 # a state ours can't show
     if hit in one_colour:
         return True                                  # ours is one colour already
     return any(name.endswith(s) or s + "-" in name for s in KEEP_SUFFIXES)

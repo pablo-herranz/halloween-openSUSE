@@ -255,8 +255,8 @@ SYMBOLIC = {
     "glyph-lock": ("actions", ("system-lock-screen", "system-lock-screen-symbolic")),
     "glyph-logout": ("actions", ("system-log-out", "system-log-out-symbolic", "xfsm-logout")),
     "glyph-ghosts": ("actions", ("system-switch-user", "system-switch-user-symbolic")),
-    "glyph-bell": ("actions", ("notifications-disabled-symbolic", "notifications-disabled",
-                                  "notification-symbolic", "notification", "bell-symbolic", "bell")),
+    # Not notifications-disabled: do not disturb needs the crossed bell (Plasma's tray, GNOME)
+    "glyph-bell": ("actions", ("notification-symbolic", "notification", "bell-symbolic", "bell")),
 }
 SYMBOLIC_SIZE = 16
 

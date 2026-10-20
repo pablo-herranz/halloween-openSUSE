@@ -83,7 +83,6 @@ sleep 4
 
 log "Sway: the themed bar, and the notification centre"
 "$V" ssh "mkdir -p /home/geeko/.config/sway /home/geeko/.config/waybar /home/geeko/.config/swaync
-          printf 'include /usr/share/openSUSE-halloween/sway/theme\noutput * bg /usr/share/backgrounds/openSUSEhalloween/night.jpg fill\n' > /home/geeko/.config/sway/config
           cp /usr/share/openSUSE-halloween/waybar/style.css /home/geeko/.config/waybar/style.css
           cp /usr/share/openSUSE-halloween/swaync/style.css /home/geeko/.config/swaync/style.css"
 "$V" desktop sway
