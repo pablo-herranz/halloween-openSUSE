@@ -6,7 +6,7 @@
 # tools/requirements-dev.txt.
 [project]
 name = "halloween-openSUSE"
-version = "2026.10.2"
+version = "2026.10.3"
 requires-python = ">=3.11"
 
 [tool.ruff]
