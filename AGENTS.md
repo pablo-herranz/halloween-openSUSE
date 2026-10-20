@@ -10,8 +10,6 @@ otherwise get wrong.
 - **Public content only.** No host names, IP addresses, user names, home
   paths, credentials or account balances of any service, in code, docs,
   commits or the dev helpers. Write `user@testbox`.
-- **No AI attribution in commits**: no `Assisted-by:` or `Co-Authored-By:`
-  trailers naming an AI. Name the tools in the pull request description.
 - **Verify against upstream, not memory.** Keys, selectors, file locations and
   behaviour of KDE, GNOME, Xfce, Plymouth and Firefox come from their source
   or specification (pin it in `tools/upstream.toml`), and the check that relies
@@ -49,8 +47,8 @@ run. CI runs the same checks on every pull request.
 
 ## Project
 
-A cosy autumn Halloween theme for openSUSE Tumbleweed with KDE Plasma, GNOME
-and Xfce. Python in `tools/` builds every installable file into `build/`, and
+A cosy autumn Halloween theme for openSUSE Tumbleweed with KDE Plasma, GNOME,
+Xfce and Sway. Python in `tools/` builds every installable file into `build/`, and
 `tools/install.py` installs them; `docs/architecture.md` shows how it fits
 together.
 
@@ -58,15 +56,15 @@ together.
 
 - Colours: only in `art/palette.toml`, by name. Generated files take them from
   the palette, never as hard-coded hex values.
-- Hand-written sources: `shared/` for any desktop, `plasma/`, `gnome/` and
-  `xfce/` for one. The GTK 3 theme GNOME and Xfce share is built from
-  `shared/gtk/`.
+- Hand-written sources: `shared/` for any desktop, `plasma/`, `gnome/`,
+  `xfce/` and `sway/` for one. The GTK 3 theme GNOME, Xfce and Sway share is
+  built from `shared/gtk/`.
 - A new build target: copy `tools/targets/sddm.py`, set `DESKTOP`, and add it
   to `TARGETS` in `tools/targets/__init__.py`.
 - New icons: an SVG master in `art/source/vectors/`, mapped to icon names in
   `tools/vectors.py`.
-- Generated art: record how it was made in `art/prompts/`, in the format of
-  the latest record there.
+- Generated art: record the model, its settings and the full prompts in
+  `art/prompts/`, in the format of the latest record there.
 - Install paths: only in the table in `tools/install.py`.
 - `build/` is output. `art/source/` holds the masters, in Git LFS.
 
@@ -108,8 +106,8 @@ request what you fixed and what you declined, with the reason.
   wallpaper-based images with `crop_to()` (`tools/imaging.py`), and keep
   `check_resolutions` and `check_plymouth_layout` passing rather than relaxing
   them.
-- Verify a change in the test VM (`tools/dev/vm/`) on all three desktops,
-  KDE Plasma included, never by applying the theme to a real machine's
+- Verify a change in the test VM (`tools/dev/vm/`) on every desktop it
+  touches, KDE Plasma included, never by applying the theme to a real machine's
   desktop (CONTRIBUTING.md, "Trying it in the test VM").
 - Retake the README gallery with `make gallery` after a change that shows (it
   runs the test VM, so it is one of the `TARGET=` targets: ask first).
@@ -133,9 +131,8 @@ request what you fixed and what you declined, with the reason.
 
 ## Commits and pull requests
 
-An imperative subject line, and a body that says what changed and why. Name
-the AI tools you used in the pull request description, and fill in its
-checklist.
+An imperative subject line, and a body that says what changed and why. Fill
+in the pull request's checklist.
 
 ## When unsure
 
