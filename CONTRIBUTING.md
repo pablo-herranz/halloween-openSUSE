@@ -273,12 +273,10 @@ gh attestation verify halloween-openSUSE-2026.10.0.tar.gz --repo plusky/hallowee
 
 ## AI-assisted contributions
 
-AI tools are welcome for code and art, as long as you say so:
-
-- Mention the tools in the pull request.
-- Don't credit them in commits: no `Assisted-by:` or `Co-Authored-By:`
-  trailers naming an AI tool.
-- You are responsible for the result: review it, test it, and make sure you
-  have the right to contribute it under the project's licences.
+AI tools are welcome for code and art. You are responsible for the result:
+review it, test it, and make sure you have the right to contribute it under the
+project's licences. Generated art needs its provenance recorded in
+`art/prompts/`: the model, its settings and the full prompts (see
+[Artwork](#artwork)).
 
 AI coding agents should follow [AGENTS.md](AGENTS.md).
