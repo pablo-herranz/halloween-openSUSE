@@ -16,7 +16,7 @@
         "Id": "openSUSE-halloween",
         "License": "LGPL-2.0-or-later",
         "Name": "openSUSE Halloween",
-        "Version": "2026.10.2",
+        "Version": "2026.10.3",
         "Website": "https://github.com/plusky/halloween-openSUSE"
     },
     "X-Plasma-API": "5.0"
