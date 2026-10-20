@@ -12,7 +12,7 @@
         "Id": "org.openSUSE.halloween.desktop",
         "License": "GPL-2.0-or-later",
         "Name": "openSUSE Halloween",
-        "Version": "2026.10.3",
+        "Version": "2026.10.4",
         "Website": "https://github.com/plusky/halloween-openSUSE"
     },
     "Keywords": "Desktop;Workspace;Appearance;Look and Feel;Halloween;Autumn;openSUSE;",
