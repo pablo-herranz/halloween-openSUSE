@@ -176,10 +176,10 @@ install_tarball() {
           && for t in /usr/share/icons/openSUSE-halloween*; do sudo gtk-update-icon-cache -q -f \$t; done"
 }
 
-run() {  # in the session, with its environment
-    vssh "pid=\$(pgrep -u geeko -x plasmashell || pgrep -u geeko -x gnome-shell || pgrep -u geeko -x xfce4-session) || { echo 'no desktop session' >&2; exit 1; }
+run() {  # in the session, with its environment (on Sway, Waybar's: sway's own has no WAYLAND_DISPLAY)
+    vssh "pid=\$(pgrep -u geeko -x plasmashell || pgrep -u geeko -x gnome-shell || pgrep -u geeko -x xfce4-session || pgrep -u geeko -x waybar) || { echo 'no desktop session' >&2; exit 1; }
           while IFS= read -r -d '' v; do
-              case \$v in XDG_CURRENT_DESKTOP=*|WAYLAND_DISPLAY=*|DISPLAY=*|XAUTHORITY=*|DBUS_SESSION_BUS_ADDRESS=*|XDG_SESSION_TYPE=*|XDG_RUNTIME_DIR=*) export \"\$v\" ;; esac
+              case \$v in XDG_CURRENT_DESKTOP=*|WAYLAND_DISPLAY=*|DISPLAY=*|XAUTHORITY=*|DBUS_SESSION_BUS_ADDRESS=*|XDG_SESSION_TYPE=*|XDG_RUNTIME_DIR=*|SWAYSOCK=*) export \"\$v\" ;; esac
           done < /proc/\$(echo \$pid | cut -d' ' -f1)/environ
           $*"
 }

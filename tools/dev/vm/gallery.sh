@@ -91,16 +91,15 @@ log "Sway: the themed bar, and the notification centre"
           notify-send -i preferences-desktop-locale 'Happy Halloween' 'The openSUSE Halloween theme is installed.'"
 sleep 3
 # the main shot shows the bar and the floating notification
-"$V" ssh "export XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-1; grim /tmp/sway.png" >/dev/null 2>&1 || true
+"$V" run "grim /tmp/sway.png"
 # …then the control centre, empty with its carved-gear icon
 "$V" run "swaync-client -C -sw
           sleep 1
           swaync-client -cp -sw
           swaync-client -op -sw"
 sleep 2
-"$V" ssh "export XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-1; grim /tmp/swaync.png" >/dev/null 2>&1 || true
-scp -q -F "$VM/ssh_config" 'vm:/tmp/sway.png' "$OUT/sway.png" 2>/dev/null || true
-scp -q -F "$VM/ssh_config" 'vm:/tmp/swaync.png' "$OUT/swaync.png" 2>/dev/null || true
+"$V" run "grim /tmp/swaync.png"
+scp -q -F "$VM/ssh_config" 'vm:/tmp/sway.png' 'vm:/tmp/swaync.png' "$OUT/"
 
 "$V" desktop gnome >/dev/null   # leave the VM where vm.sh create leaves it
 ls -1 "$OUT"
