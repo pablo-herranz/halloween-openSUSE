@@ -6,6 +6,15 @@ calendar-based: `YEAR.MONTH.PATCH`, the month without a leading zero.
 
 ## [Unreleased]
 
+### Fixed
+
+- Plasma showed our file-type pages for Breeze icons whose names only start
+  like a file type's: the volume icon in the tray (`audio-volume-*`),
+  microphones, speakers and sound cards, `image-missing`, and text and image
+  tools; and the brightness applet's `video-display-brightness` showed our
+  plain monitor. Only Breeze's own file-type icons take our pages now: 99
+  more names keep Breeze's, 548 in all.
+
 ## [2026.10.3] - 2026-10-20
 
 ### Added
