@@ -151,7 +151,8 @@ desktop() {
           printf '[Autologin]\nUser=geeko\nSession=%s\n' \$sname | sudo tee /etc/sddm.conf.d/90-halloween-vm.conf >/dev/null
           if [ \"$session\" = sway ]; then
             sudo -u geeko mkdir -p /home/geeko/.config/sway
-            printf 'include /usr/share/openSUSE-halloween/sway/theme\n' | sudo -u geeko tee /home/geeko/.config/sway/config >/dev/null
+            printf 'include /usr/share/openSUSE-halloween/sway/theme\noutput * bg /usr/share/backgrounds/openSUSEhalloween/night.jpg fill\nbar {\n    swaybar_command waybar\n}\n' \\
+                | sudo -u geeko tee /home/geeko/.config/sway/config >/dev/null
           fi
           sudo systemctl disable sddm.service gdm.service lightdm.service 2>/dev/null
           sudo systemctl enable --force $dm.service 2>/dev/null

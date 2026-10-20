@@ -4,7 +4,7 @@
 # openSUSE Halloween theme for sway. Include from your ~/.config/sway/config.
 # See README.md for the include path.
 #
-# This file only defines theme colours and bar settings. Keybindings, output
+# This file only defines theme colours, borders and gaps. The bar, keybindings, output
 # setup, window rules and other preferences belong in your main config.
 
 # Colours from the Halloween palette
@@ -45,25 +45,5 @@ default_floating_border pixel 2
 gaps inner 8
 gaps outer 4
 
-# Bar: use waybar (installed separately)
-bar {
-    swaybar_command waybar
-    position top
-    height 32
-    colors {
-        background $night
-        statusline $cream
-        separator  $border
-        focused_background $header
-        focused_statusline $cream
-        focused_separator $pumpkin
-        focused_workspace $pumpkin $pumpkin $cream
-        active_workspace $ember $ember $white
-        inactive_workspace $night $night $inactive
-        urgent_workspace $cranberry $cranberry_dark $white
-        binding_mode $plum $plum $cream
-    }
-    workspace_buttons yes
-    binding_mode_indicator yes
-    verbose yes
-}
+# No bar here: your config's bar stays the only one (a second bar block would
+# start a second Waybar). Waybar takes its colours from waybar/style.css.
