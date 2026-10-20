@@ -101,8 +101,8 @@ sudo zypper install halloween-openSUSE
 piece comes along by itself when the system has what it is for (its
 Supplements): the Plasma theme and icons with Plasma, the login theme with
 openSUSE's SDDM theme, the GTK, GNOME Shell and Xfce themes and their icons
-with GNOME or Xfce, the boot splash with Plymouth, the Firefox theme with
-Firefox. Where recommended packages are switched off (some minimal images
+with GNOME, Xfce or Sway, the Sway, Waybar and swaync themes with Sway, the
+boot splash with Plymouth, the Firefox theme with Firefox. Where recommended packages are switched off (some minimal images
 set `solver.onlyRequires`), use `zypper install --recommends`. Installing
 only puts files in place; the SDDM and GNOME defaults packages make the
 theme the default there, and your own choices still win.
@@ -111,12 +111,13 @@ theme the default there, and your own choices still win.
 |---|---|
 | `halloween-openSUSE-wallpapers` | wallpapers, GNOME backgrounds |
 | `halloween-openSUSE-icon-theme` | icon theme over Breeze (Plasma) |
-| `halloween-openSUSE-adwaita-icon-theme` | the same icons over Adwaita (GNOME, Xfce) |
+| `halloween-openSUSE-adwaita-icon-theme` | the same icons over Adwaita (GNOME, Xfce, Sway) |
 | `halloween-openSUSE-plasma` | colour scheme, Plasma style, global theme with splash |
 | `halloween-openSUSE-sddm-theme`, `-sddm-defaults` | login theme, and it as SDDM's default |
 | `halloween-openSUSE-plymouth-theme` | boot splash (choosing it stays with you) |
 | `halloween-openSUSE-gtk3-theme` | GTK 3, GNOME Shell, xfwm4 and notification themes |
 | `halloween-openSUSE-gnome-defaults` | GNOME defaults: accent, dark style, wallpaper, Shell theme name |
+| `halloween-openSUSE-sway-theme` | Sway colours, borders and gaps, Waybar and swaync stylesheets |
 | `halloween-openSUSE-firefox-theme` | the Firefox theme |
 
 ### From source
