@@ -62,10 +62,12 @@ def first_hit(name, ours):
     return next((n for n in chain(name) if n in ours), None)
 
 
-def wanted(name, hit, one_colour):
-    """Is it right that Breeze's `name` shows our `hit`?"""
-    if name.split("-", 1)[0] in MEDIA or hit.endswith("-x-generic"):
-        return True                                  # file types: our generic page
+def wanted(name, path, hit, one_colour):
+    """Is it right that Breeze's `name` (its file at `path`) shows our `hit`?"""
+    if path.startswith("mimetypes/"):
+        return True                                  # file types: ours, or our generic page
+    if hit.endswith("-x-generic"):
+        return False                                 # a volume icon or a text tool is no file type
     if name.startswith("folder") and not name.endswith("-symbolic"):
         return True                                  # folder variants: our folder
     if STATES & set(name.removesuffix("-symbolic")[len(hit.removesuffix("-symbolic")):].split("-")):
@@ -84,6 +86,6 @@ def plan(ours, one_colour):
         if name in ours:
             continue
         hit = first_hit(name, ours)
-        if hit and not wanted(name, hit, one_colour):
+        if hit and not wanted(name, path, hit, one_colour):
             links[name] = path
     return links

@@ -557,11 +557,12 @@ def check_kde_lookup():
     breeze = kde_lookup.breeze()
     wrong = sorted((name, hit) for name in breeze if name not in ours
                    for hit in [kde_lookup.first_hit(name, ours)]
-                   if hit and not kde_lookup.wanted(name, hit, one_colour))
+                   if hit and not kde_lookup.wanted(name, breeze[name], hit, one_colour))
     for name, hit in wrong[:5]:
         fail(f"icons: Plasma shows our {hit} for Breeze's {name}")
     if wrong:
         fail(f"icons: {len(wrong)} Breeze icons in all would show ours; link them to Breeze's (kde_lookup.plan)")
+        return
     links = [f for f in files if f.is_symlink()]
     pinned = {"../../breeze-dark/" + path for path in breeze.values()}
     for f in links:
